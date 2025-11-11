@@ -1,0 +1,111 @@
+{
+  "home": {
+    "welcomeMessage": "Welcome to Education Empower Sri Lanka",
+    "description": "Education Empower Sri Lanka is a national initiative established to enhance equal access to quality education and empower learners of all ages across the island. This platform aims to serve students, educators, and institutions through digital resources, modern learning tools, and centralized access to academic support."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Have questions or feedback? Reach out to us — we're here to support your learning journey.",
+    "breadcrumb": "Home > Contact Us",
+    "talkToUs": "Talk to Us",
+    "subText": "Your suggestions help us grow stronger",
+    "address": "Address",
+    "email": "Email",
+    "phone": "Phone",
+    "mapTitle": "Find Us"
+  },
+  "weather": {
+    "title": "Sri Lanka Weather",
+    "loading": "Loading weather data...",
+    "error": "Could not load weather information. Please try again later."
+  },
+ "ServiceSection": {
+  "sectionTitle": "🔹 Our Services",
+  "sectionDescription": "We provide a variety of services to support learners of all ages and backgrounds.",
+  "services": [
+    {
+      "title": "Help finding classes",
+      "description": "Get matched with the right educational programs or classes tailored to your goals.",
+      "icon": "📚"
+    },
+    {
+      "title": "Job opportunities",
+      "description": "Discover employment and internship options related to your skills and interests.",
+      "icon": "💼"
+    },
+    {
+      "title": "Providing resources",
+      "description": "Access curated learning materials, tools, and platforms to support your education.",
+      "icon": "🛠️"
+    },
+    {
+      "title": "Counseling and guidance",
+      "description": "Receive academic and career counseling to plan your educational journey with confidence.",
+      "icon": "🧭"
+    }
+  ],
+  "noServices": "No services available at the moment."
+}
+
+,
+ "vision": {
+  "title": "Our Vision",
+  "text": "To be Sri Lanka’s leading education center, nurturing minds, fostering innovation, and empowering lifelong learning."
+},
+"mission": {
+  "title": "Our Mission",
+  "goalAccess": "Ensure quality education access for all",
+  "empowerTeachers": "Empower teachers with modern tools",
+  "holisticGrowth": "Support holistic student growth",
+  "scaleImpact": "Scale impact through technology",
+  "buildAwareness": "Build awareness in local communities",
+  "continuousLearning": "Foster a culture of continuous learning"
+}
+,"featureCards": {
+  "studentsValue": "4.5M+",
+  "studentsLabel": "Targeted Students Nationwide",
+  "teachersValue": "230K+",
+  "teachersLabel": "Teachers We Aim to Support",
+  "parentsValue": "3M+",
+  "parentsLabel": "Engaged Parents in Our Vision",
+  "schoolsValue": "10,000+",
+  "schoolsLabel": "Schools Across Sri Lanka — Our Goal",
+  "educationHighlight": "On a Mission to Empower Sri Lankan Education"
+}
+
+,
+  "marketOperations": {
+    "title": "How the Platform Operates",
+    "para1": "The Education Empower Sri Lanka platform collaborates with government bodies, local schools, and NGOs to deliver trusted academic content and facilitate training for both teachers and students.",
+    "para2": "Our virtual classrooms, learning repositories, and exam preparation tools are made accessible through a centralized system with minimal cost to the end user.",
+    "para3": "This initiative minimizes resource gaps and provides an efficient, transparent model for nationwide educational service delivery.",
+    "para4": "We also support offline access in remote regions through partner learning hubs and community education points."
+  },
+  "dailyPrices": {
+    "title": "Daily Educational Highlights",
+    "searchPlaceholder": "🔍︎ Search Topics",
+    "downloadPdf": "Download as PDF",
+    "noDatal1": "Daily highlights are being updated.",
+    "noDatal2": "Please check back shortly for the latest content."
+  },
+  "ui": {
+    "title": "Today’s Learning Highlights",
+    "center": "Education Empower Sri Lanka - National Portal",
+    "tel": "Tel: 011-2345678",
+    "dateLabel": "Date",
+    "emailLabel": "Email",
+    "allTypes": "All Categories",
+    "inquiry": "For Inquiries:",
+    "manager": "Coordinator, National Education Support Center",
+    "contact": "Tel: 011-2345678 / 011-8765432 | Email: support@eduempower.lk",
+    "tableHeaders": {
+      "number": "#",
+      "item": "Topic",
+      "minPrice": "Min Duration",
+      "maxPrice": "Max Duration"
+    },
+    "noPrices": "No highlights available for today.",
+    "popupBlocked": "Popup blocked! Please enable popups to print.",
+    "uncategorized": "Uncategorized"
+  }
+}

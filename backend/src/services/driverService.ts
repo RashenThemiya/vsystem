@@ -1,0 +1,160 @@
+// services/driverService.ts
+import { prisma } from "../config/prismaClient.js";
+
+interface DriverInput {
+  name: string;
+  phone_number: string;
+  driver_charges: number;
+  nic: string;
+  image?: string;
+  age: number;
+  license_number: string;
+  license_expiry_date: string;
+}
+
+/**
+ * ✅ Helper: Convert base64 → Uint8Array<ArrayBuffer>
+ */
+const toPrismaBytes = (b64?: string): Uint8Array<ArrayBuffer> | null => {
+  if (!b64) return null;
+  const buffer = Buffer.from(b64, "base64");
+
+  // Force cast to ArrayBuffer to match Prisma type
+  const arrayBuffer = buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength
+  ) as ArrayBuffer;
+
+  return new Uint8Array(arrayBuffer);
+};
+
+/**
+ * ✅ Helper: Convert Prisma Bytes → Base64 string
+ */
+const fromPrismaBytes = (bytes?: Uint8Array | null): string | null => {
+  if (!bytes) return null;
+  return `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`;
+};
+
+/**
+ * ✅ Create new driver
+ */
+export const createDriverService = async (data: DriverInput) => {
+  const {
+    name,
+    phone_number,
+    driver_charges,
+    nic,
+    image,
+    age,
+    license_number,
+    license_expiry_date,
+  } = data;
+
+  if (!name || !phone_number || !driver_charges || !nic || !age || !license_number || !license_expiry_date) {
+    throw new Error("Missing required fields");
+  }
+
+  const existing = await prisma.driver.findUnique({ where: { nic } });
+  if (existing) throw new Error("Driver with this NIC already exists");
+
+  const newDriver = await prisma.driver.create({
+    data: {
+      name,
+      phone_number,
+      driver_charges,
+      nic,
+      age,
+      license_number,
+      license_expiry_date: new Date(license_expiry_date),
+      image: image ? toPrismaBytes(image.split(",")[1]) : null,
+    },
+  });
+
+  return {
+    ...newDriver,
+    image: fromPrismaBytes(newDriver.image),
+  };
+};
+
+/**
+ * ✅ Get all drivers (with base64 images)
+ */
+export const getAllDriversService = async () => {
+  const drivers = await prisma.driver.findMany({
+    include: {
+      trips: true,
+      bill_uploads: true,
+    },
+  });
+
+  return drivers.map((d) => ({
+    ...d,
+    image: fromPrismaBytes(d.image),
+  }));
+};
+
+/**
+ * ✅ Get driver by ID
+ */
+export const getDriverByIdService = async (id: number) => {
+  const driver = await prisma.driver.findUnique({
+    where: { driver_id: id },
+    include: {
+      trips: true,
+      bill_uploads: true,
+    },
+  });
+
+  if (!driver) throw new Error("Driver not found");
+
+  return {
+    ...driver,
+    image: fromPrismaBytes(driver.image),
+  };
+};
+
+/**
+ * ✅ Update driver
+ */
+export const updateDriverService = async (id: number, data: Partial<DriverInput>) => {
+  const existing = await prisma.driver.findUnique({
+    where: { driver_id: id },
+  });
+
+  if (!existing) throw new Error("Driver not found");
+
+  const updateData: any = {
+    name: data.name ?? existing.name,
+    phone_number: data.phone_number ?? existing.phone_number,
+    driver_charges: data.driver_charges ?? existing.driver_charges,
+    nic: data.nic ?? existing.nic,
+    age: data.age ?? existing.age,
+    license_number: data.license_number ?? existing.license_number,
+    license_expiry_date: data.license_expiry_date
+      ? new Date(data.license_expiry_date)
+      : existing.license_expiry_date,
+    image:
+      data.image && data.image.startsWith("data:image")
+        ? toPrismaBytes(data.image.split(",")[1])
+        : undefined,
+  };
+
+  const updated = await prisma.driver.update({
+    where: { driver_id: id },
+    data: updateData,
+  });
+
+  return {
+    ...updated,
+    image: fromPrismaBytes(updated.image),
+  };
+};
+
+/**
+ * ✅ Delete driver
+ */
+export const deleteDriverService = async (id: number): Promise<boolean> => {
+  await prisma.driver.delete({ where: { driver_id: id } });
+  return true;
+};
