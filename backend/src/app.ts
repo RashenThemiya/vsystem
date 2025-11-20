@@ -8,7 +8,7 @@ import driverRoutes from "./routes/driverRoutes.js";
 import AdminRoleRoutes from "./routes/adminRoleRoutes.js";
 import vehicleRoutes from "./routes/vehicleRoutes";
 import fuelRoutes from "./routes/fuelRoutes";
-
+import Triproutes from "./routes/tripRoutes";
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/admin-roles", AdminRoleRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/fuels", fuelRoutes);
-
+app.use("/api/trips", Triproutes);
 
 app.get("/", (req, res) => {
   res.send("🚗 Vehicle Rent Management API is running...");

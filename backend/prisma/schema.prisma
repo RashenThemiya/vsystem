@@ -154,10 +154,15 @@ model Trip {
 }
 
 model Map {
-  map_id    Int    @id @default(autoincrement())
-  trip_id   Int
-  location  String @db.VarChar(255)
-  trip      Trip   @relation(fields: [trip_id], references: [trip_id])
+  map_id        Int     @id @default(autoincrement())
+  trip_id       Int
+  location_name String  @db.VarChar(255) // e.g., "Colombo"
+  latitude      Decimal @db.Decimal(10,6)
+  longitude     Decimal @db.Decimal(10,6)
+  sequence      Int     // order of the location in the trip
+  trip          Trip    @relation(fields: [trip_id], references: [trip_id])
+
+  @@index([trip_id, sequence])
 }
 
 model Payment {
@@ -249,6 +254,7 @@ enum Role {
 }
 
 enum FuelType {
+  SuperDisel
   Diesel
   Octane92
   Octane95
@@ -276,6 +282,7 @@ enum TripStatus {
   Pending
   Ongoing
   Ended
+  Completed
   Cancelled
 }
 

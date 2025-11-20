@@ -35,7 +35,9 @@ import ViewAllAdmins from './pages/AdminRoleManagement/ViewAllAdmins';
 import VehicleManagement from './pages/VehicleManagement/VehicleManagement';
 import AddVehicle from './pages/VehicleManagement/AddVehicle';
 import ViewVehicles from './pages/VehicleManagement/ViewVehicles';
-
+import EditVehicle from './pages/VehicleManagement/EditVehicle';
+import TripManagement from './pages/TripManagement/TripManagement';
+import AddTrip from './pages/TripManagement/AddTrip';
 function App() {
   return (
     <AuthProvider>
@@ -97,9 +99,13 @@ function App() {
             />
             <Route path="/add-vehicle" element={<PrivateRoute><AddVehicle /></PrivateRoute>} />
             <Route path="/view-vehicles" element={<PrivateRoute><ViewVehicles /></PrivateRoute>} /> 
-
-
-
+            <Route path="/vehicles/edit/:id" element={<PrivateRoute><EditVehicle /></PrivateRoute>} />
+            {/* Trip Management Routes */}
+            <Route
+              path="/trip-management"
+              element={<PrivateRoute><TripManagement /></PrivateRoute>}
+            />
+            <Route path="/create-trip" element={<PrivateRoute><AddTrip /></PrivateRoute>} />
             {/* Product Management Routes */}
             <Route path="/product-management" element={<PrivateRoute><ProductManagement /></PrivateRoute>} />
             <Route path="/add-product" element={<PrivateRoute><AddProduct /></PrivateRoute>} />

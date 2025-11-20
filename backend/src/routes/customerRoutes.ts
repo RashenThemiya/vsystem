@@ -1,14 +1,13 @@
 import { Router } from "express";
 import {
-  createAdminController,
-  getAllAdminsController,
-  getAdminByIdController,
-  updateAdminController,
-  deleteAdminController,
-  getAllUsersWithoutAdminController,
-} from "../controllers/adminRoleController";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+  createCustomerController,
+  getAllCustomersController,
+  getCustomerByIdController,
+  updateCustomerController,
+  deleteCustomerController,
+} from "../controllers/customerController.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
 
@@ -16,17 +15,24 @@ const router = Router();
 router.use(authenticate);
 
 /**
- * 👥 Admin or SuperAdmin can view admin list or specific admin
+ * 👥 Admin or SuperAdmin can view customers
  */
-router.get("/", authorizeRoles("Admin", "SuperAdmin"), getAllAdminsController);
-router.get("/:id", authorizeRoles("Admin", "SuperAdmin"), getAdminByIdController);
-router.get("/without-admin", authorizeRoles("Admin", "SuperAdmin"), getAllUsersWithoutAdminController);
+router.get("/", authorizeRoles("Admin", "SuperAdmin"), getAllCustomersController);
+router.get("/:id", authorizeRoles("Admin", "SuperAdmin"), getCustomerByIdController);
 
 /**
- * 🟢 Only SuperAdmin can create, update, or delete admins
+ * 🟢 Admin or SuperAdmin can create customers
  */
-router.post("/", authorizeRoles("SuperAdmin"), createAdminController);
-router.put("/:id", authorizeRoles("SuperAdmin"), updateAdminController);
-router.delete("/:id", authorizeRoles("SuperAdmin"), deleteAdminController);
+router.post("/", authorizeRoles("Admin", "SuperAdmin"), createCustomerController);
+
+/**
+ * 🟡 Admin or SuperAdmin can update customers
+ */
+router.put("/:id", authorizeRoles("Admin", "SuperAdmin"), updateCustomerController);
+
+/**
+ * 🔴 Only SuperAdmin can delete customers
+ */
+router.delete("/:id", authorizeRoles("SuperAdmin"), deleteCustomerController);
 
 export default router;

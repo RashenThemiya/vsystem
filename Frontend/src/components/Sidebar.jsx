@@ -28,9 +28,10 @@ const Sidebar = () => {
     { path: "/vehicle-owner", icon: <FaUsers />, label: "Vehicle Owner" },
     { path: "/customer-management", icon: <FaUserFriends />, label: "Customer Management" },
     { path: "/driver-management", icon: <FaTruck />, label: "Driver Management" },
-    { path: "/product-management", icon: <FaBox />, label: "Product" },
-    { path: "/publication", icon: <FaNewspaper />, label: "Publication" },
+    /*{ path: "/product-management", icon: <FaBox />, label: "Product" },
+    { path: "/publication", icon: <FaNewspaper />, label: "Publication" },*/
     {path:"/vehicle-management", icon:<FaTruck />, label:"Vehicle Management" },
+    {path:"/trip-management", icon:<FaBox />, label:"Trip Management" },
   ];
 
   // ✅ Only SuperAdmin sees Admin Role Management

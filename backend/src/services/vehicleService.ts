@@ -139,7 +139,7 @@ export const createVehicleService = async (data: any) => {
  * ✅ Get a single vehicle by ID with all related tables
  */
 export const getVehicleByIdService = async (id: number) => {
-  return prisma.vehicle.findUnique({
+  const vehicle = await prisma.vehicle.findUnique({
     where: { vehicle_id: id },
     include: {
       owner: true,
@@ -159,6 +159,49 @@ export const getVehicleByIdService = async (id: number) => {
       },
     },
   });
+
+  if (!vehicle) return null;
+
+  // Helper: convert binary-like data to base64
+  const toBase64 = (data: any): string | null => {
+    if (!data) return null;
+
+    if (Buffer.isBuffer(data)) {
+      return data.toString('base64');
+    }
+
+    // Prisma might return an object like { '0': 137, '1': 80, ... }
+    if (typeof data === 'object' && Object.keys(data).length > 0) {
+      try {
+        const uint8Arr = Uint8Array.from(Object.values(data));
+        return Buffer.from(uint8Arr).toString('base64');
+      } catch {
+        return null;
+      }
+    }
+
+    return null;
+  };
+
+  // Convert image fields
+  const imageFields = [
+    'image',
+    'license_image',
+    'insurance_card_image',
+    'eco_test_image',
+    'book_image',
+  ];
+
+  for (const field of imageFields) {
+    const base64 = toBase64(vehicle[field]);
+    if (base64) {
+      vehicle[field] = `data:image/png;base64,${base64}`;
+    } else {
+      vehicle[field] = null; // ensure frontend doesn't get unreadable object
+    }
+  }
+
+  return vehicle;
 };
 
 /**
