@@ -29,6 +29,6 @@
     /* === Compatibility === */
     "isolatedModules": false
   },
-  "include": ["src"],
+  "include": ["src", "../Frontend/src/pages/Customers/EditCustomer.jsx"],
   "exclude": ["node_modules"]
 }

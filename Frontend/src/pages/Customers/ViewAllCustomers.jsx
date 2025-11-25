@@ -26,7 +26,7 @@ const ViewAllCustomers = () => {
 
         const customerList = Array.isArray(response.data.data)
           ? response.data.data
-          : [];
+          : []; 
         setCustomers(customerList);
       } catch (err) {
         console.error("Error fetching customers:", err);
