@@ -1,4 +1,5 @@
 import { prisma } from "../config/prismaClient.js";
+import { Prisma, Driver } from "@prisma/client";
 
 // ==================== DTOs ====================
 export interface MapLocationDTO {
@@ -51,6 +52,31 @@ export interface UpdateTripDTO extends Partial<CreateTripDTO> {}
 
 // ========================= CREATE TRIP =========================
 export const createTripService = async (data: CreateTripDTO) => {
+  // 1️⃣ Fetch vehicle info including fuel and mileage
+  const vehicle = await prisma.vehicle.findUnique({
+    where: { vehicle_id: data.vehicle_id },
+    include: { mileage_costs: true, fuel: true },
+  });
+  if (!vehicle) throw new Error("Vehicle not found");
+
+  // 2️⃣ Fetch driver if provided
+  let driver: Driver | null = null;
+  if (data.driver_id) {
+    driver = await prisma.driver.findUnique({ where: { driver_id: data.driver_id } });
+    if (!driver) throw new Error("Driver not found");
+  }
+
+  // 3️⃣ Auto-fill new fields
+  const auto = {
+    vehicle_rent_daily: vehicle.rent_cost_daily,
+    fuel_efficiency: vehicle.vehicle_fuel_efficiency ?? null,
+    mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost ?? null,
+    additional_mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost_additional ?? null,
+    fuel_cost: vehicle.fuel?.cost ?? null,
+    driver_cost: driver?.driver_charges ?? null,
+  };
+
+  // 4️⃣ Create the trip
   const trip = await prisma.trip.create({
     data: {
       customer_id: data.customer_id,
@@ -58,42 +84,45 @@ export const createTripService = async (data: CreateTripDTO) => {
       from_location: data.from_location,
       to_location: data.to_location,
       up_down: data.up_down,
-      estimated_distance: data.estimated_distance ?? null,
-      actual_distance: data.actual_distance ?? null,
+
+      // Auto-filled fields
+      vehicle_rent_daily: auto.vehicle_rent_daily,
+      fuel_efficiency: auto.fuel_efficiency,
+      mileage_cost: auto.mileage_cost,
+      additional_mileage_cost: auto.additional_mileage_cost,
+      fuel_cost: auto.fuel_cost,
+      driver_cost: auto.driver_cost,
+
+      // Optional frontend data
+      estimated_distance: data.estimated_distance !== undefined ? new Prisma.Decimal(data.estimated_distance) : null,
+      actual_distance: data.actual_distance !== undefined ? new Prisma.Decimal(data.actual_distance) : null,
       estimated_days: data.estimated_days ?? null,
       actual_days: data.actual_days ?? null,
       driver_required: data.driver_required ?? "No",
       driver_id: data.driver_id ?? null,
-      estimated_cost: data.estimated_cost ?? null,
-      actual_cost: data.actual_cost ?? null,
-      mileage_cost: data.mileage_cost ?? null,
       fuel_required: data.fuel_required ?? "No",
       num_passengers: data.num_passengers ?? null,
-      discount: data.discount ?? 0,
-      damage_cost: data.damage_cost ?? null,
-      payment_amount: data.payment_amount ?? null,
-      advance_payment: data.advance_payment ?? null,
+      discount: data.discount !== undefined ? new Prisma.Decimal(data.discount) : new Prisma.Decimal(0),
+      damage_cost: data.damage_cost !== undefined ? new Prisma.Decimal(data.damage_cost) : null,
+      payment_amount: data.payment_amount !== undefined ? new Prisma.Decimal(data.payment_amount) : null,
+      advance_payment: data.advance_payment !== undefined ? new Prisma.Decimal(data.advance_payment) : null,
       start_meter: data.start_meter ?? null,
       end_meter: data.end_meter ?? null,
-      total_estimated_cost: data.total_estimated_cost ?? null,
-      total_actual_cost: data.total_actual_cost ?? null,
+      total_estimated_cost: data.total_estimated_cost !== undefined ? new Prisma.Decimal(data.total_estimated_cost) : null,
+      total_actual_cost: data.total_actual_cost !== undefined ? new Prisma.Decimal(data.total_actual_cost) : null,
       payment_status: data.payment_status ?? "Unpaid",
       trip_status: data.trip_status ?? "Pending",
       leaving_datetime: data.leaving_datetime ? new Date(data.leaving_datetime) : new Date(),
-      estimated_return_datetime: data.estimated_return_datetime
-        ? new Date(data.estimated_return_datetime)
-        : null,
-      actual_return_datetime: data.actual_return_datetime
-        ? new Date(data.actual_return_datetime)
-        : null,
+      estimated_return_datetime: data.estimated_return_datetime ? new Date(data.estimated_return_datetime) : null,
+      actual_return_datetime: data.actual_return_datetime ? new Date(data.actual_return_datetime) : null,
 
       // Map locations
       map: data.map_locations
         ? {
-            create: data.map_locations.map((loc, index) => ({
+            create: data.map_locations.map((loc: MapLocationDTO, index) => ({
               location_name: loc.location_name,
-              latitude: loc.latitude,
-              longitude: loc.longitude,
+              latitude: new Prisma.Decimal(loc.latitude),
+              longitude: new Prisma.Decimal(loc.longitude),
               sequence: loc.sequence ?? index + 1,
             })),
           }
@@ -102,9 +131,9 @@ export const createTripService = async (data: CreateTripDTO) => {
       // Other trip costs
       other_trip_costs: data.other_trip_costs
         ? {
-            create: data.other_trip_costs.map((cost) => ({
+            create: data.other_trip_costs.map((cost: OtherTripCostDTO) => ({
               cost_type: cost.cost_type,
-              cost_amount: cost.cost,
+              cost_amount: new Prisma.Decimal(cost.cost),
             })),
           }
         : undefined,

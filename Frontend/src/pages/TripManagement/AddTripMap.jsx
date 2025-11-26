@@ -7,7 +7,7 @@ const TripMap = ({
   fromInputRef,
   toInputRef,
   waypointRefs,
-  vehicles,
+  vehicles = [],
   calculateTotalEstimatedCost,
   mapRef,
   GOOGLE_MAPS_API_KEY,
@@ -16,7 +16,7 @@ const TripMap = ({
   const directionsRendererRef = useRef(null);
   const directionsServiceRef = useRef(null);
 
-  /** -------- SAFE GOOGLE SCRIPT LOADER (NO DUPLICATE LOAD) -------- */
+  /** -------- LOAD GOOGLE SCRIPT -------- */
   const loadGoogleScript = () => {
     if (window.google && window.google.maps) {
       initMap();
@@ -53,17 +53,16 @@ const TripMap = ({
     directionsServiceRef.current = new window.google.maps.DirectionsService();
     directionsRendererRef.current.setMap(mapInstance.current);
 
-    // Attach form autocompletes
-    safeAttachAutocomplete(fromInputRef, (addr) =>
+    attachAutocompleteSafe(fromInputRef, (addr) =>
       updateTripField("from_location", addr)
     );
-    safeAttachAutocomplete(toInputRef, (addr) =>
+    attachAutocompleteSafe(toInputRef, (addr) =>
       updateTripField("to_location", addr)
     );
 
     attachAutocompleteToWaypointRefs();
 
-    // MAP CLICK → fill locations
+    // Click map to add waypoint
     mapInstance.current.addListener("click", (e) => {
       const geocoder = new window.google.maps.Geocoder();
       geocoder.geocode({ location: e.latLng }, (results, status) => {
@@ -71,14 +70,10 @@ const TripMap = ({
         const address = results[0].formatted_address;
 
         setTrip((prev) => {
-          if (!prev.from_location)
-            return { ...prev, from_location: address };
-          if (!prev.to_location)
-            return { ...prev, to_location: address };
-          return {
-            ...prev,
-            waypoints: [...prev.waypoints, address],
-          };
+          const waypoints = Array.isArray(prev.waypoints) ? prev.waypoints : [];
+          if (!prev.from_location) return { ...prev, from_location: address, waypoints };
+          if (!prev.to_location) return { ...prev, to_location: address, waypoints };
+          return { ...prev, waypoints: [...waypoints, address] };
         });
 
         setTimeout(() => calculateRoute(), 300);
@@ -86,31 +81,36 @@ const TripMap = ({
     });
   };
 
-  /** -------- AUTOCOMPLETE SAFE ATTACH HELPER -------- */
-  const safeAttachAutocomplete = (refObj, onSelect) => {
+  /** -------- AUTOCOMPLETE HELPER -------- */
+  const attachAutocompleteSafe = (refObj, onSelect) => {
     try {
       const el = refObj?.current;
       if (!el || !window.google) return;
 
       const input =
-        el instanceof HTMLInputElement
-          ? el
-          : el.querySelector("input") || el;
-
+        el instanceof HTMLInputElement ? el : el.querySelector("input") || el;
       if (!input) return;
 
       const auto = new window.google.maps.places.Autocomplete(input);
       auto.addListener("place_changed", () => {
-        const p = auto.getPlace();
-        const addr = p.formatted_address || p.name;
-        if (addr) onSelect(addr);
+        const place = auto.getPlace();
+        const address = place.formatted_address || place.name;
+        if (!address) return;
+
+        onSelect(address);
+
+        // Ensure waypoints is always an array
+        setTrip((prev) => ({
+          ...prev,
+          waypoints: Array.isArray(prev.waypoints) ? prev.waypoints : [],
+        }));
       });
     } catch (e) {
-      console.warn("safeAttachAutocomplete error:", e);
+      console.warn("Autocomplete attach error:", e);
     }
   };
 
-  /** -------- WAYPOINT AUTOCOMPLETE (FIXED) -------- */
+  /** -------- WAYPOINT AUTOCOMPLETE -------- */
   const attachAutocompleteToWaypointRefs = () => {
     if (!window.google || !waypointRefs?.current) return;
 
@@ -118,10 +118,7 @@ const TripMap = ({
       if (!ref || ref._auto) return;
 
       const input =
-        ref instanceof HTMLInputElement
-          ? ref
-          : ref.querySelector("input") || ref;
-
+        ref instanceof HTMLInputElement ? ref : ref.querySelector("input") || ref;
       if (!input) return;
 
       try {
@@ -129,13 +126,13 @@ const TripMap = ({
         auto.addListener("place_changed", () => {
           const place = auto.getPlace();
           const address = place.formatted_address || place.name;
-
           if (!address) return;
 
           setTrip((prev) => {
-            const arr = [...prev.waypoints];
-            arr[index] = address;
-            return { ...prev, waypoints: arr };
+            const waypoints = Array.isArray(prev.waypoints) ? prev.waypoints : [];
+            const newWaypoints = [...waypoints];
+            newWaypoints[index] = address;
+            return { ...prev, waypoints: newWaypoints };
           });
         });
 
@@ -150,10 +147,11 @@ const TripMap = ({
   const calculateRoute = () => {
     if (!trip.from_location || !trip.to_location) return;
 
-    const waypoints = trip.waypoints.map((wp) => ({
-      location: wp,
-      stopover: true,
-    }));
+    const waypoints = Array.isArray(trip.waypoints)
+      ? trip.waypoints
+          .filter((wp) => wp && wp.trim().length > 0)
+          .map((wp) => ({ location: wp, stopover: true }))
+      : [];
 
     const svc = directionsServiceRef.current;
     const rnd = directionsRendererRef.current;
@@ -190,10 +188,7 @@ const TripMap = ({
             });
 
           mapLocations.push({
-            location_name:
-              leg.end_address ||
-              trip.waypoints[i] ||
-              trip.to_location,
+            location_name: leg.end_address || (trip.waypoints?.[i] ?? trip.to_location),
             latitude: leg.end_location.lat(),
             longitude: leg.end_location.lng(),
           });
@@ -218,20 +213,21 @@ const TripMap = ({
     );
   };
 
-  /** reattach waypoint autocompletes when count changes */
+  /** -------- EFFECTS -------- */
   useEffect(() => {
     attachAutocompleteToWaypointRefs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip.waypoints.length]);
+  }, [trip.waypoints?.length]);
 
-  /** recalc route on location changes */
   useEffect(() => {
     if (trip.from_location && trip.to_location) calculateRoute();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip.from_location, trip.to_location, trip.waypoints.join("|")]);
+  }, [trip.from_location, trip.to_location, trip.waypoints?.join("|")]);
 
-  const updateTripField = (f, v) => {
-    setTrip((p) => ({ ...p, [f]: v }));
+  const updateTripField = (field, value) => {
+    setTrip((prev) => ({
+      ...prev,
+      [field]: value,
+      waypoints: Array.isArray(prev.waypoints) ? prev.waypoints : [],
+    }));
   };
 
   return (
