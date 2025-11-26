@@ -6,12 +6,13 @@ import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
 import AddTripForm from "./AddTripForm";
 import AddTripMap from "./AddTripMap";
+import { calculateTotalEstimatedCost } from "../../utils/tripCalculations";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCRk-FYPlKX3xi51W9PHTd35fELrAvBs-0";
 
 const AddTrip = () => {
   const navigate = useNavigate();
-  const { name: loggedUser, role } = useAuth();
+  const { name: loggedUser } = useAuth();
 
   const [trip, setTrip] = useState({
     customer_id: "",
@@ -21,17 +22,17 @@ const AddTrip = () => {
     to_location: "",
     waypoints: [],
     up_down: "Both",
-    estimated_distance: "",
+    estimated_distance: 0,
     estimated_days: 1,
     driver_required: "Yes",
     fuel_required: "Yes",
-    num_passengers: "",
+    num_passengers: 0,
     discount: 0,
     damage_cost: 0,
     payment_amount: 0,
     advance_payment: 0,
-    start_meter: "",
-    end_meter: "",
+    start_meter: 0,
+    end_meter: 0,
     total_estimated_cost: 0,
     total_actual_cost: 0,
     payment_status: "Unpaid",
@@ -63,16 +64,11 @@ const AddTrip = () => {
 
       try {
         const [vehiclesRes, customersRes, driversRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/vehicles`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/customers`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/drivers`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/vehicles`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/customers`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/drivers`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
+        console.log("Fetched dropdown data:",customersRes.data);
 
         const formattedVehicles = (vehiclesRes.data || []).map((v) => ({
           ...v,
@@ -90,7 +86,7 @@ const AddTrip = () => {
         setVehicles(formattedVehicles);
         setCustomers(customersRes.data?.data || customersRes.data || []);
         setDrivers(formattedDrivers);
-      } catch (err) {
+      } catch {
         setError("Failed to load dropdown data.");
       }
     };
@@ -98,84 +94,16 @@ const AddTrip = () => {
     fetchData();
   }, [navigate]);
 
-  // Calculate total estimated cost
-  const calculateTotalEstimatedCost = (updatedTrip, selectedVehicle) => {
-    const numDays = Number(updatedTrip.estimated_days || 0);
-    const totalDistance = Number(updatedTrip.estimated_distance || 0);
+  const selectedVehicle = vehicles.find(v => Number(v.vehicle_id) === Number(trip.vehicle_id) || Number(v.id) === Number(trip.vehicle_id));
+  const selectedDriver = drivers.find(d => Number(d.driver_id) === Number(trip.driver_id) || Number(d.id) === Number(trip.driver_id));
 
-    const defaultDistance = Math.min(numDays * 100, totalDistance);
-    const additionalDistance = Math.max(totalDistance - numDays * 100, 0);
-
-    const mileageCost = selectedVehicle?.mileage_cost || 0;
-    const additionalMileageCost = selectedVehicle?.additional_mileage_cost || 0;
-    const defaultDistanceCost = defaultDistance * mileageCost;
-    const additionalDistanceCost = additionalDistance * additionalMileageCost;
-
-    let vehicleBookingCostPerDay = 0;
-    if (selectedVehicle) {
-      if (selectedVehicle.leased) vehicleBookingCostPerDay = selectedVehicle.lease / 30;
-      else if (selectedVehicle.owner_rent) vehicleBookingCostPerDay = selectedVehicle.owner_rent / 30;
-    }
-    const vehicleBookingCost = vehicleBookingCostPerDay * numDays;
-
-    const driverCostPerDay = selectedVehicle?.driver_cost || 0;
-    const driverCost = updatedTrip.driver_required === "Yes" ? driverCostPerDay * numDays : 0;
-
-    const otherCostsSum = updatedTrip.other_trip_costs.reduce((acc, c) => acc + Number(c.cost || 0), 0);
-
-    let discount = Number(updatedTrip.discount || 0);
-    const damageCost = Number(updatedTrip.damage_cost || 0);
-
-    const tripTotalAmount = driverCost + vehicleBookingCost + defaultDistanceCost + additionalDistanceCost + otherCostsSum - discount + damageCost;
-
-    const fuelCostTotal = selectedVehicle?.fuel_cost && selectedVehicle?.fuel_efficiency
-      ? (totalDistance / selectedVehicle.fuel_efficiency) * selectedVehicle.fuel_cost
-      : 0;
-
-    let profit = tripTotalAmount - driverCost - vehicleBookingCost - fuelCostTotal;
-
-    if (discount > profit) discount = profit;
-
-    return {
-      totalEstimatedCost: tripTotalAmount,
-      profit,
-      discount,
-    };
-  };
-
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedTrip = { ...trip, [name]: value };
 
-    if (name === "leaving_datetime" || name === "estimated_return_datetime" || name === "estimated_days") {
-      const leaving = new Date(updatedTrip.leaving_datetime);
-      const returning = new Date(updatedTrip.estimated_return_datetime);
-      const days = Number(updatedTrip.estimated_days || 0);
-
-      if (!isNaN(leaving) && !isNaN(returning)) {
-        const diffMs = returning - leaving;
-        updatedTrip.estimated_days = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60 * 24)) : 1;
-      } else if (!isNaN(leaving) && name === "estimated_days" && days > 0) {
-        leaving.setDate(leaving.getDate() + days);
-        updatedTrip.estimated_return_datetime = leaving.toISOString().slice(0, 16);
-      }
-    }
-
-    if (name === "payment_amount") {
-      updatedTrip.payment_amount = Number(value);
-      updatedTrip.advance_payment = Number(value);
-      updatedTrip.payment_status = Number(value) > 0 ? "Partly_Paid" : "Unpaid";
-    }
-
-    if (name === "advance_payment") {
-      updatedTrip.advance_payment = Number(value);
-      if (!updatedTrip.payment_amount) updatedTrip.payment_amount = Number(value);
-      updatedTrip.payment_status = Number(updatedTrip.advance_payment) > 0 ? "Partly_Paid" : "Unpaid";
-    }
-
-    const selectedVehicle = vehicles.find(v => Number(v.vehicle_id) === Number(updatedTrip.vehicle_id) || Number(v.id) === Number(updatedTrip.vehicle_id));
-    const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost(updatedTrip, selectedVehicle);
-
+    // Calculate cost safely
+    const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({ trip: updatedTrip, selectedVehicle, selectedDriver });
     updatedTrip.total_estimated_cost = totalEstimatedCost;
     updatedTrip.profit = profit;
     updatedTrip.discount = discount;
@@ -183,35 +111,21 @@ const AddTrip = () => {
     setTrip(updatedTrip);
   };
 
-  const addWaypoint = () => setTrip((prev) => ({ ...prev, waypoints: [...prev.waypoints, ""] }));
-  const removeWaypoint = (index) => {
-    setTrip((prev) => {
-      const wps = [...prev.waypoints];
-      wps.splice(index, 1);
-      return { ...prev, waypoints: wps };
-    });
-    waypointRefs.current.splice(index, 1);
-  };
-  const handleWaypointChange = (index, value) => {
-    setTrip((prev) => {
-      const wps = [...prev.waypoints];
-      wps[index] = value;
-      return { ...prev, waypoints: wps };
-    });
-  };
+  // Waypoints and other costs
+  const addWaypoint = () => setTrip(prev => ({ ...prev, waypoints: [...prev.waypoints, ""] }));
+  const removeWaypoint = (i) => setTrip(prev => ({ ...prev, waypoints: prev.waypoints.filter((_, idx) => idx !== i) }));
 
-  const addOtherCost = () => setTrip((prev) => ({ ...prev, other_trip_costs: [...prev.other_trip_costs, { cost_type: "", cost: 0 }] }));
-  const handleCostChange = (index, field, value) => {
+  const addOtherCost = () => setTrip(prev => ({ ...prev, other_trip_costs: [...prev.other_trip_costs, { cost_type: "", cost: 0 }] }));
+  const handleCostChange = (i, field, value) => {
     const updatedCosts = [...trip.other_trip_costs];
-    updatedCosts[index][field] = field === "cost" ? Number(value) : value;
-    const selectedVehicle = vehicles.find((v) => Number(v.vehicle_id) === Number(trip.vehicle_id));
-    setTrip((prev) => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: calculateTotalEstimatedCost({ ...prev, other_trip_costs: updatedCosts }, selectedVehicle) }));
+    updatedCosts[i][field] = field === "cost" ? Number(value) : value;
+    const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({ trip: { ...trip, other_trip_costs: updatedCosts }, selectedVehicle, selectedDriver });
+    setTrip(prev => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: totalEstimatedCost, profit, discount }));
   };
-  const removeOtherCost = (index) => {
-    const updatedCosts = [...trip.other_trip_costs];
-    updatedCosts.splice(index, 1);
-    const selectedVehicle = vehicles.find((v) => Number(v.vehicle_id) === Number(trip.vehicle_id));
-    setTrip((prev) => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: calculateTotalEstimatedCost({ ...prev, other_trip_costs: updatedCosts }, selectedVehicle) }));
+  const removeOtherCost = (i) => {
+    const updatedCosts = trip.other_trip_costs.filter((_, idx) => idx !== i);
+    const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({ trip: { ...trip, other_trip_costs: updatedCosts }, selectedVehicle, selectedDriver });
+    setTrip(prev => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: totalEstimatedCost, profit, discount }));
   };
 
   const handleConfirm = () => {
@@ -223,15 +137,54 @@ const AddTrip = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConfirmed) return;
+
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/trips`, trip, {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
+      console.log("Submitting trip:", trip);
+      
+    // Transform trip object for API
+    const payload = {
+  customer_id: Number(trip.customer_id),
+  vehicle_id: Number(trip.vehicle_id),
+  driver_id: trip.driver_id ? Number(trip.driver_id) : null,
+  from_location: trip.from_location,
+  to_location: trip.to_location,
+  up_down: trip.up_down,
+  estimated_distance: Number(trip.estimated_distance),
+  estimated_days: Number(trip.estimated_days),
+  driver_required: trip.driver_required,
+  fuel_required: trip.fuel_required,
+  num_passengers: Number(trip.num_passengers),
+  discount: Number(trip.discount || 0),
+  damage_cost: Number(trip.damage_cost || 0),
+  payment_amount: Number(trip.payment_amount || 0),
+  advance_payment: Number(trip.advance_payment || 0),
+  start_meter: Number(trip.start_meter || 0),
+  end_meter: Number(trip.end_meter || 0),
+  total_estimated_cost: Number(trip.total_estimated_cost || 0),
+  total_actual_cost: Number(trip.total_actual_cost || 0),
+  payment_status: trip.payment_status,
+  trip_status: trip.trip_status,
+  leaving_datetime: trip.leaving_datetime,
+  estimated_return_datetime: trip.estimated_return_datetime,
+  map_locations: (trip.map_locations || []).map((loc) => ({
+    location_name: loc.location_name,
+    latitude: Number(loc.latitude),
+    longitude: Number(loc.longitude),
+  })),
+  other_trip_costs: (trip.other_trip_costs || []).map((cost) => ({
+    cost_type: cost.cost_type,
+    cost: Number(cost.cost),
+  })),
+};
 
+    console.log("Submitting clean payload:", payload);
+       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/trips`, payload, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    });
       if (res.status === 200 || res.status === 201) {
         setShowSuccess(true);
         setTimeout(() => navigate("/trip-management"), 2000);
@@ -244,42 +197,27 @@ const AddTrip = () => {
     }
   };
 
-  const selectedVehicle = vehicles.find(v => Number(v.vehicle_id) === Number(trip.vehicle_id) || Number(v.id) === Number(trip.vehicle_id));
-  const selectedDriver = drivers.find(d => Number(d.driver_id) === Number(trip.driver_id) || Number(d.id) === Number(trip.driver_id));
-
   return (
     <div className="bg-gray-50 min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Professional Heading */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-semibold text-green-800 flex items-center gap-2">
             <FaMapMarkerAlt /> Trip Creation
           </h2>
-          <button
-            onClick={() => navigate("/trip-management")}
-            className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded transition"
-          >
+          <button onClick={() => navigate("/trip-management")} className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded transition">
             <FaArrowLeft /> Back to Trips
           </button>
         </div>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-3 rounded mb-4 text-center">
-            ❌ {error}
-          </div>
-        )}
-        {showSuccess && (
-          <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-3 rounded mb-4 text-center">
-            ✅ Trip added successfully!
-          </div>
-        )}
+        {error && <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-3 rounded mb-4 text-center">❌ {error}</div>}
+        {showSuccess && <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-3 rounded mb-4 text-center">✅ Trip added successfully!</div>}
 
-        {/* Left form + right full map */}
         <form id="add-trip-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <AddTripForm
               trip={trip}
               vehicles={vehicles}
+              setTrip={setTrip}  // ✅ Pass setTrip properly
               customers={customers}
               drivers={drivers}
               selectedVehicle={selectedVehicle}
@@ -287,7 +225,7 @@ const AddTrip = () => {
               handleChange={handleChange}
               addWaypoint={addWaypoint}
               removeWaypoint={removeWaypoint}
-              handleWaypointChange={handleWaypointChange}
+              handleWaypointChange={(i, val) => handleChange({ target: { name: "waypoints", value: val } })}
               waypointRefs={waypointRefs}
               addOtherCost={addOtherCost}
               handleCostChange={handleCostChange}
