@@ -1,11 +1,18 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 
-export default function LoginPage() {
+// Pixel-perfect single-file React + Tailwind component that mirrors the supplied screenshot.
+// Notes:
+// - Place the uploaded image at the path used below (we reference the provided local path).
+// - This component uses Tailwind CSS classes. Make sure Tailwind is configured in your project.
+// - Small additional styles are included via a <style> tag for the diagonal white wedge and exact shadows.
+
+export default function PixelPerfectLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,85 +22,133 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    console.log("🟢 Attempting login...");
-    console.log("Email:", email);
-    console.log("Password:", password); // ⚠️ Be careful — remove this in production
-
     try {
       const res = await api.post("/api/admin/login", { email, password });
-      console.log("✅ API Response:", res);
-
       const { token, admin } = res.data;
-      console.log("Token:", token);
-      console.log("Admin Data:", admin);
-
-      // Save to context and localStorage
       setAuthData(token, admin.role, admin.email);
-
-      // Redirect based on role
-      if (admin.role === "Admin" || admin.role === "SuperAdmin") {
-        console.log("➡️ Redirecting to Admin Dashboard");
-        navigate("/admin-dashboard");
-      } else if (admin.role === "Driver") {
-        console.log("➡️ Redirecting to Driver Dashboard");
-        navigate("/driver-dashboard");
-      } else if (admin.role === "Customer") {
-        console.log("➡️ Redirecting to Customer Dashboard");
-        navigate("/customer-dashboard");
-      } else {
-        console.log("⚠️ Unknown role:", admin.role);
-        setError("Unknown role, cannot redirect.");
-      }
+      if (admin.role === "Admin" || admin.role === "SuperAdmin") navigate("/admin-dashboard");
+      else if (admin.role === "Driver") navigate("/driver-dashboard");
+      else if (admin.role === "Customer") navigate("/customer-dashboard");
+      else setError("Unknown role, cannot redirect.");
     } catch (err) {
-      console.error("❌ Login failed:", err);
-      console.error("❌ Error response:", err.response?.data);
       setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
-      console.log("🟡 Login attempt completed.");
     }
   };
 
+  // IMPORTANT: the image path below points to the uploaded file available in the environment.
+  const leftImage = "/images/loginImage.jpeg";
+
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-white to-emerald-200 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-green-700 mb-6">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] p-8">
+      {/* custom styles for diagonal wedge, rounded inner card shadow, and subtle overlays */}
+      <style>{`
+        .wedge {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 140px;
+          height: 160px;
+          transform: translate(-40px,-40px) rotate(-22deg);
+          background: white;
+          z-index: 0;
+        }
+        .inner-card {
+          border-radius: 14px;
+          box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+        }
+        .soft-rounded-left {
+          border-top-left-radius: 12px;
+          border-bottom-left-radius: 12px;
+        }
+        .soft-rounded-right {
+          border-top-right-radius: 12px;
+          border-bottom-right-radius: 12px;
+        }
+        /* thin underline inputs like the design */
+        .underline-input {
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,0.35);
+          padding: 8px 6px;
+          outline: none;
+        }
+        .underline-input::placeholder { color: rgba(255,255,255,0.5); }
+        /* social circular icons */
+        .social-circle { width:36px; height:36px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center; background:white; }
+      `}</style>
 
-        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+      <div className="relative w-full max-w-6xl inner-card overflow-hidden bg-white flex" style={{ borderRadius: 18 }}>
+        {/* diagonal wedge in white to match screenshot */}
+        <div className="wedge" />
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
-            />
+        {/* LEFT: Image panel with rounded corners and overlay */}
+        <div className="hidden md:block w-1/2 relative soft-rounded-left" style={{ minHeight: 540 }}>
+          <img src={leftImage} alt="hero" className="w-full h-[650px] object-cover" />
+          <div className="absolute inset-0 bg-[rgba(11,38,88,0.55)] mix-blend-multiply"></div>
+
+        </div>
+
+        {/* RIGHT: Form panel */}
+        <div className="w-full md:w-1/2 bg-[#164380] text-white p-14 soft-rounded-right flex flex-col justify-center" style={{ minHeight: 540 }}>
+          <div className="max-w-md mx-auto w-full">
+            <div className="flex justify-center mb-6">
+              <div style={{ borderLeft: '4px solid rgba(255,255,255,0.85)', paddingLeft: 12 }}>
+                <h2 className="text-2xl md:text-3xl font-serif tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>ADMIN LOGIN PORTAL</h2>
+              </div>
+            </div>
+
+            {error && <p className="text-red-300 text-center mb-3">{error}</p>}
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label className="block text-sm mb-2">Email</label>
+                <div className="flex items-center">
+                  <input
+                    className="underline-input w-full text-white placeholder-gray-300"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <div className="ml-3 opacity-70"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/><path d="M7 10l5 5 5-5"/></svg></div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm mb-2">Password</label>
+                <div className="flex items-center">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="underline-input w-full text-white placeholder-gray-300"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="ml-3 opacity-80">
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5.52 0-10.21-3.58-11.8-8 1.07-2.9 3.06-5.2 5.44-6.6"/><path d="M1 1l22 22"/></svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-2 w-full bg-white text-[#264c7f] font-semibold py-3 rounded-full shadow-md hover:bg-gray-100 transition disabled:opacity-60"
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </form>
           </div>
-
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-md shadow-md disabled:opacity-70"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
