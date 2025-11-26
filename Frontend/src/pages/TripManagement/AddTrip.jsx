@@ -8,7 +8,7 @@ import AddTripForm from "./AddTripForm";
 import AddTripMap from "./AddTripMap";
 import { calculateTotalEstimatedCost } from "../../utils/tripCalculations";
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyCRk-FYPlKX3xi51W9PHTd35fELrAvBs-0";
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const AddTrip = () => {
   const navigate = useNavigate();
