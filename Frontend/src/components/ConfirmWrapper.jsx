@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiAlertTriangle } from "react-icons/fi"; // Default icon for warnings
 
 const ConfirmWrapper = ({
   onConfirm,
   children,
   message,
   additionalInfo,
-  confirmText = "Yes, Confirm",
+  confirmText = "Yes, Proceed",
   cancelText = "Cancel",
   icon,
   buttonTextColor = "text-white",
   buttonBackgroundColor = "bg-red-600",
+  isLoading = false, // Added isLoading prop
 }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // Stop event bubbling/default action from the trigger button
   const handleChildClick = (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Crucial to prevent double firing/bubbling
     setShowConfirm(true);
   };
 
@@ -28,53 +32,74 @@ const ConfirmWrapper = ({
     setShowConfirm(false);
   };
 
+  // Define modal backdrop and content animation variants
+  const backdropVariants = {
+    visible: { opacity: 1 },
+    hidden: { opacity: 0 },
+  };
+
+  const modalVariants = {
+    visible: { scale: 1, opacity: 1, y: 0, transition: { duration: 0.3 } },
+    hidden: { scale: 0.9, opacity: 0, y: 50 },
+  };
+
+  // Determine the icon to display (use FiAlertTriangle as a default warning)
+  const DisplayIcon = icon || <FiAlertTriangle />;
+
   return (
     <>
       <AnimatePresence>
         {showConfirm && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm z-50 p-4"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={backdropVariants}
+            onClick={handleCancel} // Close modal when clicking outside
           >
             <motion.div
-              className="bg-white p-8 rounded-2xl shadow-2xl space-y-6 w-96 max-w-md flex flex-col items-center justify-center"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              className="bg-white p-8 rounded-xl shadow-2xl space-y-6 w-full max-w-sm flex flex-col"
+              variants={modalVariants}
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
             >
-              {/* Header with custom icon */}
-              <div className="flex items-center justify-center space-x-4 mb-4">
-                {icon && (
-                  <div className="text-4xl text-red-600">
-                    {icon}
-                  </div>
-                )}
-                <p className="text-xl font-semibold text-gray-800">{message}</p>
+              {/* Header with custom icon and message */}
+              <div className="flex flex-col items-center text-center">
+                <div className={`text-5xl mb-4 ${buttonBackgroundColor.replace('bg-', 'text-') || 'text-red-600'}`}>
+                    {DisplayIcon}
+                </div>
+                <p className="text-xl font-bold text-gray-800">{message}</p>
               </div>
 
               {/* Optional additional info */}
               {additionalInfo && (
-                <div className="text-sm text-gray-500 text-center">
+                <div className="text-sm text-gray-500 text-center border-t pt-4">
                   {additionalInfo}
                 </div>
               )}
 
               {/* Action buttons */}
-              <div className="flex justify-center space-x-6 mt-6 w-full">
-                <button
-                  onClick={handleCancel}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md text-sm font-medium hover:bg-gray-400 transition duration-200"
-                >
-                  {cancelText}
-                </button>
+              <div className="flex flex-col space-y-3 mt-6 w-full">
+                {/* Confirm Button */}
                 <button
                   onClick={handleConfirm}
-                  className={`${buttonBackgroundColor} ${buttonTextColor} px-6 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition duration-200`}
+                  className={`
+                    ${buttonBackgroundColor} ${buttonTextColor} 
+                    w-full px-6 py-3 rounded-xl text-md font-semibold transition duration-200 shadow-md
+                    ${isLoading ? 'opacity-70 cursor-wait' : 'hover:opacity-90'}
+                  `}
+                  disabled={isLoading} // Disabled when loading
                 >
                   {confirmText}
+                </button>
+                
+                {/* Cancel Button */}
+                <button
+                  onClick={handleCancel}
+                  className="bg-gray-200 text-gray-700 w-full px-6 py-3 rounded-xl text-md font-medium hover:bg-gray-300 transition duration-200 disabled:opacity-50"
+                  disabled={isLoading} // Disabled when loading
+                >
+                  {cancelText}
                 </button>
               </div>
             </motion.div>

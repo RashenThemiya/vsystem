@@ -2,12 +2,20 @@ import { prisma } from "../config/prismaClient.js";
 import { Owner } from "@prisma/client";
 
 // ✅ Create new owner
+const phoneRegex = /^(?:\+94|0)?7\d{8}$/; 
+const nicRegex = /^(\d{9}[VvXx]|\d{12})$/;
+
 export const createOwnerService = async (
   data: Pick<Owner, "owner_name" | "contact_number">
 ) => {
   if (!data.owner_name || !data.contact_number) {
     throw new Error("Missing required fields: owner_name and contact_number");
   }
+
+  // Phone validation
+  {/*if (!phoneRegex.test(data.contact_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }*/}
 
   const owner = await prisma.owner.create({
     data,
@@ -34,12 +42,17 @@ export const getOwnerByIdService = async (id: number) => {
 // ✅ Update owner
 export const updateOwnerService = async (
   id: number,
-  data: Partial<Pick<Owner, "owner_name" | "contact_number">>
+  data: Partial<Pick<Owner, "owner_name" | "contact_number">> 
 ) => {
   const updated = await prisma.owner.update({
     where: { owner_id: id },
     data,
   });
+
+  //  Validate phone only if user tries to update it
+  {/*if (data.contact_number && !phoneRegex.test(data.contact_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }*/}
 
   return updated;
 };

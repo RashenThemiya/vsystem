@@ -39,6 +39,9 @@ const fromPrismaBytes = (bytes?: Uint8Array | null): string | null => {
 /**
  * ✅ Create new driver
  */
+const phoneRegex = /^(?:\+94|0)?7\d{8}$/; 
+const nicRegex = /^(\d{9}[VvXx]|\d{12})$/;
+
 export const createDriverService = async (data: DriverInput) => {
   const {
     name,
@@ -54,6 +57,16 @@ export const createDriverService = async (data: DriverInput) => {
   if (!name || !phone_number || !driver_charges || !nic || !age || !license_number || !license_expiry_date) {
     throw new Error("Missing required fields");
   }
+
+  // Phone validation
+  {/*if (!phoneRegex.test(phone_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }
+
+  // NIC validation
+  if (!nicRegex.test(nic)) {
+    throw new Error("NIC must be 9 digits + V/v/X/x or 12 digits");
+  }*/}
 
   const existing = await prisma.driver.findUnique({ where: { nic } });
   if (existing) throw new Error("Driver with this NIC already exists");
@@ -123,6 +136,16 @@ export const updateDriverService = async (id: number, data: Partial<DriverInput>
   });
 
   if (!existing) throw new Error("Driver not found");
+
+   //  Validate phone only if user tries to update it
+  {/*if (data.phone_number && !phoneRegex.test(data.phone_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }
+
+  //  Validate NIC only if user updates it
+  if (data.nic && !nicRegex.test(data.nic)) {
+    throw new Error("NIC must be 9 digits + V/v/X/x or 12 digits");
+  }*/}
 
   const updateData: any = {
     name: data.name ?? existing.name,

@@ -5,7 +5,7 @@ import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
 
-const AddVehicle = () => {
+const AddVehicleModal = ({ onClose, onSuccess }) => {
   const navigate = useNavigate();
   const { name: loggedUser, role } = useAuth();
 
@@ -44,7 +44,6 @@ const AddVehicle = () => {
   const vehicleTypes = ["Car", "Van", "Bus", "Bike"];
   const acTypes = ["AC", "Non_AC"];
 
-  // Fetch owners and fuels
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
@@ -73,13 +72,11 @@ const AddVehicle = () => {
     fetchData();
   }, [navigate]);
 
-  // Input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setVehicle((prev) => ({ ...prev, [name]: value }));
   };
 
-  // File change with preview
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
@@ -94,7 +91,6 @@ const AddVehicle = () => {
     }
   };
 
-  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConfirmed) return;
@@ -115,7 +111,12 @@ const AddVehicle = () => {
       );
       if (res.status === 200 || res.status === 201) {
         setShowSuccess(true);
-        setTimeout(() => navigate("/vehicle-management"), 2000);
+        onSuccess(res.data.data);
+
+        setTimeout(() => {
+          onClose();
+          
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add vehicle");
@@ -127,16 +128,14 @@ const AddVehicle = () => {
 
   const handleConfirm = () => {
     setIsConfirmed(true);
-    handleSubmit(new Event("submit"));
+    //handleSubmit(new Event("submit"));
   };
 
-  const handleCancel = () => setIsConfirmed(false);
-
   return (
-    <div className="flex justify-center items-center bg-gradient-to-br from-green-50 to-green-100 min-h-screen p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-6xl">
-        <h2 className="text-3xl font-bold mb-6 text-center text-green-700 flex items-center justify-center gap-2">
-          <FaCarSide /> Add New Vehicle
+    <div className="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-6xl mt-12">
+        <h2 className="text-xl font-semibold mb-6 text-center text-black-700 flex items-center justify-center gap-2">
+           Add New Vehicle
         </h2>
 
         {/* Alerts */}
@@ -152,7 +151,6 @@ const AddVehicle = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Vehicle Basic Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="label">Vehicle Number</label>
@@ -416,10 +414,10 @@ const AddVehicle = () => {
             ))}
           </div>
 
-          {/* Confirm Wrapper */}
+
           <ConfirmWrapper
             onConfirm={handleConfirm}
-            onCancel={handleCancel}
+            onCancel={() => setIsConfirmed(false)}
             message="Confirm Adding Vehicle"
             additionalInfo="Please verify all vehicle details before submission."
             confirmText="Yes, Add Vehicle"
@@ -430,7 +428,7 @@ const AddVehicle = () => {
           >
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Vehicle"}
@@ -439,7 +437,7 @@ const AddVehicle = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/vehicle-management")}
+            onClick={onClose}
             className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
           >
             Cancel
@@ -450,4 +448,4 @@ const AddVehicle = () => {
   );
 };
 
-export default AddVehicle;
+export default AddVehicleModal;

@@ -10,6 +10,7 @@ import {
   FaUserFriends,
   FaTruck,
   FaUserShield,
+  FaIdCard,
    // ✅ Added Admin Role icon
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -25,19 +26,19 @@ const Sidebar = () => {
   // ✅ All Menu Items (filtered below by role)
   const baseMenuItems = [
     { path: "/admin-dashboard", icon: <FaHome />, label: "Dashboard" },
-    { path: "/vehicle-owner", icon: <FaUsers />, label: "Vehicle Owner" },
-    { path: "/customer-management", icon: <FaUserFriends />, label: "Customer Management" },
-    { path: "/driver-management", icon: <FaTruck />, label: "Driver Management" },
+    { path: "/owner-dashboard", icon: <FaUsers />, label: "Vehicle Owner" },
+    { path: "/customer-dashboard", icon: <FaUserFriends />, label: "Customer Management" },
+    { path: "/driver-dashboard", icon: <FaIdCard />, label: "Driver Management" },
     /*{ path: "/product-management", icon: <FaBox />, label: "Product" },
     { path: "/publication", icon: <FaNewspaper />, label: "Publication" },*/
-    {path:"/vehicle-management", icon:<FaTruck />, label:"Vehicle Management" },
+    {path:"/vehicle-dashboard", icon:<FaTruck />, label:"Vehicle Management" },
     {path:"/trip-management", icon:<FaBox />, label:"Trip Management" },
   ];
 
   // ✅ Only SuperAdmin sees Admin Role Management
   if (role === "SuperAdmin") {
     baseMenuItems.push({
-      path: "/admin-role-management",
+      path: "/admin-role-dashboard",
       icon: <FaUserShield />,
       label: "Admin Roles",
     });
