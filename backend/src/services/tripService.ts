@@ -589,3 +589,57 @@ export const completeTripService = async (trip_id: number) => {
 
   return completedTrip;
 };
+
+
+/**
+ * Add a payment to a trip and update payment status automatically
+ * @param trip_id - Trip ID
+ * @param amount - Payment amount
+ * @param payment_date - Optional payment date
+ */
+export const addTripPaymentService = async (
+  trip_id: number,
+  amount: number,
+  payment_date?: Date | string
+) => {
+  // 1️⃣ Find the trip
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+    select: { trip_id: true, total_actual_cost: true, payment_amount: true, payment_status: true },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+
+  // 2️⃣ Create new payment row
+  const payment = await prisma.payment.create({
+    data: {
+      trip_id,
+      amount: new Prisma.Decimal(amount),
+      payment_date: payment_date ? new Date(payment_date) : new Date(),
+    },
+  });
+
+  // 3️⃣ Calculate new total payment
+  const newTotalPayment = (trip.payment_amount ?? new Prisma.Decimal(0)).plus(amount);
+
+  // 4️⃣ Update payment status automatically
+  let newPaymentStatus: PaymentStatus = PaymentStatus.Unpaid;
+  if (trip.total_actual_cost !== null) {
+    if (newTotalPayment.gte(trip.total_actual_cost)) {
+      newPaymentStatus = PaymentStatus.Paid;
+    } else if (newTotalPayment.gt(0)) {
+      newPaymentStatus = PaymentStatus.Partially_Paid;
+    }
+  }
+
+  // 5️⃣ Update trip with new payment info
+  const updatedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      payment_amount: newTotalPayment,
+      payment_status: newPaymentStatus,
+    },
+  });
+
+  return { payment, updatedTrip };
+};

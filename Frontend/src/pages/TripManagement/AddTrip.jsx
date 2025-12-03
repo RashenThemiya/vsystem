@@ -98,18 +98,48 @@ const AddTrip = () => {
   const selectedDriver = drivers.find(d => Number(d.driver_id) === Number(trip.driver_id) || Number(d.id) === Number(trip.driver_id));
 
   // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedTrip = { ...trip, [name]: value };
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
-    // Calculate cost safely
-    const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({ trip: updatedTrip, selectedVehicle, selectedDriver });
-    updatedTrip.total_estimated_cost = totalEstimatedCost;
-    updatedTrip.profit = profit;
-    updatedTrip.discount = discount;
+  const updatedTrip = { ...trip, [name]: value };
 
-    setTrip(updatedTrip);
-  };
+  // =======================
+  // ✅ Auto-calc estimated_days
+  // =======================
+  if (name === "leaving_datetime" || name === "estimated_return_datetime") {
+
+    const start = new Date(
+      name === "leaving_datetime" ? value : updatedTrip.leaving_datetime
+    );
+
+    const end = new Date(
+      name === "estimated_return_datetime" ? value : updatedTrip.estimated_return_datetime
+    );
+
+    if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+      const diffMs = end - start;
+      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      updatedTrip.estimated_days = days > 0 ? days : 1;
+    }
+  }
+
+  // =======================
+  // ✅ Recalculate Costs
+  // =======================
+  const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({
+    trip: updatedTrip,
+    selectedVehicle,
+    selectedDriver,
+  });
+
+  updatedTrip.total_estimated_cost = totalEstimatedCost;
+  updatedTrip.profit = profit;
+  updatedTrip.discount = discount;
+
+  setTrip(updatedTrip);
+};
+
 
   // Waypoints and other costs
   const addWaypoint = () => setTrip(prev => ({ ...prev, waypoints: [...prev.waypoints, ""] }));

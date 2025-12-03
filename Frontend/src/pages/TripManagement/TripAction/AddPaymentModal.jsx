@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+import api from "../../../utils/axiosInstance";
+
+const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
+  const [amount, setAmount] = useState("");
+  const [paymentDate, setPaymentDate] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (!open) return null;
+
+  const submitPayment = async () => {
+    if (!amount || !paymentDate) {
+      return alert("Amount and Payment Date are required.");
+    }
+
+    try {
+      setLoading(true);
+
+      await api.post(
+        `/api/trips/${tripId}/payment`,
+        {
+          amount: Number(amount),
+          payment_date: paymentDate, // "YYYY-MM-DD" format
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      onSuccess(); // Refresh trip details
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Failed to add payment");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+      <div className="bg-white p-6 rounded shadow-xl w-80">
+        <h2 className="text-xl font-semibold mb-4">Add Payment</h2>
+
+        <input
+          type="number"
+          className="w-full border rounded px-3 py-2 mb-3"
+          placeholder="Enter payment amount (Rs)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+
+        <input
+          type="date"
+          className="w-full border rounded px-3 py-2 mb-4"
+          value={paymentDate}
+          onChange={(e) => setPaymentDate(e.target.value)}
+        />
+
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
+            Cancel
+          </button>
+
+          <button
+            onClick={submitPayment}
+            disabled={loading}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          >
+            {loading ? "Saving..." : "Add Payment"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AddPaymentModal;

@@ -6,9 +6,15 @@ import {
   updateTripService,
   deleteTripService,
   startTripService,
+  addTripPaymentService,
 } from "../services/tripService";
 
 import {endTripService } from "./../services/endtripService";
+import { updateTripDatesService, UpdateTripDatesDTO } from "../services/endtripService";
+
+import { addDamageCostService ,updateTripMeterService } from "../services/endtripService"; 
+import { completeTripService } from "../services/tripService"; 
+
 /**
  * Create Trip
  */
@@ -110,5 +116,129 @@ export const endTripController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const addDamageCostController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+    const { damage_amount } = req.body;
+
+    if (damage_amount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "damage_amount is required",
+      });
+    }
+
+    const updatedTrip = await addDamageCostService(trip_id, Number(damage_amount));
+
+    res.status(200).json({
+      success: true,
+      data: updatedTrip,
+      message: "Damage cost added successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addTripPaymentController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+    const { amount, payment_date } = req.body;
+
+    if (amount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment amount is required",
+      });
+    }
+
+    const result = await addTripPaymentService(trip_id, amount, payment_date);
+
+    res.status(201).json({
+      success: true,
+      message: "Payment added successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateTripDatesController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+    const data: UpdateTripDatesDTO = req.body;
+
+    if (!data.leaving_datetime && !data.actual_return_datetime) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one of leaving_datetime or actual_return_datetime is required",
+      });
+    }
+
+    const updatedTrip = await updateTripDatesService(trip_id, data);
+
+    res.status(200).json({
+      success: true,
+      data: updatedTrip,
+      message: "Trip dates updated successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateTripMeterController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+    const { start_meter, end_meter } = req.body;
+
+    if (start_meter === undefined && end_meter === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "At least start_meter or end_meter must be provided",
+      });
+    }
+
+    const updatedTrip = await updateTripMeterService(trip_id, { start_meter, end_meter });
+
+    res.status(200).json({
+      success: true,
+      data: updatedTrip,
+      message: "Trip meters updated and cost recalculated",
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Complete Trip (Only when status = Ended and payment is fully Paid)
+ */
+export const completeTripController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+
+    const completedTrip = await completeTripService(trip_id);
+
+    res.status(200).json({
+      success: true,
+      message: "Trip marked as COMPLETED successfully",
+      data: completedTrip,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
