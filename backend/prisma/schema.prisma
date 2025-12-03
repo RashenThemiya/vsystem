@@ -144,6 +144,11 @@ model Trip {
   total_actual_cost          Decimal?   @db.Decimal(10,2)
   payment_status             PaymentStatus
   trip_status                TripStatus
+  additional_mileage_cost    Decimal?   @db.Decimal(10,2)  // per km after limit
+  fuel_cost                  Decimal?   @db.Decimal(10,2)  // total estimated fuel cost
+  driver_cost                Decimal?   @db.Decimal(10,2)  // driver charge
+  vehicle_rent_daily         Decimal?   @db.Decimal(10,2)
+  fuel_efficiency            Decimal? @db.Decimal(10,2)   // km per liter used at the time of trip
   created_at                 DateTime   @default(now())
   customer                   Customer   @relation(fields: [customer_id], references: [customer_id])
   vehicle                    Vehicle    @relation(fields: [vehicle_id], references: [vehicle_id])
