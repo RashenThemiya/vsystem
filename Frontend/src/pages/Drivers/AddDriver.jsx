@@ -5,7 +5,7 @@ import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
 
-const AddDriver = () => {
+const AddDriver = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const [driver, setDriver] = useState({
     name: "",
@@ -20,11 +20,16 @@ const AddDriver = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+
+  // validation errors
+  const [nicError, setNicError] = useState("");
+  const [contactError, setContactError] = useState("");
+  const [ageError, setAgeError] = useState("");
+
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { name: loggedUser, role } = useAuth();
 
-  // auto clear error after 3s
+  // Auto clear error messages
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 3000);
@@ -32,8 +37,57 @@ const AddDriver = () => {
     }
   }, [error]);
 
+  // Validation functions
+  const validateNIC = (nic) => {
+    const oldNIC = /^[0-9]{9}[vVxX]$/;
+    const newNIC = /^[0-9]{12}$/;
+    return oldNIC.test(nic) || newNIC.test(nic);
+  };
+
+  const validateContact = (num) => {
+    return /^0[0-9]{9}$/.test(num);
+  };
+
+  const validateAge = (age) => {
+    return age >= 18 && age <= 80;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // NIC Validation
+    if (name === "nic") {
+      setDriver({ ...driver, [name]: value });
+      if (value === "" || validateNIC(value)) {
+        setNicError("");
+      } else {
+        setNicError("Invalid NIC format");
+      }
+      return;
+    }
+
+    // Phone Number Validation
+    if (name === "phone_number") {
+      setDriver({ ...driver, [name]: value });
+      if (value === "" || validateContact(value)) {
+        setContactError("");
+      } else {
+        setContactError("Invalid phone number format");
+      }
+      return;
+    }
+
+    // Age Validation
+    if (name === "age") {
+      setDriver({ ...driver, [name]: value });
+      if (value === "" || validateAge(value)) {
+        setAgeError("");
+      } else {
+        setAgeError("Driver must be 18 years or older");
+      }
+      return;
+    }
+
     setDriver({ ...driver, [name]: value });
   };
 
@@ -45,7 +99,7 @@ const AddDriver = () => {
     reader.onloadend = () => {
       setDriver((prev) => ({
         ...prev,
-        image: reader.result.split(",")[1], // remove prefix
+        image: reader.result.split(",")[1],
       }));
     };
     reader.readAsDataURL(file);
@@ -54,6 +108,27 @@ const AddDriver = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConfirmed) return;
+
+    // Stop if validation fails
+    if (nicError || contactError || ageError) {
+      setError("Please fix validation errors before submitting.");
+      return;
+    }
+
+    if (!validateNIC(driver.nic)) {
+      setError("Invalid NIC format.");
+      return;
+    }
+
+    if (!validateContact(driver.phone_number)) {
+      setError("Invalid phone number format.");
+      return;
+    }
+
+    if (!validateAge(driver.age)) {
+      setError("Driver must be at least 18 years old.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -84,34 +159,20 @@ const AddDriver = () => {
         }
       );
 
-      if (response.status === 200 || response.status === 201) {
-        setShowSuccess(true);
-        setDriver({
-          name: "",
-          phone_number: "",
-          driver_charges: "",
-          nic: "",
-          age: "",
-          license_number: "",
-          license_expiry_date: "",
-          image: "",
-        });
+      onSuccess(response.data.data);
 
-        setTimeout(() => {
-          setShowSuccess(false);
-          navigate("/driver-management");
-        }, 2000);
-      }
+      setDriver({
+        name: "",
+        phone_number: "",
+        driver_charges: "",
+        nic: "",
+        age: "",
+        license_number: "",
+        license_expiry_date: "",
+        image: "",
+      });
     } catch (error) {
-      console.error("Error adding driver:", error);
-      if (error.response) {
-        setError(
-          error.response.data.message ||
-            `Error: ${error.response.status} ${error.response.statusText}`
-        );
-      } else {
-        setError("Network error. Please try again.");
-      }
+      setError(error.response?.data?.message || "Network error");
     } finally {
       setLoading(false);
       setIsConfirmed(false);
@@ -128,102 +189,106 @@ const AddDriver = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Add New Driver
-        </h2>
+    <div className="flex justify-center items-center w-100 min-h-screen bg-gray-100">
+      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md">
+        <h2 className="text-xl font-semibold mb-6 text-center">Add New Driver</h2>
 
-        {/* Error message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
             ❌ {error}
           </div>
         )}
 
-        {/* Success message */}
-        {showSuccess && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 text-center">
-            ✅ Driver added successfully!
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
           <input
             type="text"
             name="name"
             placeholder="Driver Name"
             value={driver.name}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-2 border rounded-lg border-gray-300"
             required
           />
 
+          {/* Phone Number */}
           <input
             type="text"
             name="phone_number"
             placeholder="Phone Number (e.g., 0712345678)"
             value={driver.phone_number}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className={`w-full p-2 border rounded-lg ${
+              contactError ? "border-red-500" : "border-gray-300"
+            }`}
             required
           />
+          {contactError && <p className="text-red-500 text-sm">{contactError}</p>}
 
+          {/* Charges */}
           <input
             type="number"
             name="driver_charges"
             placeholder="Driver Charges (LKR)"
             value={driver.driver_charges}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-2 border rounded-lg border-gray-300"
             required
           />
 
+          {/* NIC */}
           <input
             type="text"
             name="nic"
             placeholder="NIC Number"
             value={driver.nic}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className={`w-full p-2 border rounded-lg ${
+              nicError ? "border-red-500" : "border-gray-300"
+            }`}
             required
           />
+          {nicError && <p className="text-red-500 text-sm">{nicError}</p>}
 
+          {/* Age */}
           <input
             type="number"
             name="age"
             placeholder="Age"
             value={driver.age}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className={`w-full p-2 border rounded-lg ${
+              ageError ? "border-red-500" : "border-gray-300"
+            }`}
             required
           />
+          {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
 
+          {/* License Number */}
           <input
             type="text"
             name="license_number"
             placeholder="License Number"
             value={driver.license_number}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full p-2 border rounded-lg border-gray-300"
             required
           />
 
+          {/* License Expiry */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              License Expiry Date
-            </label>
+            <label className="text-sm text-gray-600">License Expiry Date</label>
             <input
               type="date"
               name="license_expiry_date"
               value={driver.license_expiry_date}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 border rounded-lg border-gray-300"
               required
             />
           </div>
 
-          {/* Image upload */}
+          {/* Image Upload */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Driver Image
@@ -231,18 +296,17 @@ const AddDriver = () => {
             <input
               type="file"
               accept="image/*"
-              name="image"
               onChange={handleFileChange}
               className="w-full border p-2 rounded-lg"
               required
             />
           </div>
 
+          {/* Confirm Wrapper */}
           <ConfirmWrapper
             onConfirm={handleConfirm}
             onCancel={handleCancel}
             message="Confirm Adding Driver"
-            additionalInfo="Please verify the driver details before submission."
             confirmText="Yes, Add Driver"
             cancelText="No, Go Back"
             icon={<FiUserPlus />}
@@ -251,7 +315,7 @@ const AddDriver = () => {
           >
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+              className="w-full py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Driver"}
@@ -260,8 +324,8 @@ const AddDriver = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/driver-management")}
-            className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+            onClick={onCancel}
+            className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg"
           >
             Cancel
           </button>

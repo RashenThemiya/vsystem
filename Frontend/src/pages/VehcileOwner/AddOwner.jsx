@@ -5,7 +5,7 @@ import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext"; // adjust path if needed
 
-const AddOwner = () => {
+const AddOwner = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const [owner, setOwner] = useState({
     owner_name: "",
@@ -15,6 +15,7 @@ const AddOwner = () => {
   const [error, setError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   const { name, role } = useAuth();
 
   useEffect(() => {
@@ -26,11 +27,23 @@ const AddOwner = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Phone Validation (10 digits, starts with 0)
+  if (name === "contact_number") {
+    const phonePattern = /^0\d{9}$/;
+
+    if (!phonePattern.test(value)) {
+      setPhoneError("Phone must start with 0 and contain exactly 10 digits.");
+    } else {
+      setPhoneError("");
+    }
+  }
     setOwner({ ...owner, [name]: value });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!isConfirmed) return;
 
     setLoading(true);
@@ -57,15 +70,12 @@ const AddOwner = () => {
 
       if (response.status === 200 || response.status === 201) {
         setShowSuccess(true);
+        onSuccess(response.data.data);
         setOwner({
           owner_name: "",
           contact_number: "",
         });
 
-        setTimeout(() => {
-          setShowSuccess(false);
-          navigate("/vehicle-owner");
-        }, 2000);
       }
     } catch (error) {
       console.error("Error adding owner:", error);
@@ -93,9 +103,9 @@ const AddOwner = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
+    <div className="flex justify-center items-center w-100 min-h-screen bg-white-100">
+      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md">
+        <h2 className="text-xl font-semibold mb-6 text-center">
           Add New Vehicle Owner
         </h2>
 
@@ -131,6 +141,7 @@ const AddOwner = () => {
             className="w-full p-2 border border-gray-300 rounded-lg"
             required
           />
+          {phoneError && <p className="text-red-600 text-sm mt-1">{phoneError}</p>}
 
           <ConfirmWrapper
             onConfirm={handleConfirm}
@@ -154,7 +165,7 @@ const AddOwner = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/vehicle-owner")}
+             onClick={onCancel}
             className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
           >
             Cancel

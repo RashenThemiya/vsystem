@@ -1,9 +1,18 @@
 import { prisma } from "../config/prismaClient.js";
 
+interface CustomerInput {
+  name: string;
+  nic: string;
+  phone_number: string,
+  email: string;
+  nic_photo_front?: string;
+  nic_photo_back?: string;
+}
+
 /**
  * Helper: Convert base64 → Uint8Array<ArrayBuffer>
  */
-const toPrismaBytes = (b64) => {
+const toPrismaBytes = (b64?: string): Uint8Array<ArrayBuffer> | null => {
   if (!b64) return null;
   const buffer = Buffer.from(b64, "base64");
   const arrayBuffer = buffer.buffer.slice(
@@ -16,7 +25,7 @@ const toPrismaBytes = (b64) => {
 /**
  * Helper: Convert Prisma Bytes → Base64 string
  */
-const fromPrismaBytes = (bytes) => {
+const fromPrismaBytes = (bytes?: Uint8Array | null): string | null  => {
   if (!bytes) return null;
   return `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`;
 };
@@ -24,7 +33,10 @@ const fromPrismaBytes = (bytes) => {
 /**
  * ✅ Create a new customer
  */
-export const createCustomerService = async (data) => {
+const phoneRegex = /^(?:\+94|0)?7\d{8}$/; 
+const nicRegex = /^(\d{9}[VvXx]|\d{12})$/;
+
+export const createCustomerService = async (data: CustomerInput) => {
   const { name, nic, phone_number, email, nic_photo_front, nic_photo_back } = data;
 
   if (!name || !nic || !phone_number || !email) {
@@ -34,16 +46,34 @@ export const createCustomerService = async (data) => {
   const existing = await prisma.customer.findUnique({ where: { email } });
   if (existing) throw new Error("Customer with this email already exists");
 
-  return await prisma.customer.create({
-    data: {
-      name,
-      nic,
-      phone_number,
-      email,
-      nic_photo_front: toPrismaBytes(nic_photo_front),
-      nic_photo_back: toPrismaBytes(nic_photo_back),
-    },
-  });
+  // Phone validation
+  {/*if (!phoneRegex.test(phone_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }
+
+  // NIC validation
+  if (!nicRegex.test(nic)) {
+    throw new Error("NIC must be 9 digits + V/v/X/x or 12 digits");
+  }*/}
+
+  const newCustomer = await prisma.customer.create({
+  data: {
+    name,
+    nic,
+    phone_number,
+    email,
+    nic_photo_front: nic_photo_front ? toPrismaBytes(nic_photo_front.split(",")[1]) : null,
+    nic_photo_back: nic_photo_back ? toPrismaBytes(nic_photo_back.split(",")[1]) : null,
+  },
+});
+
+// Convert NIC photos to base64 before sending to frontend
+return {
+  ...newCustomer,
+  nic_photo_front: fromPrismaBytes(newCustomer.nic_photo_front),
+  nic_photo_back: fromPrismaBytes(newCustomer.nic_photo_back),
+};
+
 };
 
 /**
@@ -63,7 +93,7 @@ export const getAllCustomersService = async () => {
 /**
  * ✅ Get single customer by ID
  */
-export const getCustomerByIdService = async (id) => {
+export const getCustomerByIdService = async (id: number) => {
   const customer = await prisma.customer.findUnique({
     where: { customer_id: id },
     include: { trips: true },
@@ -81,12 +111,22 @@ export const getCustomerByIdService = async (id) => {
 /**
  * ✅ Update customer by ID
  */
-export const updateCustomerService = async (id, data) => {
+export const updateCustomerService = async (id: number, data: Partial<CustomerInput>) => {
   const existing = await prisma.customer.findUnique({
     where: { customer_id: id },
   });
 
   if (!existing) throw new Error("Customer not found");
+
+  //  Validate phone only if user tries to update it
+  {/*if (data.phone_number && !phoneRegex.test(data.phone_number)) {
+    throw new Error("Phone number must be 10 digits");
+  }
+
+  //  Validate NIC only if user updates it
+  if (data.nic && !nicRegex.test(data.nic)) {
+    throw new Error("NIC must be 9 digits + V/v/X/x or 12 digits");
+  }*/}
 
   const updateData = {
     name: data.name ?? existing.name,

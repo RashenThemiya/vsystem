@@ -5,7 +5,7 @@ import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
 
-const AddCustomer = () => {
+const AddCustomer = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState({
     name: "",
@@ -20,6 +20,9 @@ const AddCustomer = () => {
   const [error, setError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [AddCustomerMode, setAddCustomerMode] = useState(false);
+  const [nicError, setNicError] = useState("");
+  const [contactError, setContactError] = useState("");
   const { name: loggedUser, role } = useAuth();
 
   useEffect(() => {
@@ -31,6 +34,26 @@ const AddCustomer = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "nic") {
+    if (value === "" || validateNIC(value)) {
+      setCustomer({ ...customer, [name]: value });
+      setNicError(""); 
+    } else {
+      setCustomer({ ...customer, [name]: value });
+      setNicError("Invalid NIC format");
+    }
+    return;
+  }
+  if (name === "phone_number") {
+    if (value === "" || validateContact(value)) {
+      setCustomer({ ...customer, [name]: value });
+      setContactError(""); 
+    } else {
+      setCustomer({ ...customer, [name]: value });
+      setContactError("Invalid Phone Number format");
+    }
+    return;
+  }
     setCustomer({ ...customer, [name]: value });
   };
 
@@ -50,8 +73,10 @@ const AddCustomer = () => {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!isConfirmed) return;
 
     setLoading(true);
@@ -64,10 +89,18 @@ const AddCustomer = () => {
       return;
     }
 
+    
+
     try {
+      const payload = {
+        ...customer,
+        nic_photo_front: customer.nic_photo_front ? `data:image/png;base64,${customer.nic_photo_front}` : null,
+        nic_photo_back: customer.nic_photo_back ? `data:image/png;base64,${customer.nic_photo_back}` : null,
+      };
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/customers`,
-        customer,
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -77,6 +110,9 @@ const AddCustomer = () => {
       );
 
       if (response.status === 200 || response.status === 201) {
+        if (onSuccess) {
+                onSuccess(response.data.data); // Pass the newly created customer data (if the API returns it)
+            }
         setShowSuccess(true);
         setCustomer({
           name: "",
@@ -86,10 +122,16 @@ const AddCustomer = () => {
           phone_number: "",
           email: "",
         });
+       
 
         setTimeout(() => {
           setShowSuccess(false);
-          navigate("/customer-management");
+          if (onCancel) {
+                    onCancel(); 
+                } else {
+                    navigate("/customer-dashboard");
+                }
+                
         }, 2000);
       }
     } catch (error) {
@@ -115,12 +157,28 @@ const AddCustomer = () => {
 
   const handleCancel = () => {
     setIsConfirmed(false);
+    if (onCancel) onCancel(); // <-- call parent handler
   };
 
+  const validateNIC = (nic) => {
+  const oldNIC = /^[0-9]{9}[vVxX]$/;   // 9 numbers + V/X
+  const newNIC = /^[0-9]{12}$/;        // 12 numbers
+
+  return oldNIC.test(nic) || newNIC.test(nic);
+  };
+  const validateContact = (contact_number) => {
+    const contact = /^0[0-9]{9}$/;   // 10 numbers
+
+    return contact.test(contact_number);
+  };
+
+
+  
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
+    
+    <div className="flex justify-center items-center w-100 min-h-screen bg-grey-100">
+      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md">
+        <h2 className="text-xl font-semibold mb-6 text-center">
           Add New Customer
         </h2>
 
@@ -147,16 +205,23 @@ const AddCustomer = () => {
             required
           />
 
-          <input
-            type="text"
-            name="nic"
-            placeholder="NIC Number"
-            value={customer.nic}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
-            required
-          />
+          
+            <input
+              type="text"
+              name="nic"
+              placeholder="NIC Number"
+              value={customer.nic}
+              onChange={handleChange}
+              className={`w-full p-2 border rounded-lg ${
+                nicError ? "border-red-500" : "border-gray-300"
+              }`}
+              required
+            />
 
+            {nicError && (
+              <p className="text-red-500 text-sm mt-1">{nicError}</p>
+            )}
+        
           {/* NIC Front Image */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
@@ -190,12 +255,18 @@ const AddCustomer = () => {
           <input
             type="text"
             name="phone_number"
-            placeholder="Phone Number (e.g., 0712345678)"
+            placeholder="Phone Number (e.g., 07XXXXXXXX)"
             value={customer.phone_number}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className={`w-full p-2 border rounded-lg ${
+                contactError ? "border-red-500" : "border-gray-300"
+              }`}
             required
           />
+           {contactError && (
+              <p className="text-red-500 text-sm mt-1">{contactError}</p>
+            )}
+
 
           <input
             type="email"
@@ -220,7 +291,7 @@ const AddCustomer = () => {
           >
             <button
               type="submit"
-              className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Customer"}
@@ -229,7 +300,7 @@ const AddCustomer = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/customer-management")}
+            onClick={handleCancel}
             className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
           >
             Cancel

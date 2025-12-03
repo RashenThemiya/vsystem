@@ -5,7 +5,7 @@ import { FiUserPlus } from "react-icons/fi";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
 
-const AddAdminRole = () => {
+const AddAdminRole = ({onClose, onSuccess}) => {
   const navigate = useNavigate();
   const { name: loggedUser, role } = useAuth();
 
@@ -103,9 +103,10 @@ const AddAdminRole = () => {
 
       if (res.status === 200 || res.status === 201) {
         setSuccess(true);
+        onSuccess(res.data.data);
         setTimeout(() => {
           setSuccess(false);
-          navigate("/admin-role-management");
+          
         }, 2000);
       }
     } catch (err) {
@@ -129,9 +130,9 @@ const AddAdminRole = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">
+    <div className="flex justify-center items-center w-100 min-h-screen bg-white-100">
+      <div className="bg-white p-10 rounded-lg shadow-lg  h-full w-full max-w-lg">
+        <h2 className="text-xl font-semibold mb-6 text-center">
           Create New Admin Role
         </h2>
 
@@ -155,7 +156,7 @@ const AddAdminRole = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full p-2 border border-gray-300 rounded-lg"
             required
           />
 
@@ -166,7 +167,7 @@ const AddAdminRole = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full p-2 border border-gray-300 rounded-lg"
             required
           />
 
@@ -175,7 +176,7 @@ const AddAdminRole = () => {
             name="role"
             value={formData.role}
             onChange={handleRoleChange}
-            className="w-full border p-2 rounded-lg"
+            className="w-full p-2 border border-gray-300 rounded-lg"
             required
           >
             <option value="SuperAdmin">SuperAdmin</option>
@@ -253,7 +254,7 @@ const AddAdminRole = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/admin-role-management")}
+            onClick={onClose}
             className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
           >
             Cancel
