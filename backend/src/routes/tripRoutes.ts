@@ -5,9 +5,16 @@ import {
   getTripByIdController,
   updateTripController,
   deleteTripController,
+  startTripController,
+  endTripController,
+  addDamageCostController,
+  addTripPaymentController,
+  updateTripDatesController ,
+  updateTripMeterController  // ✅ import endTripController
 } from "../controllers/tripController";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorizeRoles } from "../middlewares/role.middleware";
+import { completeTripController } from "../controllers/tripController";
 
 const router = Router();
 
@@ -22,5 +29,41 @@ router.get("/:id", authorizeRoles("Admin", "SuperAdmin", "Driver", "Customer"), 
 router.post("/", authorizeRoles("Admin", "SuperAdmin"), createTripController);
 router.put("/:id", authorizeRoles("Admin", "SuperAdmin"), updateTripController);
 router.delete("/:id", authorizeRoles("Admin", "SuperAdmin"), deleteTripController);
+
+// ----------------- Trip Lifecycle Routes -----------------
+// Start trip (change status: Pending -> Ongoing, update vehicle & trip start_meter)
+router.patch("/:id/start", authorizeRoles("Admin", "SuperAdmin"), startTripController);
+
+// End trip (change status: Ongoing -> Ended, update vehicle meter, actual distance, cost, etc.)
+router.patch("/:id/end", authorizeRoles("Admin", "SuperAdmin"), endTripController);
+router.patch(
+  "/:id/damage",
+  authorizeRoles("Admin", "SuperAdmin"),
+  addDamageCostController
+);
+
+
+router.post(
+  "/:id/payment",
+  authorizeRoles("Admin", "SuperAdmin"),
+  addTripPaymentController
+);
+
+router.patch(
+  "/:id/update-dates",
+  authorizeRoles("Admin", "SuperAdmin"),
+  updateTripDatesController
+);
+router.patch(
+  "/:id/update-meter",
+  authorizeRoles("Admin", "SuperAdmin"),
+  updateTripMeterController
+);
+// Complete trip (Only if Ended + Paid)
+router.patch(
+  "/:id/complete",
+  authorizeRoles("Admin", "SuperAdmin"),
+  completeTripController
+);
 
 export default router;

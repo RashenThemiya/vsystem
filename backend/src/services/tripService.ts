@@ -1,5 +1,6 @@
 import { prisma } from "../config/prismaClient.js";
 import { Prisma, Driver } from "@prisma/client";
+import { TripStatus, PaymentStatus } from "@prisma/client";
 
 // ==================== DTOs ====================
 export interface MapLocationDTO {
@@ -140,6 +141,15 @@ export const createTripService = async (data: CreateTripDTO) => {
     },
     include: { map: true, other_trip_costs: true },
   });
+if (data.advance_payment) {
+  await prisma.payment.create({
+    data: {
+      trip_id: trip.trip_id,
+      amount: new Prisma.Decimal(data.advance_payment),
+      payment_date: new Date(), // always a valid date
+    },
+  });
+}
 
   return trip;
 };
@@ -230,36 +240,320 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
 };
 
 // ========================= GET ALL TRIPS =========================
-export const getAllTripsService = async () => {
+interface GetTripsFilter {
+  trip_status?: string; // optional filter by status
+  start_date?: string;  // ISO string, optional
+  end_date?: string;    // ISO string, optional
+}
+
+export const getAllTripsService = async (filters?: GetTripsFilter) => {
+  const where: any = {};
+
+  // Filter by status
+  if (filters?.trip_status) {
+    where.trip_status = filters.trip_status;
+  }
+
+  // Filter by leaving date range
+  if (filters?.start_date && filters?.end_date) {
+    where.leaving_datetime = {
+      gte: new Date(filters.start_date),
+      lte: new Date(filters.end_date),
+    };
+  }
+
   return await prisma.trip.findMany({
-    include: {
-      map: { orderBy: { sequence: "asc" } },
-      customer: true,
-      vehicle: true,
-      driver: true,
-      payments: true,
-      other_trip_costs: true,
+    where,
+    select: {
+      trip_id: true,
+      from_location: true,
+      to_location: true,
+      up_down: true,
+      estimated_distance: true,
+      actual_distance: true,
+      estimated_days: true,
+      actual_days: true,
+      leaving_datetime: true,
+      estimated_return_datetime: true,
+      actual_return_datetime: true,
+      driver_required: true,
+      estimated_cost: true,
+      actual_cost: true,
+      mileage_cost: true,
+      fuel_required: true,
+      num_passengers: true,
+      discount: true,
+      damage_cost: true,
+      payment_amount: true,
+      advance_payment: true,
+      start_meter: true,
+      end_meter: true,
+      total_estimated_cost: true,
+      total_actual_cost: true,
+      payment_status: true,
+      trip_status: true,
+      vehicle_rent_daily: true,
+      fuel_efficiency: true,
+      fuel_cost: true,
+      driver_cost: true,
+      additional_mileage_cost: true,
+      created_at: true,
+
+      // Map locations
+      map: {
+        select: {
+          map_id: true,
+          location_name: true,
+          latitude: true,
+          longitude: true,
+          sequence: true,
+        },
+        orderBy: { sequence: "asc" },
+      },
+
+      // Customer without images
+      customer: {
+        select: {
+          customer_id: true,
+          name: true,
+          phone_number: true,
+          email: true,
+          nic: true,
+        },
+      },
+
+      // Vehicle without images
+      vehicle: {
+        select: {
+          vehicle_id: true,
+          vehicle_number: true,
+          name: true,
+          type: true,
+          rent_cost_daily: true,
+          fuel_id: true,
+          ac_type: true,
+          vehicle_fuel_efficiency: true,
+          mileage_costs: {
+            select: {
+              mileage_cost_id: true,
+              mileage_cost: true,
+              mileage_cost_additional: true,
+            },
+          },
+          fuel: {
+            select: {
+              fuel_id: true,
+              type: true,
+              cost: true,
+            },
+          },
+        },
+      },
+
+      // Driver without images
+      driver: {
+        select: {
+          driver_id: true,
+          name: true,
+          phone_number: true,
+          driver_charges: true,
+          nic: true,
+          age: true,
+          license_number: true,
+          license_expiry_date: true,
+        },
+      },
+
+      // Payments
+      payments: {
+        select: {
+          payment_id: true,
+          amount: true,
+          payment_date: true,
+        },
+      },
+
+      // Other trip costs
+      other_trip_costs: {
+        select: {
+          trip_other_cost_id: true,
+          cost_type: true,
+          cost_amount: true,
+        },
+      },
     },
   });
 };
 
+// ========================= START TRIP =========================
+export const startTripService = async (trip_id: number, start_meter: number) => {
+  const trip = await prisma.trip.findUnique({ where: { trip_id } });
+  if (!trip) throw new Error("Trip not found");
+  if (trip.trip_status !== "Pending") throw new Error("Only pending trips can be started");
+
+  // Update trip and vehicle meter
+  const updatedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      trip_status: "Ongoing",
+      start_meter,
+    },
+  });
+
+  await prisma.vehicle.update({
+    where: { vehicle_id: trip.vehicle_id },
+    data: { meter_number: start_meter },
+  });
+
+  return updatedTrip;
+};
 // ========================= GET SINGLE TRIP =========================
 export const getTripByIdService = async (trip_id: number) => {
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
-    include: {
-      map: { orderBy: { sequence: "asc" } },
-      customer: true,
-      vehicle: true,
-      driver: true,
+    select: {
+      // === Trip base fields (all needed fields) ===
+      trip_id: true,
+      map_id: true,
+      customer_id: true,
+      vehicle_id: true,
+      from_location: true,
+      to_location: true,
+      up_down: true,
+      estimated_distance: true,
+      actual_distance: true,
+      estimated_days: true,
+      actual_days: true,
+      leaving_datetime: true,
+      estimated_return_datetime: true,
+      actual_return_datetime: true,
+      driver_required: true,
+      driver_id: true,
+      estimated_cost: true,
+      actual_cost: true,
+      mileage_cost: true,
+      fuel_required: true,
+      num_passengers: true,
+      discount: true,
+      damage_cost: true,
+      payment_amount: true,
+      advance_payment: true,
+      start_meter: true,
+      end_meter: true,
+      total_estimated_cost: true,
+      total_actual_cost: true,
+      payment_status: true,
+      trip_status: true,
+      additional_mileage_cost: true,
+      fuel_cost: true,
+      driver_cost: true,
+      vehicle_rent_daily: true,
+      fuel_efficiency: true,
+      created_at: true,
+
+      // === Map ===
+      map: {
+        orderBy: { sequence: "asc" },
+      },
+
+      // === Customer ===
+      customer: {
+        select: {
+          customer_id: true,
+          nic: true,
+          name: true,
+          phone_number: true,
+          email: true,
+          nic_photo_front: true,
+          nic_photo_back: true,
+        },
+      },
+
+      // === Driver ===
+      driver: {
+        select: {
+          driver_id: true,
+          name: true,
+          phone_number: true,
+          driver_charges: true,
+          nic: true,
+          age: true,
+          license_number: true,
+          license_expiry_date: true,
+          image: true,        // KEEP ONLY THIS IMAGE
+        },
+      },
+
+      // === Vehicle (ONLY needed fields) ===
+      vehicle: {
+        select: {
+          vehicle_id: true,
+          vehicle_number: true,
+          name: true,
+          type: true,
+          rent_cost_daily: true,
+          fuel_id: true,
+          ac_type: true,
+          owner_cost_monthly: true,
+          license_expiry_date: true,
+          insurance_expiry_date: true,
+          eco_test_expiry_date: true,
+          vehicle_fuel_efficiency: true,
+          vehicle_availability: true,
+          meter_number: true,
+          last_service_meter_number: true,
+          owner_id: true,
+
+          // ONLY THIS IMAGE SHOULD BE FETCHED
+          image: true,
+
+          // ❌ DO NOT FETCH THESE:
+          // license_image: false
+          // insurance_card_image: false
+          // eco_test_image: false
+          // book_image: false
+        },
+      },
+
+      // === Payments ===
       payments: true,
+
+      // === Other trip costs ===
       other_trip_costs: true,
     },
   });
 
   if (!trip) throw new Error("Trip not found");
-  return trip;
+
+  const toBase64 = (bytes: Uint8Array | null) =>
+    bytes ? Buffer.from(bytes).toString("base64") : null;
+
+  return {
+    ...trip,
+    customer: trip.customer
+      ? {
+          ...trip.customer,
+          nic_photo_front: toBase64(trip.customer.nic_photo_front),
+          nic_photo_back: toBase64(trip.customer.nic_photo_back),
+        }
+      : null,
+
+    driver: trip.driver
+      ? {
+          ...trip.driver,
+          image: toBase64(trip.driver.image),
+        }
+      : null,
+
+    vehicle: trip.vehicle
+      ? {
+          ...trip.vehicle,
+          image: toBase64(trip.vehicle.image),
+        }
+      : null,
+  };
 };
+
 
 // ========================= DELETE TRIP =========================
 export const deleteTripService = async (trip_id: number) => {
@@ -267,4 +561,85 @@ export const deleteTripService = async (trip_id: number) => {
   await prisma.other_Trip_Cost.deleteMany({ where: { trip_id } });
   await prisma.trip.delete({ where: { trip_id } });
   return true;
+};
+
+
+export const completeTripService = async (trip_id: number) => {
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+
+  if (trip.trip_status !== TripStatus.Ended)
+    throw new Error("Only trips with status 'Ended' can be completed");
+
+  // ✅ Check full payment before completing
+  if (trip.payment_status !== PaymentStatus.Paid)
+    throw new Error("Cannot complete trip: full payment is not done");
+
+  // Update trip to Completed
+  const completedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      trip_status: TripStatus.Completed,
+      actual_return_datetime: new Date(), // mark completion time
+    },
+  });
+
+  return completedTrip;
+};
+
+
+/**
+ * Add a payment to a trip and update payment status automatically
+ * @param trip_id - Trip ID
+ * @param amount - Payment amount
+ * @param payment_date - Optional payment date
+ */
+export const addTripPaymentService = async (
+  trip_id: number,
+  amount: number,
+  payment_date?: Date | string
+) => {
+  // 1️⃣ Find the trip
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+    select: { trip_id: true, total_actual_cost: true, payment_amount: true, payment_status: true },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+
+  // 2️⃣ Create new payment row
+  const payment = await prisma.payment.create({
+    data: {
+      trip_id,
+      amount: new Prisma.Decimal(amount),
+      payment_date: payment_date ? new Date(payment_date) : new Date(),
+    },
+  });
+
+  // 3️⃣ Calculate new total payment
+  const newTotalPayment = (trip.payment_amount ?? new Prisma.Decimal(0)).plus(amount);
+
+  // 4️⃣ Update payment status automatically
+  let newPaymentStatus: PaymentStatus = PaymentStatus.Unpaid;
+  if (trip.total_actual_cost !== null) {
+    if (newTotalPayment.gte(trip.total_actual_cost)) {
+      newPaymentStatus = PaymentStatus.Paid;
+    } else if (newTotalPayment.gt(0)) {
+      newPaymentStatus = PaymentStatus.Partially_Paid;
+    }
+  }
+
+  // 5️⃣ Update trip with new payment info
+  const updatedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      payment_amount: newTotalPayment,
+      payment_status: newPaymentStatus,
+    },
+  });
+
+  return { payment, updatedTrip };
 };
