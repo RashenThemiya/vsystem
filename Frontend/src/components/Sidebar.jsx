@@ -5,37 +5,31 @@ import {
   FaHome,
   FaNewspaper,
   FaSignOutAlt,
-  FaTimes,
   FaUsers,
   FaUserFriends,
   FaTruck,
   FaUserShield,
   FaIdCard,
-   // ✅ Added Admin Role icon
 } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./../context/AuthContext";
 import ConfirmWrapper from "./ConfirmWrapper";
 
-// ✅ Sidebar Component
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { logout, role } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // ✅ All Menu Items (filtered below by role)
   const baseMenuItems = [
     { path: "/admin-dashboard", icon: <FaHome />, label: "Dashboard" },
     { path: "/owner-dashboard", icon: <FaUsers />, label: "Vehicle Owner" },
     { path: "/customer-dashboard", icon: <FaUserFriends />, label: "Customer Management" },
     { path: "/driver-dashboard", icon: <FaIdCard />, label: "Driver Management" },
-    /*{ path: "/product-management", icon: <FaBox />, label: "Product" },
-    { path: "/publication", icon: <FaNewspaper />, label: "Publication" },*/
-    {path:"/vehicle-dashboard", icon:<FaTruck />, label:"Vehicle Management" },
-    {path:"/trip-management", icon:<FaBox />, label:"Trip Management" },
+    { path: "/vehicle-dashboard", icon: <FaTruck />, label: "Vehicle Management" },
+    { path: "/trip-management", icon: <FaBox />, label: "Trip Management" },
   ];
 
-  // ✅ Only SuperAdmin sees Admin Role Management
   if (role === "SuperAdmin") {
     baseMenuItems.push({
       path: "/admin-role-dashboard",
@@ -48,44 +42,53 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/"); // Redirect to home page
+    navigate("/");
   };
 
   return (
     <>
-      {/* 🌐 Desktop Sidebar */}
+      {/* Desktop Sidebar */}
       <div
-        className={`bg-gray-900 text-white transition-all duration-300 ${
-          isExpanded ? "w-64" : "w-16"
+        className={`bg-purple-700 text-white transition-all duration-300 ${
+          isExpanded ? "w-64" : "w-20"
         } fixed md:relative top-0 left-0 h-full z-50 flex flex-col hidden md:flex`}
       >
         {/* Toggle Button */}
         <button
-          className="text-white p-4 focus:outline-none hover:bg-gray-700 transition md:flex items-center justify-center"
+          className="text-white p-4 focus:outline-none hover:bg-purple-800 transition md:flex items-center justify-center"
           onClick={toggleSidebar}
         >
-          {isExpanded ? <FaTimes size={24} /> : <FaBars size={24} />}
+          {isExpanded ? <FaBars size={28} /> : <FaBars size={28} />}
         </button>
 
         {/* Menu Items */}
-        <ul className="mt-4 space-y-2 flex-grow">
-          {baseMenuItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className="flex items-center p-2 hover:bg-gray-700 transition rounded-lg"
-              >
-                <span className="text-xl ml-4 mr-4">{item.icon}</span>
-                <span
-                  className={`transition-all duration-300 ${
-                    isExpanded ? "opacity-100" : "opacity-0 hidden"
+        <ul className="mt-4 space-y-4 flex-grow">
+          {baseMenuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center p-3 transition rounded-lg ${
+                    isActive
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg text-white font-bold scale-105"
+                      : "hover:bg-purple-800"
                   }`}
                 >
-                  {item.label}
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <span className={`ml-4 mr-3 ${isActive ? "text-3xl" : "text-2xl"}`}>
+                    {item.icon}
+                  </span>
+                  <span
+                    className={`transition-all duration-300 text-sm font-medium ${
+                      isExpanded ? "opacity-100" : "opacity-0 hidden"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Logout */}
@@ -93,12 +96,12 @@ const Sidebar = () => {
           onConfirm={handleLogout}
           message={"Are you sure you want to logout?"}
         >
-          <button className="flex items-center p-2 mt-auto hover:bg-red-600 transition rounded-lg text-white w-full text-left">
-            <span className="text-xl ml-4 mr-4">
+          <button className="flex items-center p-3 mt-auto hover:bg-red-600 transition rounded-lg text-white w-full text-left">
+            <span className="text-2xl ml-4 mr-3">
               <FaSignOutAlt />
             </span>
             <span
-              className={`transition-all duration-300 ${
+              className={`transition-all duration-300 text-sm font-medium ${
                 isExpanded ? "opacity-100" : "opacity-0 hidden"
               }`}
             >
@@ -108,11 +111,15 @@ const Sidebar = () => {
         </ConfirmWrapper>
       </div>
 
-      {/* 📱 Mobile Bottom Navigation */}
-      <div className="bg-gray-900 text-white fixed bottom-0 left-0 w-full flex justify-around p-2 md:hidden z-50">
+      {/* Mobile Bottom Navigation */}
+      <div className="bg-purple-700 text-white fixed bottom-0 left-0 w-full flex justify-around p-2 md:hidden z-50">
         {baseMenuItems.map((item) => (
-          <Link key={item.path} to={item.path} className="flex flex-col items-center">
-            <span className="text-xl">{item.icon}</span>
+          <Link
+            key={item.path}
+            to={item.path}
+            className="flex flex-col items-center text-white"
+          >
+            <span className="text-2xl">{item.icon}</span>
           </Link>
         ))}
 
@@ -121,8 +128,8 @@ const Sidebar = () => {
           onConfirm={handleLogout}
           message={"Are you sure you want to logout?"}
         >
-          <button className="flex flex-col items-center text-red-500">
-            <span className="text-xl">
+          <button className="flex flex-col items-center text-red-400">
+            <span className="text-2xl">
               <FaSignOutAlt />
             </span>
           </button>

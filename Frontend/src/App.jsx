@@ -45,7 +45,8 @@ import VehicleDashboard from './pages/VehicleManagement/VehicleDashboard';
 import AdminRoleDashboard from './pages/AdminRoleManagement/AdminDashboard';
 import TripView from './pages/TripManagement/viewtrip'; 
 import TripDetails from './pages/TripManagement/TripDetails';
-
+import DriverProfile from './pages/Drivers/DriverProfile';
+import VehicleProfile from './pages/VehicleManagement/VehicleProfile';
 function App() {
   return (
     <AuthProvider>
@@ -93,6 +94,7 @@ function App() {
             <Route path="/view-drivers" element={<PrivateRoute><ViewAllDrivers /></PrivateRoute>} />
             <Route path="/edit-driver/:id" element={<PrivateRoute><EditDriver /></PrivateRoute>} />*/}
             <Route path="/driver-dashboard" element={<PrivateRoute><DriverDashboard /></PrivateRoute>} />
+            <Route path="/driver-profile/:driverId" element={<PrivateRoute><DriverProfile /></PrivateRoute>} />
 
             {/* Admin Role Management Route */}
             {/*<Route
@@ -112,6 +114,8 @@ function App() {
             <Route path="/view-vehicles" element={<PrivateRoute><ViewVehicles /></PrivateRoute>} /> 
             <Route path="/vehicles/edit/:id" element={<PrivateRoute><EditVehicle /></PrivateRoute>} />*/}
              <Route path="/vehicle-dashboard" element={<PrivateRoute><VehicleDashboard /></PrivateRoute>} />
+<Route path="/vehicles/:id" element={<PrivateRoute><VehicleProfile /></PrivateRoute>} />
+
             {/* Trip Management Routes */}
             <Route
               path="/trip-management"
