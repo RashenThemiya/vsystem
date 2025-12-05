@@ -150,11 +150,7 @@ export const getVehicleByIdService = async (id: number) => {
       bill_uploads: true,
       trips: {
         include: {
-          customer: true,
-          driver: true,
-          payments: true,
-          map: true,
-          other_trip_costs: true,
+   
         },
       },
     },
