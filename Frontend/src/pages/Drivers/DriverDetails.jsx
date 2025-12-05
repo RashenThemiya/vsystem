@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";      // ⬅ ADDED
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/axiosInstance";
@@ -11,6 +12,8 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
   const [error, setError] = useState(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+
+  const navigate = useNavigate();    // ⬅ ADDED
 
   useEffect(() => {
     setForm({ ...driver });
@@ -35,7 +38,7 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
     reader.readAsDataURL(file);
   };
 
-  // Save edited customer
+  // Save edited driver
   const handleSave = async () => {
     if (!isConfirmed) return;
     setLoading(true);
@@ -50,7 +53,7 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
         age: form.age,
         license_number: form.license_number,
         license_expiry_date: form.license_expiry_date,
-        image:form.image,
+        image: form.image,
       };
 
       const response = await api.put(
@@ -59,11 +62,13 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
-      onUpdated(response.data.data); // update parent
+      onUpdated(response.data.data);
       setEditMode(false);
       setIsConfirmed(false);
+
       setSuccessMsg("Driver updated successfully!");
       setTimeout(() => setSuccessMsg(""), 2000);
+
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to update driver.");
@@ -77,17 +82,19 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
   const handleDelete = async () => {
     setLoading(true);
     setError(null);
+
     try {
       await api.delete(`/api/drivers/${driver.driver_id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      onDelete(driver.driver_id); // update parent
+      onDelete(driver.driver_id);
       setSuccessMsg("Driver deleted successfully!");
       setTimeout(() => setSuccessMsg(""), 2000);
+
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Driver to delete customer.");
+      setError(err.response?.data?.message || "Failed to delete driver.");
     } finally {
       setLoading(false);
     }
@@ -101,43 +108,66 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
   return (
     <div className="flex justify-center items-center w-100 min-h-screen bg-gray-100">
       <div className="bg-white p-13 rounded-lg shadow-lg w-full h-full max-w-md overflow-auto max-h-full relative">
+        
         <h2 className="text-xl font-semibold mb-5 text-center">
           {editMode ? "Edit Driver" : "Driver Details"}
         </h2>
 
+        {/* Error message */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center">
             ❌ {error}
           </div>
         )}
 
+        {/* Success message */}
         {successMsg && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 text-center">
             ✅ {successMsg}
           </div>
         )}
 
+        {/* ---------- DRIVER DETAILS PANEL ---------- */}
         {!editMode && (
           <div className="space-y-4 text-gray-700">
-            <p><strong>Name:</strong> {driver.name}</p>
+
+            {/* CLICKABLE DRIVER NAME → NAVIGATE */}
+            <p>
+              <strong>Name:</strong>
+              <span
+                className="text-blue-600 cursor-pointer ml-1 underline hover:text-blue-900"
+                onClick={() => navigate(`/driver-profile/${driver.driver_id}`)}   // ⬅ ADDED
+              >
+                {driver.name}
+              </span>
+            </p>
+
             <p><strong>Phone:</strong> {driver.phone_number}</p>
-            <p><strong>Driver Charges:</strong> {driver.phone_number}</p>
+            <p><strong>Driver Charges:</strong> {driver.driver_charges}</p>
             <p><strong>NIC:</strong> {driver.nic}</p>
             <p><strong>Age:</strong> {driver.age}</p>
             <p><strong>License Number:</strong> {driver.license_number}</p>
-            <p><strong>License Expiry Date:</strong> {driver.license_expiry_date ? new Date(driver.license_expiry_date).toISOString().split("T")[0] : "N/A"}</p>
 
+            <p>
+              <strong>License Expiry Date:</strong>{" "}
+              {driver.license_expiry_date
+                ? new Date(driver.license_expiry_date).toISOString().split("T")[0]
+                : "N/A"}
+            </p>
+
+            {/* Image */}
             <div>
               <h3 className="font-bold mb-2">Image:</h3>
               {driver.image && (
                 <img
                   src={driver.image}
                   className="w-full h-32 object-cover rounded border mb-2"
-                  alt="NIC Front"
+                  alt="Driver"
                 />
               )}
             </div>
 
+            {/* Buttons */}
             <button
               onClick={() => setEditMode(true)}
               className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-gray-900 transition"
@@ -145,10 +175,10 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
               Edit Driver
             </button>
 
+            {/* Delete */}
             <ConfirmWrapper
               onConfirm={handleDelete}
-              onCancel={() => {}}
-              message="Are you sure you want to delete this Driver?"
+              message="Are you sure you want to delete this driver?"
               confirmText="Yes, Delete"
               cancelText="Cancel"
               icon={<FiTrash2 />}
@@ -173,6 +203,7 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
           </div>
         )}
 
+        {/* ---------- EDIT FORM ---------- */}
         {editMode && (
           <EditDriverForm
             driver={driver}
@@ -183,7 +214,6 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
             onCancel={() => setEditMode(false)}
           />
         )}
-
       </div>
     </div>
   );

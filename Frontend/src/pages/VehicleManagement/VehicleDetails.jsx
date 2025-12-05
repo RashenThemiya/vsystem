@@ -3,6 +3,7 @@ import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/axiosInstance";
 import EditVehicleForm from "./EditVehicle";
+import { Link } from "react-router-dom";
 
 export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, onEdit }) {
   const [editMode, setEditMode] = useState(false);
@@ -112,7 +113,15 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, 
         {!editMode && (
           <div className="space-y-4 text-gray-700">
             <p><strong>Vehicle:</strong> {vehicle.name}</p>
-            <p><strong>Vehicle Number:</strong> {vehicle.vehicle_number}</p>
+            <p>
+              <strong>Vehicle Number:</strong>{" "}
+              <Link
+                to={`/vehicles/${vehicle.vehicle_id}`}
+                className="text-blue-600 underline hover:text-blue-800"
+              >
+                {vehicle.vehicle_number}
+              </Link>
+            </p>
             <p><strong>Vehicle Type:</strong> {vehicle.type}</p>
             <p><strong>Fuel Type:</strong> {vehicle.fuel?.type}</p>
             <p><strong>Owner Name:</strong> {vehicle.owner?.owner_name}</p>
