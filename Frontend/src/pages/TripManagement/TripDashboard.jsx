@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import api from "../../utils/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
-import ActionCards from "./ActionCards";
-import StatsCards from "./StatsCards";
-import TripSearchBar from "./SearchBar";
-import TripTable from "./TripTable";
+import ActionCards from "./TripDashboardCompnent/ActionCards";
+import StatsCards from "./TripDashboardCompnent/StatsCards";
+import TripSearchBar from "./TripDashboardCompnent//SearchBar";
+import TripTable from "./TripDashboardCompnent/TripTable";
 
 export default function TripDashboard() {
   const { name, role } = useAuth();

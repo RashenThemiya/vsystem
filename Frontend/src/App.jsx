@@ -36,14 +36,12 @@ import EditDriver from './pages/Drivers/EditDriver';*/}
 import AddVehicle from './pages/VehicleManagement/AddVehicle';
 import ViewVehicles from './pages/VehicleManagement/ViewVehicles';
 import EditVehicle from './pages/VehicleManagement/EditVehicle';*/}
-import TripManagement from './pages/TripManagement/TripManagement';
 import AddTrip from './pages/TripManagement/AddTrip';
 import CustomerDashboard from './pages/Customers/CustomerDashboard';
 import DriverDashboard from './pages/Drivers/DriverDashboard';
 import OwnerDashboard from './pages/VehcileOwner/OwnerDashboard';
 import VehicleDashboard from './pages/VehicleManagement/VehicleDashboard';
 import AdminRoleDashboard from './pages/AdminRoleManagement/AdminDashboard';
-import TripView from './pages/TripManagement/viewtrip'; 
 import TripDetails from './pages/TripManagement/TripDetails';
 import TripDashboard from './pages/TripManagement/TripDashboard';
 
@@ -119,11 +117,7 @@ function App() {
 <Route path="/vehicles/:id" element={<PrivateRoute><VehicleProfile /></PrivateRoute>} />
 
             {/* Trip Management Routes */}
-            <Route
-              path="/trip-management"
-              element={<PrivateRoute><TripManagement /></PrivateRoute>}
-            />
-            <Route path="/view-trips" element={<PrivateRoute><TripView /></PrivateRoute>} />
+         
             <Route path="/create-trip" element={<PrivateRoute><AddTrip /></PrivateRoute>} />
             <Route path="/trip/:id" element={<PrivateRoute><TripDetails /></PrivateRoute>} />
             <Route path="/trip-dashboard" element={<PrivateRoute><TripDashboard /></PrivateRoute>} />
