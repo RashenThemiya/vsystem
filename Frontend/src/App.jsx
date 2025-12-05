@@ -45,6 +45,8 @@ import VehicleDashboard from './pages/VehicleManagement/VehicleDashboard';
 import AdminRoleDashboard from './pages/AdminRoleManagement/AdminDashboard';
 import TripView from './pages/TripManagement/viewtrip'; 
 import TripDetails from './pages/TripManagement/TripDetails';
+import TripDashboard from './pages/TripManagement/TripDashboard';
+
 import DriverProfile from './pages/Drivers/DriverProfile';
 import VehicleProfile from './pages/VehicleManagement/VehicleProfile';
 function App() {
@@ -124,6 +126,8 @@ function App() {
             <Route path="/view-trips" element={<PrivateRoute><TripView /></PrivateRoute>} />
             <Route path="/create-trip" element={<PrivateRoute><AddTrip /></PrivateRoute>} />
             <Route path="/trip/:id" element={<PrivateRoute><TripDetails /></PrivateRoute>} />
+            <Route path="/trip-dashboard" element={<PrivateRoute><TripDashboard /></PrivateRoute>} />
+
             {/* Product Management Routes */}
             <Route path="/product-management" element={<PrivateRoute><ProductManagement /></PrivateRoute>} />
             <Route path="/add-product" element={<PrivateRoute><AddProduct /></PrivateRoute>} />

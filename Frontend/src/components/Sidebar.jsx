@@ -26,6 +26,10 @@ const Sidebar = () => {
     { path: "/owner-dashboard", icon: <FaUsers />, label: "Vehicle Owner" },
     { path: "/customer-dashboard", icon: <FaUserFriends />, label: "Customer Management" },
     { path: "/driver-dashboard", icon: <FaIdCard />, label: "Driver Management" },
+    /*{ path: "/product-management", icon: <FaBox />, label: "Product" },
+    { path: "/publication", icon: <FaNewspaper />, label: "Publication" },*/
+    {path:"/vehicle-dashboard", icon:<FaTruck />, label:"Vehicle Management" },
+    {path:"/trip-dashboard", icon:<FaBox />, label:"Trip Management" },
     { path: "/vehicle-dashboard", icon: <FaTruck />, label: "Vehicle Management" },
     { path: "/trip-management", icon: <FaBox />, label: "Trip Management" },
   ];
