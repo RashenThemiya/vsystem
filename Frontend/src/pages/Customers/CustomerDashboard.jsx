@@ -116,7 +116,7 @@
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
                 <h1 className="text-2xl font-semibold">Customer Management</h1>
-                <p className="text-sm text-gray-500">Manage customers and their related information</p>
+                <p className="text-sm text-gray-500">Manage customers and related information</p>
                 </div>
                 <div className="text-sm text-gray-600">Signed in as <span className="font-medium">{name}</span> — {role}</div>
             </div>

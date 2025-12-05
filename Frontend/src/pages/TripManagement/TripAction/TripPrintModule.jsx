@@ -29,147 +29,256 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
   const formatDate = (d) => (d ? new Date(d).toLocaleString() : "-");
 
   const handlePrint = () => {
-    if (!trip) return;
+  if (!trip) return;
 
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Trip #${tripId} Details</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h2, h3, h4 { margin-bottom: 10px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background: #f0f0f0; }
-          </style>
-        </head>
-        <body>
-          <h2>Trip #${tripId} Details</h2>
-          <h3>Status & Payment</h3>
-          <p>Status: ${trip.trip_status} | Payment: ${trip.payment_status}</p>
+  const printWindow = window.open("", "_blank");
 
-          <h3>Participants</h3>
-          <p><strong>Customer:</strong> ${trip.customer?.name || "-"}</p>
-          <p><strong>Driver:</strong> ${trip.driver?.name || "-"}</p>
-          <p><strong>Vehicle:</strong> ${trip.vehicle?.name || "-"}</p>
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Invoice - Trip #${tripId}</title>
 
-          ${trip.customer ? `
-          <h4>Customer Details</h4>
-          <p>Name: ${trip.customer.name}</p>
-          <p>NIC: ${trip.customer.nic}</p>
-          <p>Phone: ${trip.customer.phone_number}</p>
-          <p>Email: ${trip.customer.email}</p>
-          ` : ''}
+        <style>
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
 
-          ${trip.driver ? `
-          <h4>Driver Details</h4>
-          <p>Name: ${trip.driver.name}</p>
-          <p>Phone: ${trip.driver.phone_number}</p>
-          <p>NIC: ${trip.driver.nic}</p>
-          <p>Age: ${trip.driver.age}</p>
-          <p>License: ${trip.driver.license_number}</p>
-          <p>Charges: ${formatCurrency(trip.driver.driver_charges)}</p>
-          ` : ''}
+          body {
+            font-family: Arial, sans-serif;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+          }
 
-          ${trip.vehicle ? `
-          <h4>Vehicle Details</h4>
-          <p>Name: ${trip.vehicle.name}</p>
-          <p>Number: ${trip.vehicle.vehicle_number}</p>
-          <p>Type: ${trip.vehicle.type}</p>
-          <p>AC Type: ${trip.vehicle.ac_type}</p>
-          <p>Fuel Efficiency: ${trip.vehicle.vehicle_fuel_efficiency ? trip.vehicle.vehicle_fuel_efficiency + " km/l" : "-"}</p>
-          <p>License Expiry: ${trip.vehicle.license_expiry_date ? new Date(trip.vehicle.license_expiry_date).toLocaleDateString() : "-"}</p>
-          <p>Insurance Expiry: ${trip.vehicle.insurance_expiry_date ? new Date(trip.vehicle.insurance_expiry_date).toLocaleDateString() : "-"}</p>
-          <p>Last Service Meter: ${trip.vehicle.last_service_meter_number}</p>
-          ` : ''}
+          .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm;
+            box-sizing: border-box;
+            margin: auto;
+          }
 
-          <h3>Trip Summary</h3>
-          <table>
-            <tbody>
-              <tr><th>From</th><td>${trip.from_location}</td></tr>
-              <tr><th>To</th><td>${trip.to_location}</td></tr>
-              <tr><th>Up/Down</th><td>${trip.up_down}</td></tr>
-              <tr><th>Passengers</th><td>${trip.num_passengers}</td></tr>
-              <tr><th>Driver Required</th><td>${trip.driver_required}</td></tr>
-              <tr><th>Fuel Required</th><td>${trip.fuel_required}</td></tr>
-            </tbody>
-          </table>
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+          }
 
-          <h3>Distance & Route</h3>
-          <table>
-            <tbody>
-              <tr><th>Estimated Distance</th><td>${trip.estimated_distance || "-"} km</td></tr>
-              <tr><th>Actual Distance</th><td>${trip.actual_distance || "-"} km</td></tr>
-              <tr><th>Start Meter</th><td>${trip.start_meter || "-"}</td></tr>
-              <tr><th>End Meter</th><td>${trip.end_meter || "-"}</td></tr>
-            </tbody>
-          </table>
+          .logo {
+            height: 80px;
+          }
 
-          ${trip.map?.length ? `
-            <h4>Route / Map</h4>
-            <ol>
-              ${trip.map.sort((a,b)=>a.sequence-b.sequence).map(m => `<li>${m.sequence}. ${m.location_name} (${m.latitude}, ${m.longitude})</li>`).join('')}
-            </ol>
-          ` : `<p>No map locations recorded</p>`}
+          .title {
+            text-align: right;
+            font-size: 30px;
+            font-weight: bold;
+            color: #3C007E;
+          }
 
-          <h3>Dates</h3>
-          <table>
-            <tbody>
-              <tr><th>Leaving Date</th><td>${formatDate(trip.leaving_datetime)}</td></tr>
-              <tr><th>Estimated Return</th><td>${formatDate(trip.estimated_return_datetime)}</td></tr>
-              <tr><th>Actual Return</th><td>${formatDate(trip.actual_return_datetime)}</td></tr>
-              <tr><th>Estimated Days</th><td>${trip.estimated_days || "-"}</td></tr>
-              <tr><th>Actual Days</th><td>${trip.actual_days || "-"}</td></tr>
-            </tbody>
-          </table>
+          h3 {
+            margin-bottom: 8px;
+            border-bottom: 2px solid #cfcfcf;
+            padding-bottom: 4px;
+            color: #3C007E;
+          }
 
-          <h3>Cost Summary</h3>
-          <table>
-            <tbody>
-              <tr><th>Vehicle Rent (Daily)</th><td>${formatCurrency(trip.vehicle_rent_daily)}</td></tr>
-              <tr><th>Driver Cost</th><td>${formatCurrency(trip.driver_cost)}</td></tr>
-              <tr><th>Fuel Cost</th><td>${formatCurrency(trip.fuel_cost)}</td></tr>
-              <tr><th>Mileage Extra Cost</th><td>${formatCurrency(trip.additional_mileage_cost)}</td></tr>
-              <tr><th>Mileage Cost</th><td>${formatCurrency(trip.mileage_cost)}</td></tr>
-              <tr><th>Discount</th><td>${formatCurrency(trip.discount)}</td></tr>
-              <tr><th>Damage Cost</th><td>${formatCurrency(trip.damage_cost)}</td></tr>
-              <tr><th>Total Estimated Cost</th><td>${formatCurrency(trip.total_estimated_cost)}</td></tr>
-              <tr><th>Total Actual Cost</th><td>${formatCurrency(trip.total_actual_cost)}</td></tr>
-            </tbody>
-          </table>
+          .section {
+            margin-top: 10px;
+          }
+          
+          .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+          }
 
-          ${trip.other_trip_costs?.length ? `
-            <h4>Other Trip Costs</h4>
-            <ul>
-              ${trip.other_trip_costs.map(c => `<li>${c.cost_type}: ${formatCurrency(c.cost_amount)}</li>`).join('')}
-            </ul>
-          ` : ''}
+          .col {
+            width: 48%;
+          }
 
-          <h3>Payments</h3>
-          ${trip.payments?.length ? `
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+
+          th {
+            text-align: left;
+            background: #f2f2f2;
+            padding: 5px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+          }
+
+          td {
+            padding: 5px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+          }
+
+          .space {
+            margin-bottom: 6px;
+          }
+        </style>
+
+      </head>
+
+      <body>
+        <div class="page">
+
+          <!-- HEADER -->
+          <div class="header">
+            <img src="/images/CP-Logo.png" class="logo" alt="Company Logo" />
+            <div class="title">TRIP INVOICE</div>
+          </div>
+
+          <!-- INVOICE META -->
+          <div class="section">
             <table>
-              <thead><tr><th>Date</th><th>Amount</th></tr></thead>
-              <tbody>
-                ${trip.payments.map(p => `<tr><td>${formatDate(p.payment_date)}</td><td>${formatCurrency(p.amount)}</td></tr>`).join('')}
-              </tbody>
+              <tr><th>Invoice Date</th><td>${trip.leaving_datetime ? new Date(trip.leaving_datetime).toLocaleDateString() : "-"}</td></tr>
+              <tr><th>Trip ID</th><td>${tripId}</td></tr>
             </table>
-          ` : `<p>No payments recorded</p>`}
-        </body>
-      </html>
-    `);
+          </div>
 
-    printWindow.document.close();
-    printWindow.focus();
+          <!-- CUSTOMER + DRIVER -->
+          <div class="section row">
+            <div class="col">
+              <h3>Customer Details</h3>
+              <div class="space"><strong>Name:</strong> ${trip.customer?.name || "-"}</div>
+              <div class="space"><strong>NIC:</strong> ${trip.customer?.nic || "-"}</div>
+              <div class="space"><strong>Phone:</strong> ${trip.customer?.phone_number || "-"}</div>
+              <div class="space"><strong>Email:</strong> ${trip.customer?.email || "-"}</div>
+            </div>
 
-    // Close modal after printing is done
-    printWindow.onafterprint = () => {
-      onClose();
-      onSuccess();
-    };
+            <div class="col">
+              <h3>Driver Details</h3>
+              <div class="space"><strong>Name:</strong> ${trip.driver?.name || "-"}</div>
+              <div class="space"><strong>NIC:</strong> ${trip.driver?.nic || "-"}</div>
+              <div class="space"><strong>Phone:</strong> ${trip.driver?.phone_number || "-"}</div>
+            </div>
+          </div>
 
-    printWindow.print();
+          <!-- TRIP SUMMARY + VEHICLE -->
+          <div class="section row">
+            <div class="col">
+              <h3>Trip Summary</h3>
+              <div class="space"><strong>Leaving Date:</strong> ${formatDate(trip.leaving_datetime)}</div>
+              <div class="space"><strong>Estimated Return:</strong> ${formatDate(trip.estimated_return_datetime)}</div>
+              <div class="space"><strong>Actual Return:</strong> ${formatDate(trip.actual_return_datetime)}</div>
+              <div class="space"><strong>Passenger Count:</strong> ${trip.num_passengers || "-"}</div>
+            </div>
+
+            <div class="col">
+              <h3>Vehicle Details</h3>
+              <div class="space"><strong>Name:</strong> ${trip.vehicle?.name || "-"}</div>
+              <div class="space"><strong>Vehicle No:</strong> ${trip.vehicle?.vehicle_number || "-"}</div>
+              <div class="space"><strong>Type:</strong> ${trip.vehicle?.type || "-"}</div>
+              
+            </div>
+          </div>
+
+          <!-- DISTANCE + ROUTE -->
+          <div class="section row">
+            <div class="col">
+              <h3>Distance</h3>
+              <div class="space"><strong>Estimated Distance:</strong> ${trip.estimated_distance || "-"} km</div>
+              <div class="space"><strong>Actual Distance:</strong> ${trip.actual_distance || "-"} km</div>
+              <div class="space"><strong>Start Meter:</strong> ${trip.start_meter || "-"}</div>
+              <div class="space"><strong>End Meter:</strong> ${trip.end_meter || "-"}</div>
+            </div>
+
+            <div class="col">
+              <h3>Route</h3>
+              ${
+                trip.map?.length
+                  ? trip.map
+                      .sort((a,b)=>a.sequence-b.sequence)
+                      .map(m => `<div class="space"><strong>Route ${m.sequence}:</strong> ${m.location_name}</div>`)
+                      .join("")
+                  : "<div>No routes recorded</div>"
+              }
+            </div>
+          </div>
+
+          <!-- COSTS + PAYMENTS SIDE BY SIDE -->
+          <div class="section row">
+
+            <!-- COSTS -->
+            <div class="col">
+              <h3>Costs</h3>
+              <table>
+                <tr><th>Vehicle Rent (Daily)</th><td>${formatCurrency(trip.vehicle_rent_daily)}</td></tr>
+                <tr><th>Driver Cost</th><td>${formatCurrency(trip.driver_cost)}</td></tr>
+                <tr><th>Fuel Cost</th><td>${formatCurrency(trip.fuel_cost)}</td></tr>
+                <tr><th>Mileage Cost</th><td>${formatCurrency(trip.mileage_cost)}</td></tr>
+                <tr><th>Mileage Extra Cost</th><td>${formatCurrency(trip.additional_mileage_cost)}</td></tr>
+                <tr><th>Damage Cost</th><td>${formatCurrency(trip.damage_cost)}</td></tr>
+               ${     trip.other_trip_costs?.length
+                        ? trip.other_trip_costs
+                            .map(
+                              (c) =>
+                                `<tr>
+                                  <th>${c.cost_type}:</th>
+                                  <td>${formatCurrency(c.cost_amount)}</td>
+                                </tr>`
+                            )
+                            .join("")
+                        : ""
+                }
+                <tr><th>Discount</th><td>${formatCurrency(trip.discount)}</td></tr>              
+              </table>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div class="col">
+              <h3>Payments</h3>
+              ${
+                trip.payments?.length
+                  ? `
+                    <table>
+                      <thead>
+                        <tr><th>Date</th><th>Amount</th></tr>
+                      </thead>
+                      <tbody>
+                        ${trip.payments
+                          .map(p => `<tr><td>${formatDate(p.payment_date)}</td><td>${formatCurrency(p.amount)}</td></tr>`)
+                          .join("")}
+                      </tbody>
+                    </table>
+                  `
+                  : "<p>No payments recorded</p>"
+              }
+            </div>
+          </div>
+
+          <!-- TOTALS -->
+          <div class="section">
+            <table>
+              <tr><th>Total Estimated Cost</th><td>${formatCurrency(trip.total_estimated_cost)}</td></tr>
+              <tr><th>Total Payments</th><td>${formatCurrency((trip.payments || []).reduce((acc, p) => acc + p.amount, 0))}</td></tr>
+              <tr><th>Total Actual Cost</th><td>${formatCurrency(trip.total_actual_cost)}</td></tr>
+            </table>
+          </div>
+
+        </div>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+
+  printWindow.onafterprint = () => {
+    onClose();
+    onSuccess();
   };
+
+  printWindow.print();
+};
+
 
   if (!open) return null;
   if (loading)

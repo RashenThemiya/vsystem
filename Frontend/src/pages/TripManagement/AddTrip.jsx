@@ -234,7 +234,7 @@ const handleChange = (e) => {
           <h2 className="text-3xl font-semibold text-green-800 flex items-center gap-2">
             <FaMapMarkerAlt /> Trip Creation
           </h2>
-          <button onClick={() => navigate("/trip-management")} className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded transition">
+          <button onClick={() => navigate("/trip-dashboard")} className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded transition">
             <FaArrowLeft /> Back to Trips
           </button>
         </div>
