@@ -3,104 +3,102 @@ import { useParams } from "react-router-dom";
 import api from "../../utils/axiosInstance";
 import dayjs from "dayjs";
 
-const CustomerProfile = () => {
-  const { customerId } = useParams();
-
-  const [customer, setCustomer] = useState(null);
+const DriverProfile = () => {
+  const { driverId } = useParams();
+  const [driver, setDriver] = useState(null);
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState("all");
-  const [totalPayment, setTotalPayment] = useState(0);
-
+  const [totalEarning, setTotalEarning] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchCustomer();
-  }, [customerId]);
+    fetchDriver();
+  }, [driverId]);
 
   useEffect(() => {
-    if (customer) applyFilters();
-  }, [customer, selectedYear, selectedMonth]);
+    if (driver) applyFilters();
+  }, [driver, selectedYear, selectedMonth]);
 
-  const fetchCustomer = async () => {
+  const fetchDriver = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get(`/api/customers/${customerId}`);
-      setCustomer(res.data.data);
+      const res = await api.get(`/api/drivers/${driverId}`);
+      setDriver(res.data.data);
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch customer details.");
+      setError("Failed to fetch driver details. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateTotalPayment = (trips) => {
+  const calculateEarning = (trips) => {
     const total = trips.reduce((sum, t) => {
-      const amount = Number(t.payment_amount || 0);
-      return sum + amount;
+      if (t.trip_status === "Completed") {
+        if (t.driver_cost) return sum + Number(t.driver_cost);
+        if (t.payment_amount) return sum + Number(t.payment_amount);
+        if (t.total_actual_cost) return sum + Number(t.total_actual_cost);
+      }
+      return sum;
     }, 0);
-    setTotalPayment(total);
+    setTotalEarning(total);
   };
 
   const applyFilters = () => {
-    if (!customer?.trips) return;
+    if (!driver?.trips) return;
 
-    let trips = [...customer.trips];
+    let trips = [...driver.trips];
 
     if (selectedYear !== "all") {
-      trips = trips.filter(
-        (t) => dayjs(t.created_at).format("YYYY") === selectedYear
-      );
+      trips = trips.filter((t) => dayjs(t.created_at).format("YYYY") === selectedYear);
     }
 
     if (selectedMonth !== "all") {
-      trips = trips.filter(
-        (t) => dayjs(t.created_at).format("MM") === selectedMonth
-      );
+      trips = trips.filter((t) => dayjs(t.created_at).format("MM") === selectedMonth);
     }
 
     setFilteredTrips(trips);
-    calculateTotalPayment(trips);
+    calculateEarning(trips);
   };
 
-  const years = customer?.trips
-    ? ["all",
-        ...Array.from(
-          new Set(customer.trips.map((t) => dayjs(t.created_at).format("YYYY")))
-        ).sort((a, b) => b - a)
-      ]
+  // Get unique years from trips
+  const years = driver?.trips
+    ? ["all", ...Array.from(new Set(driver.trips.map(t => dayjs(t.created_at).format("YYYY")))).sort((a,b)=>b-a)]
     : ["all"];
 
+  // Months list
   const months = ["all", ...Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"))];
 
-  if (loading) return <p className="p-6">Loading customer...</p>;
+  if (loading) return <p className="p-6">Loading driver...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
-  if (!customer) return <p className="p-6">No customer found.</p>;
+  if (!driver) return <p className="p-6">No driver found.</p>;
 
   return (
     <div className="p-6">
-
-      {/* CUSTOMER INFO */}
+      {/* DRIVER HEADER */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-6 flex gap-6">
         <img
-          src={customer.nic_photo_front || "/default-customer.png"}
-          alt="NIC Front"
+          src={driver.image || "/default-driver.png"}
+          alt="Driver"
           className="w-32 h-32 rounded-lg object-cover border"
         />
-
         <div>
-          <h2 className="text-2xl font-bold">{customer.name}</h2>
-          <p><strong>Phone:</strong> {customer.phone_number || "-"}</p>
-          <p><strong>NIC:</strong> {customer.nic || "-"}</p>
-          <p><strong>Email:</strong> {customer.email || "-"}</p>
+          <h2 className="text-2xl font-bold">{driver.name}</h2>
+          <p><strong>Phone:</strong> {driver.phone_number || "-"}</p>
+          <p><strong>NIC:</strong> {driver.nic || "-"}</p>
+          <p><strong>Charges:</strong> Rs. {driver.driver_charges || "0"}</p>
+          <p><strong>License No:</strong> {driver.license_number || "-"}</p>
+          <p><strong>License Expiry:</strong>{" "}
+            {driver.license_expiry_date ? dayjs(driver.license_expiry_date).format("YYYY-MM-DD") : "-"}
+          </p>
         </div>
       </div>
 
-      {/* FILTERS */}
-      <div className="flex gap-3 mb-4 items-center flex-wrap">
+      {/* YEAR & MONTH DROPDOWN */}
+      <div className="flex gap-3 mb-4 items-center">
         <div>
           <label className="mr-2 font-semibold">Year:</label>
           <select
@@ -109,9 +107,7 @@ const CustomerProfile = () => {
             onChange={(e) => setSelectedYear(e.target.value)}
           >
             {years.map((y) => (
-              <option key={y} value={y}>
-                {y === "all" ? "All Years" : y}
-              </option>
+              <option key={y} value={y}>{y === "all" ? "All Years" : y}</option>
             ))}
           </select>
         </div>
@@ -132,15 +128,15 @@ const CustomerProfile = () => {
         </div>
       </div>
 
-      {/* TOTAL PAYMENT */}
+      {/* TOTAL EARNING */}
       <div className="bg-green-100 p-4 rounded-lg mb-4 text-lg font-semibold">
-        Total Payment (Filtered Trips): Rs. {totalPayment.toLocaleString()}
+        Total Earnings (Completed Trips Only): Rs. {totalEarning.toLocaleString()}
       </div>
 
       {/* TRIPS TABLE */}
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         {filteredTrips.length === 0 ? (
-          <p className="p-4 text-center">No trips found for this filter.</p>
+          <p className="p-4 text-center">No trips found for this selection.</p>
         ) : (
           <table className="w-full table-auto">
             <thead className="bg-gray-200">
@@ -150,11 +146,11 @@ const CustomerProfile = () => {
                 <th className="p-2">To</th>
                 <th className="p-2">Passengers</th>
                 <th className="p-2">Payment</th>
+                <th className="p-2">Driver Cost</th>
                 <th className="p-2">Status</th>
-                <th className="p-2">Date</th>
+                <th className="p-2">Created</th>
               </tr>
             </thead>
-
             <tbody>
               {filteredTrips.map((t) => (
                 <tr key={t.trip_id} className="border-b">
@@ -162,7 +158,8 @@ const CustomerProfile = () => {
                   <td className="p-2">{t.from_location}</td>
                   <td className="p-2">{t.to_location}</td>
                   <td className="p-2 text-center">{t.num_passengers}</td>
-                  <td className="p-2">Rs. {t.payment_amount || "0"}</td>
+                  <td className="p-2">{t.payment_amount || "-"}</td>
+                  <td className="p-2">{t.driver_cost || "0"}</td>
                   <td className="p-2">{t.trip_status}</td>
                   <td className="p-2">{dayjs(t.created_at).format("YYYY-MM-DD")}</td>
                 </tr>
@@ -175,4 +172,4 @@ const CustomerProfile = () => {
   );
 };
 
-export default CustomerProfile;
+export default DriverProfile;

@@ -19,15 +19,15 @@ import AlterDatesModal from "./TripAction/AlterDatesModal";
 import AlterMeterModal from "./TripAction/AlterMeterModal";
 import TripCompleteModal from "./TripAction/TripCompleteModal";
 import TripPrintModal from "./TripAction/TripPrintModule";
-
+ 
 const TripDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+ 
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ 
   const [showCustomer, setShowCustomer] = useState(true);
   const [showDriver, setShowDriver] = useState(true);
   const [showVehicle, setShowVehicle] = useState(true);
@@ -37,13 +37,13 @@ const [showAlterDatesModal, setShowAlterDatesModal] = useState(false);
 const [showAlterMeterModal, setShowAlterMeterModal] = useState(false);
 const [showCompleteModal, setShowCompleteModal] = useState(false);
 const [showPrintModal, setShowPrintModal] = useState(false);
-
-
-
+ 
+ 
+ 
   useEffect(() => {
     fetchTrip();
   }, [id]);
-
+ 
   const fetchTrip = async () => {
     setLoading(true);
     setError(null);
@@ -59,23 +59,23 @@ const [showPrintModal, setShowPrintModal] = useState(false);
       setLoading(false);
     }
   };
-
+ 
   const formatCurrency = (v) => (v == null ? "-" : `Rs. ${Number(v).toLocaleString()}`);
   const formatDate = (d) => (d ? new Date(d).toLocaleString() : "-");
   const isBase64 = (s) => typeof s === "string" && /^[A-Za-z0-9+/=]+$/.test(s.replace(/\s/g, ""));
-
+ 
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-gray-600 text-lg animate-pulse">Loading trip details...</div>
       </div>
     );
-
+ 
   if (error)
     return <div className="text-center mt-20 text-red-600 text-lg">❌ {error}</div>;
-
+ 
   if (!trip) return <div className="text-center mt-20 text-gray-600">Trip not found</div>;
-
+ 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -107,7 +107,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
             >
               {trip.trip_status}
             </span>
-            
+           
             <span
               className={`
                 text-md font-bold px-2 py-1 rounded-md ml-1
@@ -127,7 +127,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               onAlterReturnDate={() => setShowAlterDatesModal(true)}
               onAlterMeter={() => setShowAlterMeterModal(true)}
               onGetPrint={() => setShowPrintModal(true)} // <-- new print handler
-            />   
+            />  
           <div className="flex gap-2">
             <button
               onClick={() => navigate(-1)}
@@ -143,36 +143,36 @@ const [showPrintModal, setShowPrintModal] = useState(false);
             </button>
           </div>
         </div>
-
+ 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Participants & Actions */}
           <div className="space-y-4">
             {/* Action Buttons */}
          
-
-
+ 
+ 
 <DamageCostModal
   open={openDamageModal}
   onClose={() => setOpenDamageModal(false)}
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
-
+ 
 <AddPaymentModal
   open={showPaymentModal}
   tripId={trip.trip_id}
   onClose={() => setShowPaymentModal(false)}
   onSuccess={fetchTrip}
 />
-
+ 
 <AlterDatesModal
   open={showAlterDatesModal}
   onClose={() => setShowAlterDatesModal(false)}
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
-
+ 
 <AlterMeterModal
   open={showAlterMeterModal}
   onClose={() => setShowAlterMeterModal(false)}
@@ -185,18 +185,18 @@ const [showPrintModal, setShowPrintModal] = useState(false);
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
-
+ 
 <TripPrintModal
   open={showPrintModal}
   onClose={() => setShowPrintModal(false)}
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
-
-        
-            
+ 
+       
+           
             <InfoCardSub title="Trip Participants">
-              
+             
               {/* Customer */}
               <div className="mb-3">
                 <div
@@ -211,7 +211,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
                 <br></br>
                 {showCustomer && <CustomerDetails trip={trip} isBase64={isBase64} />}
               </div>
-
+ 
               {/* Driver */}
               <div className="mb-3">
                 <div
@@ -226,7 +226,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
                 <br></br>
                 {showDriver && <DriverDetails trip={trip} isBase64={isBase64} />}
               </div>
-
+ 
               {/* Vehicle */}
               <div className="mb-3">
                 <div
@@ -241,11 +241,11 @@ const [showPrintModal, setShowPrintModal] = useState(false);
                 <br></br>
                 {showVehicle && <VehicleDetails trip={trip} isBase64={isBase64} />}
               </div>
-            
+           
             </InfoCardSub>
-            
+           
           </div>
-
+ 
           {/* Right Column: Trip Info */}
           <div className="lg:col-span-2 space-y-6">
             <InfoCardSub title="Trip Summary">
@@ -254,7 +254,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="To" value={trip.to_location} />
               <OneColumnRow label="Passengers" value={trip.num_passengers} />
               </div>
-
+ 
               <br></br>
               <h3 className="text-xl font-bold text-gray-800">Distance & Route</h3>
               <div className="border-b pb-2 mb-4"></div>
@@ -264,7 +264,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="Start Meter" value={trip.start_meter} />
               <OneColumnRow label="End Meter" value={trip.end_meter} />
               </div>
-
+ 
               <h4 className="mt-3 font-semibold">Route / Map</h4>
               {trip.map?.length ? (
                 <ol className="list-decimal list-inside space-y-2 text-sm">
@@ -292,13 +292,13 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="Actual Days" value={trip.actual_days} />
               </div>
             </InfoCardSub>
-
+ 
             {/*<InfoCard title="Distance & Route">
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
               <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
               <OneColumnRow label="Start Meter" value={trip.start_meter} />
               <OneColumnRow label="End Meter" value={trip.end_meter} />
-
+ 
               <h4 className="mt-3 font-semibold">Route / Map</h4>
               {trip.map?.length ? (
                 <ol className="list-decimal list-inside space-y-2 text-sm">
@@ -316,7 +316,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
                 <div className="text-sm text-gray-500">No map locations recorded</div>
               )}
             </InfoCard>
-
+ 
             <InfoCard title="Dates">
               <OneColumnRow label="Leaving Date" value={formatDate(trip.leaving_datetime)} />
               <OneColumnRow label="Estimated Return" value={formatDate(trip.estimated_return_datetime)} />
@@ -324,8 +324,8 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="Estimated Days" value={trip.estimated_days} />
               <OneColumnRow label="Actual Days" value={trip.actual_days} />
             </InfoCard>*/}
-
-            <CostSummary trip={trip} formatCurrency={formatCurrency} />
+ 
+          <CostSummary trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />
             {/*<Payments trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />*/}
           </div>
         </div>
@@ -333,5 +333,5 @@ const [showPrintModal, setShowPrintModal] = useState(false);
     </div>
   );
 };
-
+ 
 export default TripDetails;

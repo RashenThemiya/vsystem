@@ -310,7 +310,7 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
 
 
 /* ------------------ CostSummary ------------------ */
-export const CostSummary = ({ trip, formatCurrency }) => (
+export const CostSummary = ({ trip, formatCurrency,formatDate  }) => (
   <InfoCardSub title="Cost Summary">
     <div className="bg-gray-100 p-1 rounded-lg">
     <div className="flex flex-col gap-1 text-gray-600 font-medium">
