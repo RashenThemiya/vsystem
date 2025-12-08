@@ -3,6 +3,7 @@ import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/axiosInstance";
 import EditCustomerForm from "./EditCustomerForm";
+import { useNavigate } from "react-router-dom";
 
 export default function CustomerDetails({ customer, onClose, onDelete, onUpdated }) {
   const [editMode, setEditMode] = useState(false);
@@ -11,6 +12,7 @@ export default function CustomerDetails({ customer, onClose, onDelete, onUpdated
   const [error, setError] = useState(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     setForm({ ...customer });
@@ -118,7 +120,15 @@ export default function CustomerDetails({ customer, onClose, onDelete, onUpdated
 
         {!editMode && (
           <div className="space-y-4 text-gray-700">
-            <p><strong>Name:</strong> {customer.name}</p>
+            <p>
+                    <strong>Name:</strong>
+                    <span
+                      className="text-blue-600 cursor-pointer ml-1 underline hover:text-blue-900"
+                      onClick={() => navigate(`/customer-profile/${customer.customer_id}`)}
+                    >
+                      {customer.name}
+                    </span>
+                  </p>
             <p><strong>Email:</strong> {customer.email}</p>
             <p><strong>Phone:</strong> {customer.phone_number}</p>
             <p><strong>NIC:</strong> {customer.nic}</p>

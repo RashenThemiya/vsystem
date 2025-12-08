@@ -96,7 +96,15 @@ export const getAllCustomersService = async () => {
 export const getCustomerByIdService = async (id: number) => {
   const customer = await prisma.customer.findUnique({
     where: { customer_id: id },
-    include: { trips: true },
+    include: {
+      trips: {
+        include: {
+          map: {               // Include route details
+            orderBy: { sequence: "asc" } // order map points
+          },
+        },
+      },
+    },
   });
 
   if (!customer) throw new Error("Customer not found");
