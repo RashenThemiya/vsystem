@@ -181,70 +181,55 @@ const [showPrintModal, setShowPrintModal] = useState(false);
  
        
            
-           <InfoCardSub title="Trip Participants">
-
-  {/* Customer */}
-  <div className="mt-2 p-3 rounded-lg ">
-    <div
-      className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-gray-900 transition"
-      onClick={() => setShowCustomer((s) => !s)}
-    >
-      <span className="flex items-center gap-2">
-        <FaUser /> <h3 className="text-lg font-bold text-gray-700">Customer</h3>
-      </span>
-      <span className="text-blue-600 underline">
-        {showCustomer ? <FaChevronUp /> : <FaChevronDown />}
-      </span>
-    </div>
-    {showCustomer && (
-      <div className="mt-2 p-3 rounded-lg ">
-        <CustomerDetails trip={trip} isBase64={isBase64} />
-      </div>
-    )}
-  </div>
-
-  {/* Driver */}
-  <div className="mb-mt-2 p-3 rounded-lg ">
-    <div
-      className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-gray-900 transition"
-      onClick={() => setShowDriver((s) => !s)}
-    >
-      <span className="flex items-center gap-2">
-        <FaUser /> <h3 className="text-lg font-bold text-gray-700">Driver</h3>
-      </span>
-      <span className="text-blue-600 underline">
-        {showDriver ? <FaChevronUp /> : <FaChevronDown />}
-      </span>
-    </div>
-    {showDriver && (
-      <div className="mt-2 p-3 rounded-lg ">
-        <DriverDetails trip={trip} isBase64={isBase64} />
-      </div>
-    )}
-  </div>
-
-  {/* Vehicle */}
-  <div className="mb-mt-2 p-3 rounded-lg ">
-    <div
-      className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-gray-900 transition"
-      onClick={() => setShowVehicle((s) => !s)}
-    >
-      <span className="flex items-center gap-2">
-        <FaCar /> <h3 className="text-lg font-bold text-gray-700">Vehicle</h3>
-      </span>
-      <span className="text-blue-600 underline">
-        {showVehicle ? <FaChevronUp /> : <FaChevronDown />}
-      </span>
-    </div>
-    {showVehicle && (
-      <div className="mt-2 p-3 rounded-lg ">
-        <VehicleDetails trip={trip} isBase64={isBase64} />
-      </div>
-    )}
-  </div>
-
-</InfoCardSub>
-
+          
+            <InfoCardSub title="Trip Participants">
+             
+              {/* Customer */}
+              <div className="mb-3">
+                <div
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
+                  onClick={() => setShowCustomer((s) => !s)}
+                >
+                  <span className="flex items-center gap-2">
+                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Customer</h3>
+                  </span>
+                  <span className="text-blue-600 underline">{showCustomer ? <FaChevronUp/> : <FaChevronDown/>}</span>
+                </div>
+                <br></br>
+                {showCustomer && <CustomerDetails trip={trip} isBase64={isBase64} />}
+              </div>
+ 
+              {/* Driver */}
+              <div className="mb-3">
+                <div
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
+                  onClick={() => setShowDriver((s) => !s)}
+                >
+                  <span className="flex items-center gap-2">
+                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Driver</h3>
+                  </span>
+                  <span className="text-blue-600 underline">{showDriver ? <FaChevronUp/> : <FaChevronDown/>}</span>
+                </div>
+                <br></br>
+                {showDriver && <DriverDetails trip={trip} isBase64={isBase64} />}
+              </div>
+ 
+              {/* Vehicle */}
+              <div className="mb-3">
+                <div
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
+                  onClick={() => setShowVehicle((s) => !s)}
+                >
+                  <span className="flex items-center gap-2">
+                    <FaCar /> <h3 className="text-lg font-bold text-gray-670">Vehicle</h3>
+                  </span>
+                  <span className="text-blue-600 underline">{showVehicle ? <FaChevronUp/> : <FaChevronDown/>}</span>
+                </div>
+                <br></br>
+                {showVehicle && <VehicleDetails trip={trip} isBase64={isBase64} />}
+              </div>
+           
+            </InfoCardSub>
            
           </div>
  
