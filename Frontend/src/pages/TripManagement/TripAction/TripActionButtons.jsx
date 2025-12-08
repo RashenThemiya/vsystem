@@ -1,6 +1,6 @@
 // TripActionButtons.jsx
 import React from "react";
-import { FaMoneyBillWave, FaCar, FaChevronDown, FaPrint } from "react-icons/fa";
+import { FaMoneyBillWave, FaCar, FaCalendar, FaCheck, FaPrint } from "react-icons/fa";
 
 const TripActionButtons = ({
   onAddPayment,
@@ -10,35 +10,63 @@ const TripActionButtons = ({
   onAlterMeter,
   onGetPrint,
 }) => {
-  // Consistent button style for all buttons
-  const buttonStyle =
-    "flex items-center gap-2 justify-center px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition duration-200";
+  const cardStyle =
+    "bg-white px-3 py-3 rounded-lg shadow cursor-pointer hover:shadow-md transition flex items-center gap-2";
+
+  const iconBox = "p-2 rounded-md flex items-center justify-center";
+
+  const labelStyle = "font-medium text-sm";
 
   return (
-    <div className="flex flex-col gap-3">
-      <button onClick={onAddPayment} className={buttonStyle}>
-        <FaMoneyBillWave /> Add Payment
-      </button>
+    <div className="flex flex-row gap-2">
+      
+      {/* Add Payment */}
+      <div className={cardStyle} onClick={onAddPayment}>
+        <div className={`${iconBox} bg-blue-50`}>
+          <FaMoneyBillWave className="text-blue-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Add Payment</div>
+      </div>
 
-      <button onClick={onAddDamage} className={buttonStyle}>
-        <FaCar /> Add Damage Cost
-      </button>
+      {/* Add Damage */}
+      <div className={cardStyle} onClick={onAddDamage}>
+        <div className={`${iconBox} bg-red-50`}>
+          <FaCar className="text-red-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Add Damage</div>
+      </div>
 
-      <button onClick={onCompleteTrip} className={buttonStyle}>
-        <FaChevronDown /> Complete Trip
-      </button>
+      {/* Complete Trip */}
+      <div className={cardStyle} onClick={onCompleteTrip}>
+        <div className={`${iconBox} bg-green-50`}>
+          <FaCheck className="text-green-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Complete Trip</div>
+      </div>
 
-      <button onClick={onAlterReturnDate} className={buttonStyle}>
-        Alter Leave/Return Date
-      </button>
+      {/* Alter Dates */}
+      <div className={cardStyle} onClick={onAlterReturnDate}>
+        <div className={`${iconBox} bg-purple-50`}>
+          <FaCalendar className="text-purple-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Alter Dates</div>
+      </div>
 
-      <button onClick={onAlterMeter} className={buttonStyle}>
-        Alter Start/End Meter
-      </button>
+      {/* Alter Meter */}
+      <div className={cardStyle} onClick={onAlterMeter}>
+        <div className={`${iconBox} bg-yellow-50`}>
+          <FaCar className="text-yellow-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Alter Meter</div>
+      </div>
 
-      <button onClick={onGetPrint} className={buttonStyle}>
-        <FaPrint /> Get Print
-      </button>
+      {/* Print */}
+      <div className={cardStyle} onClick={onGetPrint}>
+        <div className={`${iconBox} bg-indigo-50`}>
+          <FaPrint className="text-indigo-600 text-lg" />
+        </div>
+        <div className={labelStyle}>Print</div>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@
 export default function StatsCards({ stats }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card title="Total Customers" value={stats.total} gradient="from-indigo-500 to-violet-500" />
+      <Card title="Total Customers" value={stats.total} gradient="from-indigo-600 to-violet-600" />
       
     </div>
   );

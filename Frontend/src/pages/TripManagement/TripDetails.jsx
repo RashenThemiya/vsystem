@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/axiosInstance";
 import {
   InfoCard,
+  InfoCardSub,
   OneColumnRow,
   CustomerDetails,
   DriverDetails,
@@ -10,7 +11,7 @@ import {
   CostSummary,
   Payments,
 } from "./TripDetailsComponents";
-import { FaChevronDown, FaChevronUp, FaMoneyBillWave, FaCar, FaUser } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaMoneyBillWave, FaCar, FaUser, FaRedo, FaArrowLeft } from "react-icons/fa";
 import TripActionButtons from "./TripAction/TripActionButtons";
 import DamageCostModal from "./TripAction/DamageCostModal";
 import AddPaymentModal from "./TripAction/AddPaymentModal";
@@ -81,24 +82,64 @@ const [showPrintModal, setShowPrintModal] = useState(false);
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Trip #{trip.trip_id}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Status: <span className="font-medium">{trip.trip_status}</span> • Payment:{" "}
-              <span className="font-medium">{trip.payment_status}</span>
-            </p>
-          </div>
+            <div className="flex items-center">
+              <div className="w-2 h-8 bg-blue-800 rounded mr-3"></div>
+              <h1 className="text-3xl font-bold text-gray-800">Trip #{trip.trip_id}</h1>
+            </div>
+            <p className="text-md text-gray-700 font-semibold mt-1 p-1 rounded-lg">
+            <span
+              className={`
+                text-md font-bold px-2 py-1 rounded-md ml-1
+                ${
+                  trip.trip_status === "Pending"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : trip.trip_status === "Ongoing"
+                    ? "bg-blue-100 text-blue-800"
+                    : trip.trip_status === "Completed"
+                    ? "bg-green-100 text-green-800"
+                    : trip.trip_status === "Ended"
+                    ? "bg-gray-200 text-gray-700"
+                    : trip.trip_status === "Cancelled"
+                    ? "bg-red-100 text-red-800"
+                    : "bg-gray-100 text-gray-700"
+                }
+              `}
+            >
+              {trip.trip_status}
+            </span>
+            
+            <span
+              className={`
+                text-md font-bold px-2 py-1 rounded-md ml-1
+                ${trip.payment_status === "Paid"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"}
+              `}
+            >
+              {trip.payment_status}
+            </span>
+          </p>
+          </div>  
+          <TripActionButtons
+              onAddPayment={() => setShowPaymentModal(true)}
+              onAddDamage={() => setOpenDamageModal(true)}
+              onCompleteTrip={() => setShowCompleteModal(true)}
+              onAlterReturnDate={() => setShowAlterDatesModal(true)}
+              onAlterMeter={() => setShowAlterMeterModal(true)}
+              onGetPrint={() => setShowPrintModal(true)} // <-- new print handler
+            />   
           <div className="flex gap-2">
             <button
               onClick={() => navigate(-1)}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
             >
-              Back
+              <FaArrowLeft/>
             </button>
             <button
               onClick={fetchTrip}
-              className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition flex items-center gap-2"
+              className="px-4 py-2 bg-gray-500 text-gray-100 rounded hover:bg-teal-700 transition flex items-center gap-2"
             >
-              Refresh
+              <FaRedo/>
             </button>
           </div>
         </div>
@@ -108,15 +149,8 @@ const [showPrintModal, setShowPrintModal] = useState(false);
           {/* Left Column: Participants & Actions */}
           <div className="space-y-4">
             {/* Action Buttons */}
-            
-<TripActionButtons
-  onAddPayment={() => setShowPaymentModal(true)}
-  onAddDamage={() => setOpenDamageModal(true)}
-  onCompleteTrip={() => setShowCompleteModal(true)}
-  onAlterReturnDate={() => setShowAlterDatesModal(true)}
-  onAlterMeter={() => setShowAlterMeterModal(true)}
-  onGetPrint={() => setShowPrintModal(true)} // <-- new print handler
-/>
+         
+
 
 <DamageCostModal
   open={openDamageModal}
@@ -160,64 +194,106 @@ const [showPrintModal, setShowPrintModal] = useState(false);
 />
 
         
-
-            <InfoCard title="Trip Participants">
+            
+            <InfoCardSub title="Trip Participants">
+              
               {/* Customer */}
               <div className="mb-3">
                 <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-teal-600 transition"
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
                   onClick={() => setShowCustomer((s) => !s)}
                 >
                   <span className="flex items-center gap-2">
-                    <FaUser /> Customer
+                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Customer</h3>
                   </span>
-                  <span className="text-blue-600 underline">{showCustomer ? "Hide" : "Show"}</span>
+                  <span className="text-blue-600 underline">{showCustomer ? <FaChevronUp/> : <FaChevronDown/>}</span>
                 </div>
+                <br></br>
                 {showCustomer && <CustomerDetails trip={trip} isBase64={isBase64} />}
               </div>
 
               {/* Driver */}
               <div className="mb-3">
                 <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-teal-600 transition"
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
                   onClick={() => setShowDriver((s) => !s)}
                 >
                   <span className="flex items-center gap-2">
-                    <FaUser /> Driver
+                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Driver</h3>
                   </span>
-                  <span className="text-blue-600 underline">{showDriver ? "Hide" : "Show"}</span>
+                  <span className="text-blue-600 underline">{showDriver ? <FaChevronUp/> : <FaChevronDown/>}</span>
                 </div>
+                <br></br>
                 {showDriver && <DriverDetails trip={trip} isBase64={isBase64} />}
               </div>
 
               {/* Vehicle */}
               <div className="mb-3">
                 <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-teal-600 transition"
+                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
                   onClick={() => setShowVehicle((s) => !s)}
                 >
                   <span className="flex items-center gap-2">
-                    <FaCar /> Vehicle
+                    <FaCar /> <h3 className="text-lg font-bold text-gray-670">Vehicle</h3>
                   </span>
-                  <span className="text-blue-600 underline">{showVehicle ? "Hide" : "Show"}</span>
+                  <span className="text-blue-600 underline">{showVehicle ? <FaChevronUp/> : <FaChevronDown/>}</span>
                 </div>
+                <br></br>
                 {showVehicle && <VehicleDetails trip={trip} isBase64={isBase64} />}
               </div>
-            </InfoCard>
+            
+            </InfoCardSub>
+            
           </div>
 
           {/* Right Column: Trip Info */}
           <div className="lg:col-span-2 space-y-6">
-            <InfoCard title="Trip Summary">
+            <InfoCardSub title="Trip Summary">
+              <div className="bg-gray-100 p-1 rounded-lg">
               <OneColumnRow label="From" value={trip.from_location} />
               <OneColumnRow label="To" value={trip.to_location} />
-              <OneColumnRow label="Up / Down" value={trip.up_down} />
               <OneColumnRow label="Passengers" value={trip.num_passengers} />
-              <OneColumnRow label="Driver Required" value={trip.driver_required} />
-              <OneColumnRow label="Fuel Required" value={trip.fuel_required} />
-            </InfoCard>
+              </div>
 
-            <InfoCard title="Distance & Route">
+              <br></br>
+              <h3 className="text-xl font-bold text-gray-800">Distance & Route</h3>
+              <div className="border-b pb-2 mb-4"></div>
+              <div className="bg-gray-100 p-1 rounded-lg">
+              <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
+              <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
+              <OneColumnRow label="Start Meter" value={trip.start_meter} />
+              <OneColumnRow label="End Meter" value={trip.end_meter} />
+              </div>
+
+              <h4 className="mt-3 font-semibold">Route / Map</h4>
+              {trip.map?.length ? (
+                <ol className="list-decimal list-inside space-y-2 text-sm">
+                  {trip.map
+                    .slice()
+                    .sort((a, b) => a.sequence - b.sequence)
+                    .map((m) => (
+                      <li key={m.map_id}>
+                        <span className="font-medium">{m.sequence}. {m.location_name}</span>
+                        <span className="text-gray-500 text-xs"> ({m.latitude}, {m.longitude})</span>
+                      </li>
+                    ))}
+                </ol>
+              ) : (
+                <div className="text-sm text-gray-500">No map locations recorded</div>
+              )}
+              <br></br>
+              <h3 className="text-xl font-bold text-gray-800">Dates</h3>
+              <div className="border-b pb-2 mb-4"></div>
+              <div className="bg-gray-100 p-1 rounded-lg">
+              <OneColumnRow label="Leaving Date" value={formatDate(trip.leaving_datetime)} />
+              <OneColumnRow label="Estimated Return" value={formatDate(trip.estimated_return_datetime)} />
+              <OneColumnRow label="Actual Return" value={formatDate(trip.actual_return_datetime)} />
+              <OneColumnRow label="Estimated Days" value={trip.estimated_days} />
+              <OneColumnRow label="Actual Days" value={trip.actual_days} />
+              </div>
+            </InfoCardSub>
+
+            {/*<InfoCard title="Distance & Route">
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
               <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
               <OneColumnRow label="Start Meter" value={trip.start_meter} />
@@ -247,10 +323,10 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="Actual Return" value={formatDate(trip.actual_return_datetime)} />
               <OneColumnRow label="Estimated Days" value={trip.estimated_days} />
               <OneColumnRow label="Actual Days" value={trip.actual_days} />
-            </InfoCard>
+            </InfoCard>*/}
 
             <CostSummary trip={trip} formatCurrency={formatCurrency} />
-            <Payments trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />
+            {/*<Payments trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />*/}
           </div>
         </div>
       </div>

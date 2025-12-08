@@ -40,7 +40,7 @@ const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm z-50 p-4">
       <div className="bg-white p-6 rounded shadow-xl w-80">
         <h2 className="text-xl font-semibold mb-4">Add Payment</h2>
 
