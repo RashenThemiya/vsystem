@@ -53,13 +53,13 @@ const Sidebar = () => {
     <>
       {/* Desktop Sidebar */}
       <div
-        className={`bg-purple-700 text-white transition-all duration-300 ${
+        className={`bg-gradient-to-r from-indigo-800 to-violet-800 text-white transition-all duration-300 ${
           isExpanded ? "w-64" : "w-20"
         } fixed md:relative top-0 left-0 h-full z-50 flex flex-col hidden md:flex`}
       >
         {/* Toggle Button */}
         <button
-          className="text-white p-4 focus:outline-none hover:bg-purple-800 transition md:flex items-center justify-center"
+          className="text-white p-4 focus:outline-none hover:bg-violet-900 transition md:flex items-center justify-center"
           onClick={toggleSidebar}
         >
           {isExpanded ? <FaBars size={28} /> : <FaBars size={28} />}
@@ -76,7 +76,7 @@ const Sidebar = () => {
                   className={`flex items-center p-3 transition rounded-lg ${
                     isActive
                       ? "bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg text-white font-bold scale-105"
-                      : "hover:bg-purple-800"
+                      : "hover:bg-violet-900"
                   }`}
                 >
                   <span className={`ml-4 mr-3 ${isActive ? "text-3xl" : "text-2xl"}`}>
