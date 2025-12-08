@@ -47,6 +47,7 @@ import TripDashboard from './pages/TripManagement/TripDashboard';
 
 import DriverProfile from './pages/Drivers/DriverProfile';
 import VehicleProfile from './pages/VehicleManagement/VehicleProfile';
+import CustomerProfile from './pages/Customers/CustomerProfile';
 function App() {
   return (
     <AuthProvider>
@@ -83,7 +84,7 @@ function App() {
             <Route path="/view-customers" element={<PrivateRoute><ViewCustomers /></PrivateRoute>} />
             <Route path="/edit-customer/:id" element={<PrivateRoute><EditCustomer /></PrivateRoute>} />*/}
             <Route path="/customer-dashboard" element={<PrivateRoute><CustomerDashboard /></PrivateRoute>} />
-
+            <Route path="/customer-profile/:customerId" element={<PrivateRoute><CustomerProfile /></PrivateRoute>} />
             {/* Driver Management Route */}
 
             {/*<Route

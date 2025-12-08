@@ -195,6 +195,8 @@ model Bill_Upload {
   bill_type    BillType
   vehicle      Vehicle? @relation(fields: [vehicle_id], references: [vehicle_id])
   driver       Driver?  @relation(fields: [driver_id], references: [driver_id])
+  bill_date    DateTime
+  bill_status  BillStatus @default(pending)
 }
 
 model Other_Trip_Cost {
@@ -224,6 +226,10 @@ model AuditLog {
 }
 
 // ====================== ENUMS ======================
+enum BillStatus {
+  pending
+  completed
+}
 
 enum ActionType {
   CREATE
