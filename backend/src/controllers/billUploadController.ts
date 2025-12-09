@@ -7,6 +7,9 @@ import {
   deleteBillService,
 } from "../services/billUploadService.js";
 
+/**
+ * ✅ Create a new bill
+ */
 export const createBillController = async (req: Request, res: Response) => {
   try {
     const bill = await createBillService(req.body);
@@ -16,6 +19,9 @@ export const createBillController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * ✅ Get all bills
+ */
 export const getAllBillsController = async (_req: Request, res: Response) => {
   try {
     const bills = await getAllBillsService();
@@ -25,6 +31,9 @@ export const getAllBillsController = async (_req: Request, res: Response) => {
   }
 };
 
+/**
+ * ✅ Get bill by ID
+ */
 export const getBillByIdController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -36,6 +45,9 @@ export const getBillByIdController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * ✅ Update bill by ID
+ */
 export const updateBillController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -46,6 +58,9 @@ export const updateBillController = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * ✅ Delete bill by ID
+ */
 export const deleteBillController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
