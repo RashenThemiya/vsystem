@@ -167,7 +167,14 @@ export const updateCustomerService = async (id: number, data: Partial<CustomerIn
 /**
  * ✅ Delete customer by ID
  */
-export const deleteCustomerService = async (id) => {
+export const deleteCustomerService = async (id: number) => {
+  // Delete all trips of the customer (cascade delete dependent tables manually)
+  await prisma.trip.deleteMany({
+    where: { customer_id: id },
+  });
+
+  // Now delete the customer
   await prisma.customer.delete({ where: { customer_id: id } });
+
   return true;
 };

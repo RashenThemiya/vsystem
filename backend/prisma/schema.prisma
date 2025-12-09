@@ -185,19 +185,26 @@ model Vehicle_Other_Cost {
   cost                  Decimal   @db.Decimal(10,2)
   cost_type             VehicleCostType
   vehicle               Vehicle   @relation(fields: [vehicle_id], references: [vehicle_id])
+
+  // One-to-one relation to Bill_Upload
+  bill                  Bill_Upload? @relation(fields: [bill_id], references: [bill_id])
+  bill_id               Int?         @unique
 }
 
 model Bill_Upload {
-  bill_id      Int      @id @default(autoincrement())
-  vehicle_id   Int?
-  driver_id    Int?
-  bill_image   Bytes?
-  bill_type    BillType
-  vehicle      Vehicle? @relation(fields: [vehicle_id], references: [vehicle_id])
-  driver       Driver?  @relation(fields: [driver_id], references: [driver_id])
-  bill_date    DateTime
-  bill_status  BillStatus @default(pending)
+  bill_id          Int      @id @default(autoincrement())
+  vehicle_id       Int?
+  driver_id        Int?
+  bill_image       Bytes?
+  bill_type        BillType
+  bill_date        DateTime
+  bill_status      BillStatus @default(pending)
+
+  vehicle          Vehicle? @relation(fields: [vehicle_id], references: [vehicle_id])
+  driver           Driver?  @relation(fields: [driver_id], references: [driver_id])
+  vehicle_other_cost Vehicle_Other_Cost?  // Optional inverse relation
 }
+
 
 model Other_Trip_Cost {
   trip_other_cost_id Int          @id @default(autoincrement())
