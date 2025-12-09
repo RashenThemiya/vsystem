@@ -1,0 +1,57 @@
+import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+const CustomerSidebar = ({ customer, openImage }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 p-3 bg-gradient-to-r from-indigo-600 to-violet-700 text-white rounded-full shadow hover:bg-gray-600"
+      >
+        <FaArrowAltCircleLeft size={20} />
+      </button>
+
+      {/* Avatar */}
+      <div className="mt-8 w-28 h-28 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-gray-500 text-4xl font-bold shadow">
+        {customer.name?.charAt(0)?.toUpperCase() || "?"}
+      </div>
+      <h2 className="text-xl font-bold text-white text-center">{customer.name}</h2>
+
+      {/* Customer Details */}
+      <div className="text-sm text-white space-y-1 w-full mt-2">
+        {[
+          ["Phone", customer.phone_number],
+          ["NIC", customer.nic],
+          ["Email", customer.email],
+        ].map(([label, value]) => (
+          <div key={label} className="flex justify-between">
+            <span className="font-semibold w-28">{label}:</span>
+            <span>{value || "-"}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* NIC Images */}
+      <div className="flex gap-4 mt-6 justify-center w-full">
+        <img
+          src={customer.nic_photo_front || "/nic-front-placeholder.png"}
+          alt="NIC Front"
+          onClick={() => openImage(customer.nic_photo_front)}
+          className="w-32 h-20 rounded-lg object-cover border-2 border-white p-1 shadow cursor-pointer hover:scale-105 transition"
+        />
+        <img
+          src={customer.nic_photo_back || "/nic-back-placeholder.png"}
+          alt="NIC Back"
+          onClick={() => openImage(customer.nic_photo_back)}
+          className="w-32 h-20 rounded-lg object-cover border-2 border-white p-1 shadow cursor-pointer hover:scale-105 transition"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default CustomerSidebar;

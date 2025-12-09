@@ -1,3 +1,6 @@
+import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
+
 const Sidebar = ({ vehicle, openImage }) => {
   const documents = [
     { label: "Vehicle", src: vehicle.image },
@@ -6,44 +9,63 @@ const Sidebar = ({ vehicle, openImage }) => {
     { label: "Eco Test", src: vehicle.eco_test_image },
     { label: "Book", src: vehicle.book_image },
   ];
+  const navigate = useNavigate();
 
   return (
-    <div className="w-72 bg-white shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
-      <img
-        src={vehicle.image}
-        alt={vehicle.name}
-        className="w-32 h-32 rounded-full border-2 border-purple-600 object-cover shadow-md"
-      />
-      <h2 className="text-xl font-bold text-purple-700 text-center">{vehicle.name}</h2>
+    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
+      {/* Back Button - top left */}
+  <button
+    onClick={() => navigate(-1)}
+    className="absolute top-4 left-4 p-3 bg-gradient-to-r from-indigo-600 to-violet-700 text-white rounded-full shadow hover:bg-gray-600"
+  >
+    <FaArrowAltCircleLeft size={20} />
+  </button>
 
-      <div className="text-sm text-gray-700 space-y-1 w-full">
-        <p><strong>Number:</strong> {vehicle.vehicle_number}</p>
-        <p><strong>Type:</strong> {vehicle.type}</p>
-        <p><strong>Daily Rent:</strong> Rs. {vehicle.rent_cost_daily}</p>
-        <p><strong>AC:</strong> {vehicle.ac_type}</p>
-        <p><strong>Owner Cost/Month:</strong> Rs. {vehicle.owner_cost_monthly}</p>
-        <p><strong>Fuel:</strong> {vehicle.fuel?.type} (Rs. {vehicle.fuel?.cost})</p>
-        <p><strong>Efficiency:</strong> {vehicle.vehicle_fuel_efficiency} km/L</p>
-        <p><strong>Meter:</strong> {vehicle.meter_number} km</p>
-        <p><strong>Last Service:</strong> {vehicle.last_service_meter_number} km</p>
-        <p><strong>Availability:</strong> {vehicle.vehicle_availability}</p>
-        <p><strong>Owner:</strong> {vehicle.owner?.owner_name}</p>
-        <p><strong>Mileage Cost:</strong> Rs. {vehicle.mileage_costs?.[0]?.mileage_cost}</p>
-        <p><strong>Additional Mileage:</strong> Rs. {vehicle.mileage_costs?.[0]?.mileage_cost_additional}</p>
-        <p><strong>License Expiry:</strong> {vehicle.license_expiry_date?.split("T")[0]}</p>
-        <p><strong>Insurance Expiry:</strong> {vehicle.insurance_expiry_date?.split("T")[0]}</p>
-        <p><strong>ECO Test Expiry:</strong> {vehicle.eco_test_expiry_date?.split("T")[0]}</p>
+  {/* Avatar Image */}
+  <img
+    src={vehicle.image}
+    alt={vehicle.name}
+    className="w-32 h-32 rounded-full border-2 border-gray-100 object-cover shadow-md mt-8"
+  />
+      <h2 className="text-xl font-bold text-white text-center">{vehicle.name}</h2>
+
+      <div className="text-sm text-white space-y-1 w-full">
+        {[
+          ["Number", vehicle.vehicle_number],
+          ["Type", vehicle.type],
+          ["Daily Rent", `Rs. ${vehicle.rent_cost_daily}`],
+          ["AC", vehicle.ac_type],
+          ["Owner Cost/Month", `Rs. ${vehicle.owner_cost_monthly}`],
+          ["Fuel", `${vehicle.fuel?.type}`],
+          ["Fuel Cost", `Rs. ${vehicle.fuel?.cost}`],
+          ["Efficiency", `${vehicle.vehicle_fuel_efficiency} km/L`],
+          ["Meter", `${vehicle.meter_number} km`],
+          ["Last Service", `${vehicle.last_service_meter_number} km`],
+          ["Availability", vehicle.vehicle_availability],
+          ["Owner", vehicle.owner?.owner_name],
+          ["Mileage Cost", `Rs. ${vehicle.mileage_costs?.[0]?.mileage_cost}`],
+          ["Additional Mileage", `Rs. ${vehicle.mileage_costs?.[0]?.mileage_cost_additional}`],
+          ["License Expiry", vehicle.license_expiry_date?.split("T")[0]],
+          ["Insurance Expiry", vehicle.insurance_expiry_date?.split("T")[0]],
+          ["ECO Test Expiry", vehicle.eco_test_expiry_date?.split("T")[0]],
+        ].map(([label, value]) => (
+          <div key={label} className="flex justify-between">
+            <span className="font-semibold w-40">{label}:</span>
+            <span>{value || "-"}</span>
+          </div>
+        ))}
       </div>
 
+
       <div className="w-full mt-4">
-        <h3 className="text-sm font-bold text-gray-800 mb-2 text-center">Documents</h3>
+        <h3 className="text-sm font-bold text-white mb-2 text-center">Documents</h3>
         <div className="grid grid-cols-3 gap-2">
           {documents
             .filter((doc) => doc.src)
             .map((doc) => (
               <div
                 key={doc.label}
-                className="flex flex-col items-center border rounded-sm overflow-hidden shadow hover:shadow-md cursor-pointer p-1"
+                className="flex flex-col text-white items-center border rounded-sm overflow-hidden shadow hover:shadow-md cursor-pointer p-1"
                 onClick={() => openImage(doc.src)}
               >
                 <img src={doc.src} alt={doc.label} className="w-14 h-14 object-cover rounded" />

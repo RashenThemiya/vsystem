@@ -1,144 +1,105 @@
 import { useEffect, useState } from "react";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
-import api from "../../utils/axiosInstance";
+import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
 import EditOwnerForm from "./EditOwnerForm";
+import api from "../../utils/axiosInstance";
 
 export default function OwnerDetails({ owner, onClose, onDelete, onUpdated }) {
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ ...owner });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-
-  useEffect(() => {
-    setForm({ ...owner });
-    setEditMode(false);
-    setError(null);
-    setSuccessMsg("");
-  }, [owner]);
 
   if (!owner) return null;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSave = async () => {
-    if (!isConfirmed) return;
-    setLoading(true);
-    setError(null);
-
-    try {
-      const updateData = {
-        owner_name: form.owner_name,
-        contact_number: form.contact_number,
-      };
-
-      const response = await api.put(
-        `/api/owners/${owner.owner_id}`,
-        updateData,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-
-      onUpdated(response.data.data); // update parent
-      setEditMode(false);
-      setIsConfirmed(false);
-      setSuccessMsg("Owner updated successfully!");
-      setTimeout(() => setSuccessMsg(""), 2000);
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Failed to update owner.");
-      setIsConfirmed(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async () => {
-    setLoading(true);
-    setError(null);
     try {
       await api.delete(`/api/owners/${owner.owner_id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      onDelete(owner.owner_id); // update parent
+      onDelete(owner.owner_id);
       setSuccessMsg("Owner deleted successfully!");
-      setTimeout(() => setSuccessMsg(""), 2000);
+      setTimeout(() => setSuccessMsg(""), 1500);
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.message || "Failed to delete owner.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleConfirmSave = () => {
-    setIsConfirmed(true);
-    handleSave();
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen w-100 bg-gray-100">
-      <div className="bg-white p-11 rounded-lg shadow-lg w-full h-full max-w-md overflow-auto max-h-full relative">
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          {editMode ? "" : "Vehicle Owner Details"}
-        </h2><br></br>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center">
-            ❌ {error}
-          </div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-5 rounded-lg shadow-lg w-100 h-full relative overflow-auto">
+      
+        {/* TOP LEFT — Close */}
+        {!editMode &&(
+              <button
+          onClick={onClose}
+          className="absolute top-3 left-1 p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+        >
+          <FaTimes size={16} />
+        </button>
         )}
-
-        {successMsg && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 text-center">
-            ✅ {successMsg}
-          </div>
-        )}
-
+        {/* TOP left — Edit */}
         {!editMode && (
-          <div className="space-y-4 text-gray-700">
-            <p><strong>Name:</strong> {owner.owner_name}</p>
-            <p><strong>Contact Number:</strong> {owner.contact_number}</p><br></br>
-
-            <button
-              onClick={() => setEditMode(true)}
-              className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-gray-900 transition"
-            >
-              Edit Owner
-            </button>
-
+          <button
+            onClick={() => setEditMode(true)}
+            className="absolute top-3 left-15 p-2 rounded-full bg-blue-200 hover:bg-blue-300 text-blue-700 shadow"
+          >
+            <FaEdit size={16} />
+          </button>
+        )}
+        {/* Delete Button */}
+        {!editMode && (
             <ConfirmWrapper
               onConfirm={handleDelete}
-              onCancel={() => {}}
               message="Are you sure you want to delete this Owner?"
               confirmText="Yes, Delete"
               cancelText="Cancel"
-              icon={<FiTrash2 />}
+              icon={<FaTrash />}
               buttonBackgroundColor="bg-red-600"
               buttonTextColor="text-white"
             >
               <button
                 type="button"
-                className="w-full py-2 bg-black text-white rounded-lg hover:bg-red-700 transition"
-                disabled={loading}
+                className="absolute top-3 right-3 p-2 rounded-full bg-red-200 hover:bg-red-300 text-red-700 shadow"
               >
-                Delete Owner
+                <FaTrash size={16}/>
               </button>
             </ConfirmWrapper>
+        )}
+            
 
-            <button
-              onClick={onClose}
-              className="w-full py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-            >
-              Close
-            </button>
+        {/* Messages */}
+        {error && (
+          <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-2 rounded text-center mb-4 mt-8">
+            ❌ {error}
           </div>
         )}
 
+        {successMsg && (
+          <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-2 rounded text-center mb-4 mt-8">
+            ✅ {successMsg}
+          </div>
+        )}
+
+        {/* TITLE */}
+        {!editMode && (
+          
+          <h2 className="text-2xl font-bold text-center text-gray-800 mt-10 mb-6">
+            Owner Details
+          </h2>
+        )}
+
+        {/* VIEW MODE */}
+        {!editMode && (
+          <div className="space-y-4 text-gray-700">
+
+            <p><strong>Name:</strong> {owner.owner_name}</p>
+            <p><strong>Contact Number:</strong> {owner.contact_number}</p>
+
+            
+          </div>
+        )}
+
+        {/* EDIT MODE */}
         {editMode && (
           <EditOwnerForm
             owner={owner}
