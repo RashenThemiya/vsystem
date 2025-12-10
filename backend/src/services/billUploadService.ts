@@ -65,19 +65,12 @@ export const createBillService = async (data: BillCreateInput) => {
       vehicle_other_cost: data.vehicle_other_cost_id
         ? { connect: { vehicle_other_cost_id: data.vehicle_other_cost_id } }
         : undefined,
-    },
-    include: {
-      vehicle: true,
-      driver: true,
-      vehicle_other_cost: true,
-    },
+    }
   });
 
-  return {
-    ...bill,
-    bill_image: bill.bill_image || null,
-  };
+  return bill; // ⬅️ Return only the bill object
 };
+
 
 // ----------------- GET ALL BILLS -----------------
 export const getAllBillsService = async () => {

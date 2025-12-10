@@ -3,61 +3,25 @@ import { FaMoneyBill } from "react-icons/fa";
 import axios from "axios";
 
 const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
-  const costTypes = ["Lease_Cost", "Repair_Cost", "Fuel_Cost", "Other_Cost"];
-
-  // Map bill type to default cost type
-  const mapBillToCostType = (billType) => {
-    switch (billType) {
-      case "Service_Cost":
-        return "Repair_Cost";
-      case "Repair_Cost":
-        return "Repair_Cost";
-      case "Fuel_Bill":
-        return "Fuel_Cost";
-      case "Other_Cost":
-      case "Insurance":
-      case "License":
-        return "Other_Cost";
-      default:
-        return "Lease_Cost";
-    }
-  };
+  // Must match Prisma VehicleCostType enum
+  const costTypes = [
+    "Lease_Cost",
+    "Service_Cost",
+    "Repairs_Cost",
+    "Insurance_Amount",
+    "Revenue_License",
+    "Eco_Test_Cost",
+    "Fuel_Cost",
+  ];
 
   const [cost, setCost] = useState("");
-  const [costType, setCostType] = useState(mapBillToCostType(bill.bill_type));
+  const [costType, setCostType] = useState(bill.bill_type || "Lease_Cost");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [vehicle, setVehicle] = useState(null);
-  const [driver, setDriver] = useState(null);
 
   // Update costType if bill changes
   useEffect(() => {
-    setCostType(mapBillToCostType(bill.bill_type));
-  }, [bill]);
-
-  // Fetch vehicle & driver info
-  useEffect(() => {
-    const fetchInfo = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const [vehicleRes, driverRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/vehicles/${bill.vehicle_id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/drivers/${bill.driver_id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        setVehicle(vehicleRes.data.data);
-        setDriver(driverRes.data.data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load vehicle/driver info.");
-      }
-    };
-
-    if (bill) fetchInfo();
+    setCostType(bill.bill_type || "Lease_Cost");
   }, [bill]);
 
   const handleSubmit = async (e) => {
@@ -68,6 +32,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
     try {
       const token = localStorage.getItem("token");
 
+      // Send bill_id so backend can mark it completed
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/vehicle-other-costs`,
         {
@@ -75,6 +40,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
           date: bill.bill_date,
           cost: Number(cost),
           cost_type: costType,
+          bill_id: bill.bill_id, // important to update bill status
         },
         {
           headers: {
@@ -84,8 +50,8 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
         }
       );
 
-      onSuccess();
-      onClose();
+      onSuccess(); // refresh parent
+      onClose();   // close modal
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update cost.");
     } finally {
@@ -101,21 +67,22 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
         </h2>
 
         {/* Bill Info */}
-        <div className="mb-4">
+        <div className="mb-4 flex flex-col items-center">
           {bill.bill_image && (
             <img
-              src={bill.bill_image}
+              src={bill.bill_image} // dynamically use the backend URL
               alt="Bill"
-              className="w-full h-40 object-cover rounded mb-2"
+              className="w-32 h-32 object-cover rounded-full mb-2 border border-gray-300"
+              onError={(e) => {
+                e.target.src = "/placeholder.png"; // fallback if image not loaded
+              }}
             />
           )}
           <p>Bill Type: {bill.bill_type.replace("_", " ")}</p>
           <p>Bill Date: {new Date(bill.bill_date).toLocaleDateString()}</p>
           <p>Status: {bill.bill_status}</p>
-          <p>
-            Vehicle: {vehicle ? `${vehicle.vehicle_number} - ${vehicle.name}` : bill.vehicle_id}
-          </p>
-          <p>Driver: {driver ? `${driver.name} (${driver.nic})` : bill.driver_id}</p>
+          <p>Vehicle: {bill.vehicle_name} (ID: {bill.vehicle_id})</p>
+          <p>Driver: {bill.driver_name} (ID: {bill.driver_id})</p>
         </div>
 
         {error && (
@@ -131,7 +98,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
               type="number"
               value={cost}
               onChange={(e) => setCost(e.target.value)}
-              className="input"
+              className="input w-full border border-gray-300 rounded px-2 py-1"
               required
             />
           </div>
@@ -141,7 +108,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
             <select
               value={costType}
               onChange={(e) => setCostType(e.target.value)}
-              className="input"
+              className="input w-full border border-gray-300 rounded px-2 py-1"
             >
               {costTypes.map((c) => (
                 <option key={c} value={c}>

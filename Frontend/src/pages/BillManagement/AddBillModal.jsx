@@ -13,7 +13,7 @@ const AddBillModal = ({ onClose, onSuccess }) => {
     bill_type: "",
     bill_date: "",
     bill_status: "pending",
-    bill_image: "",
+    bill_image_base64: "",
     vehicle_other_cost_id: null,
   });
 
@@ -26,18 +26,21 @@ const AddBillModal = ({ onClose, onSuccess }) => {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [preview, setPreview] = useState("");
 
-  const billTypes = [
-    "Service_Cost",
-    "Repair_Cost",
-    "Other_Cost",
-    "Fuel_Bill",
-    "Insurance",
-    "License",
-  ];
+  // Bill type mapping
+  const billTypeMap = {
+    Service_Cost: "Service_Cost",
+    Repairs_Cost: "Repairs_Cost",
+    Lease_Cost: "Lease_Cost",
+    Insurance_Amount: "Insurance_Amount",
+    Revenue_License: "Revenue_License",
+    Eco_Test_Cost: "Eco_Test_Cost",
+    Fuel_Cost: "Fuel_Cost",
+  };
 
+  const billTypes = Object.keys(billTypeMap);
   const billStatusOptions = ["pending", "completed"];
 
-  // Fetch vehicles and drivers
+  // Fetch vehicles & drivers
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -58,11 +61,20 @@ const AddBillModal = ({ onClose, onSuccess }) => {
           }),
         ]);
 
-        console.log("Vehicle Response:", vehicleRes.data);
-        console.log("Driver Response:", driverRes.data);
+        // Safe array handling
+        const vehiclesArray = Array.isArray(vehicleRes.data?.data)
+          ? vehicleRes.data.data
+          : Array.isArray(vehicleRes.data)
+          ? vehicleRes.data
+          : [];
+        const driversArray = Array.isArray(driverRes.data?.data)
+          ? driverRes.data.data
+          : Array.isArray(driverRes.data)
+          ? driverRes.data
+          : [];
 
-        setVehicles(vehicleRes.data?.data || vehicleRes.data || []);
-        setDrivers(driverRes.data?.data || driverRes.data || []);
+        setVehicles(vehiclesArray);
+        setDrivers(driversArray);
       } catch (err) {
         console.error("Dropdown fetch error:", err.response || err);
         setError("Failed to load vehicles or drivers.");
@@ -74,11 +86,13 @@ const AddBillModal = ({ onClose, onSuccess }) => {
     fetchDropdowns();
   }, [navigate]);
 
+  // Input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBill((prev) => ({ ...prev, [name]: value }));
   };
 
+  // File upload
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -88,12 +102,13 @@ const AddBillModal = ({ onClose, onSuccess }) => {
       setPreview(reader.result);
       setBill((prev) => ({
         ...prev,
-        bill_image: reader.result.split(",")[1], // save base64 only
+        bill_image_base64: reader.result.split(",")[1],
       }));
     };
     reader.readAsDataURL(file);
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConfirmed) return;
@@ -103,10 +118,20 @@ const AddBillModal = ({ onClose, onSuccess }) => {
 
     try {
       const token = localStorage.getItem("token");
+      const backendBillType = billTypeMap[bill.bill_type];
+      if (!backendBillType) throw new Error("Invalid bill type selected.");
+
+      const payload = {
+        ...bill,
+        vehicle_id: bill.vehicle_id || null,
+        driver_id: bill.driver_id || null,
+        bill_type: backendBillType,
+        vehicle_other_cost_id: bill.vehicle_other_cost_id || null,
+      };
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/bill-uploads`,
-        bill,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,14 +140,16 @@ const AddBillModal = ({ onClose, onSuccess }) => {
         }
       );
 
-      if (res.status === 200 || res.status === 201) {
-        setShowSuccess(true);
-        onSuccess(res.data.data);
+      // Use returned bill object if exists
+      const createdBill = res.data?.data || res.data;
 
-        setTimeout(() => onClose(), 1500);
-      }
+      setShowSuccess(true);
+      onSuccess(createdBill);
+
+      setTimeout(() => onClose(), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to upload bill.");
+      console.error(err);
+      setError(err.response?.data?.message || err.message || "Failed to upload bill.");
     } finally {
       setLoading(false);
       setIsConfirmed(false);
@@ -132,7 +159,6 @@ const AddBillModal = ({ onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-white/40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl mt-12">
-
         <h2 className="text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
           <FaReceipt /> Add New Bill
         </h2>
@@ -150,10 +176,11 @@ const AddBillModal = ({ onClose, onSuccess }) => {
         )}
 
         {dropdownLoading ? (
-          <div className="text-center py-4 text-gray-500">Loading vehicles and drivers...</div>
+          <div className="text-center py-4 text-gray-500">
+            Loading vehicles and drivers...
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-
             {/* VEHICLE + DRIVER */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -181,7 +208,6 @@ const AddBillModal = ({ onClose, onSuccess }) => {
                   value={bill.driver_id}
                   onChange={handleChange}
                   className="input"
-                  required
                 >
                   <option value="">Select Driver</option>
                   {drivers.map((d) => (
@@ -246,17 +272,18 @@ const AddBillModal = ({ onClose, onSuccess }) => {
             {/* BILL IMAGE */}
             <div className="flex flex-col items-center">
               <label className="label mb-2">Bill Image</label>
-
               <div className="relative w-48 h-48 border-2 border-dashed rounded-xl bg-gray-50 hover:bg-green-50 transition flex items-center justify-center overflow-hidden">
                 {preview ? (
-                  <img src={preview} className="w-full h-full object-cover rounded-xl" />
+                  <img
+                    src={preview}
+                    className="w-full h-full object-cover rounded-xl"
+                  />
                 ) : (
                   <div className="flex flex-col items-center text-gray-400">
                     <FaUpload className="text-3xl mb-2" />
                     <p>Upload Bill</p>
                   </div>
                 )}
-
                 <input
                   type="file"
                   accept="image/*"
