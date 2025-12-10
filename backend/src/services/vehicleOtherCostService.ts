@@ -1,5 +1,5 @@
 import { prisma } from "../config/prismaClient";
-import { Vehicle_Other_Cost, BillStatus } from "@prisma/client";
+import { Vehicle_Other_Cost, BillStatus, Prisma } from "@prisma/client";
 
 type VehicleCostCreateInput = Omit<Vehicle_Other_Cost, "vehicle_other_cost_id"> & {
   bill_id?: number | null; // optional relation to Bill_Upload
@@ -11,26 +11,29 @@ type VehicleCostUpdateInput = Partial<VehicleCostCreateInput>;
  * ✅ CREATE Vehicle Other Cost
  */
 export const createVehicleCostService = async (data: VehicleCostCreateInput) => {
-  let billConnection;
+  let bill_id: number | undefined;
 
+  // If bill_id is provided → update status
   if (data.bill_id) {
-    // If bill_id provided, update bill status to completed and connect
     const updatedBill = await prisma.bill_Upload.update({
       where: { bill_id: data.bill_id },
       data: { bill_status: BillStatus.completed },
     });
-    billConnection = { connect: { bill_id: updatedBill.bill_id } };
+
+    bill_id = updatedBill.bill_id;
   }
 
+  // Create Vehicle Other Cost
   const vehicleCost = await prisma.vehicle_Other_Cost.create({
     data: {
       vehicle_id: data.vehicle_id,
       date: data.date,
       cost: data.cost,
       cost_type: data.cost_type,
-      bill: billConnection, // only connect if bill_id exists
+      bill_id, // assign bill_id directly
     },
     include: {
+      bill: true,
     },
   });
 

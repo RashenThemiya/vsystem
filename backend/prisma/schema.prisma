@@ -195,7 +195,7 @@ model Bill_Upload {
   bill_id          Int      @id @default(autoincrement())
   vehicle_id       Int?
   driver_id        Int?
-  bill_image       Bytes?
+  bill_image       String?
   bill_type        BillType
   bill_date        DateTime
   bill_status      BillStatus @default(pending)
