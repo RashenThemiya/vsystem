@@ -13,7 +13,7 @@ function Card({ title, value, gradient }) {
     <div className={`p-5 rounded-xl shadow-md text-white bg-gradient-to-r ${gradient}`}>
       <div className="text-sm opacity-90">{title}</div>
       <div className="text-2xl font-bold mt-2">{value ?? 0}</div>
-      <div className="text-xs mt-1 opacity-80">Overview</div>
+      
     </div>
   );
 }

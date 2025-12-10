@@ -87,132 +87,122 @@ const [activeTab, setActiveTab] = useState("customer");
     <div className="flex justify-between items-center mb-4">
     </div>
 
-    {/* Header: Back + Refresh (LEFT) AND Action Buttons (RIGHT) */}
-<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-
-  {/* LEFT → Back & Refresh */}
-  <div className="flex gap-2">
-    <button
-      onClick={() => navigate(-1)}
-      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition flex items-center gap-2"
-    >
-      <FaArrowLeft /> Back
-    </button>
-
-    <button
-      onClick={fetchTrip}
-      className="px-4 py-2 bg-gray-500 text-gray-100 rounded hover:bg-teal-700 transition flex items-center gap-2"
-    >
-      <FaRedo /> Refresh
-    </button>
-  </div>
-
-  
-
-</div>
+    
 
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Participants & Actions */}
           <div className="space-y-4">
-            <div className="bg-gradient-to-r from-indigo-500 to-violet-600 h-200 p-2 rounded-xl shadow-md mb-6">
-                {/* Top Row: Trip ID and Status */}
-                <div className="flex flex-col items-center text-center mb-2 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Trip ID: {trip.trip_id}
-                </h2>
+            <div className="bg-gradient-to-r from-indigo-500 to-violet-600 h-220 p-2 rounded-xl shadow-md mb-6">
 
-                <div className="flex flex-wrap gap-2 items-center justify-center mb-3">
-                  <span
-                    className={`px-2 py-1 rounded-md font-semibold ${
-                      trip.trip_status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : trip.trip_status === "Ongoing"
-                        ? "bg-blue-100 text-blue-800"
-                        : trip.trip_status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : trip.trip_status === "Ended"
-                        ? "bg-gray-200 text-gray-700"
-                        : trip.trip_status === "Cancelled"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {trip.trip_status}
-                  </span>
+  {/* Top Row: Back Button + Trip ID + Status */}
+  <div className="flex items-center justify-between mb-2">
 
-                  <span
-                    className={`px-2 py-1 rounded-md font-semibold ${
-                      trip.payment_status === "Paid"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {trip.payment_status}
-                  </span>
-                </div>
-              </div>
-            </div>
+    {/* LEFT → Back Button */}
+    <button
+      onClick={() => navigate(-1)}
+      className="px-3 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition flex items-center -mt-11 gap-2"
+    >
+      <FaArrowLeft size={18} />
+    </button>
 
+    {/* CENTER → Trip ID + Status */}
+    <div className="flex flex-col items-center flex-1">
+      <h2 className="text-2xl font-bold text-white mb-3 mt-2">
+        Trip ID: {trip.trip_id}
+      </h2>
 
-                {/* Trip Participants */}
-              {/* Trip Participants */}
-              <InfoCard title="Trip Participants">
-                {/* Tabs */}
-                <div className="flex gap-4 border-b border-gray-200 pb-2">
-                  <button
-                    onClick={() => setActiveTab("customer")}
-                    className={`px-4 py-2 font-semibold transition ${
-                      activeTab === "customer"
-                        ? "border-b-2 border-white text-white"
-                        : "text-white hover:text-white"
-                    }`}
-                  >
-                    Customer
-                  </button>
+      <div className="flex flex-wrap gap-2 items-center justify-center mb-4">
+        <span
+          className={`px-2 py-1 rounded-md font-semibold ${
+            trip.trip_status === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : trip.trip_status === "Ongoing"
+              ? "bg-blue-100 text-blue-800"
+              : trip.trip_status === "Completed"
+              ? "bg-green-100 text-green-800"
+              : trip.trip_status === "Ended"
+              ? "bg-gray-200 text-gray-700"
+              : trip.trip_status === "Cancelled"
+              ? "bg-red-100 text-red-800"
+              : "bg-gray-100 text-gray-700"
+          }`}
+        >
+          {trip.trip_status}
+        </span>
 
-                  <button
-                    onClick={() => setActiveTab("driver")}
-                    className={`px-4 py-2 font-semibold transition ${
-                      activeTab === "driver"
-                        ? "border-b-2 border-white text-white"
-                        : "text-white hover:text-white"
-                    }`}
-                  >
-                    Driver
-                  </button>
+        <span
+          className={`px-2 py-1 rounded-md font-semibold ${
+            trip.payment_status === "Paid"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {trip.payment_status}
+        </span>
+      </div>
+    </div>
 
-                  <button
-                    onClick={() => setActiveTab("vehicle")}
-                    className={`px-4 py-2 font-semibold transition ${
-                      activeTab === "vehicle"
-                        ? "border-b-2 border-white text-white"
-                        : "text-white hover:text-white"
-                    }`}
-                  >
-                    Vehicle
-                  </button>
-                </div>
+    {/* RIGHT → Spacer to keep center alignment */}
+    <div className="w-10"></div>
+  </div>
 
-                {/* Tab Content */}
-                <div className="mt-4">
-                  {activeTab === "customer" && (
-                    <CustomerDetails trip={trip} isBase64={isBase64} />
-                  )}
+  {/* Trip Participants */}
+  <InfoCard title="Trip Participants">
+    {/* Tabs */}
+    <div className="flex gap-4 border-b border-gray-200 pb-2">
+      <button
+        onClick={() => setActiveTab("customer")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "customer"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Customer
+      </button>
 
-                  {activeTab === "driver" && (
-                    <DriverDetails trip={trip} isBase64={isBase64} />
-                  )}
+      <button
+        onClick={() => setActiveTab("driver")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "driver"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Driver
+      </button>
 
-                  {activeTab === "vehicle" && (
-                    <VehicleDetails trip={trip} isBase64={isBase64} />
-                  )}
-                </div>
-              </InfoCard>
- 
-                </div>
+      <button
+        onClick={() => setActiveTab("vehicle")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "vehicle"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Vehicle
+      </button>
+    </div>
+
+    {/* Tab Content */}
+    <div className="mt-4">
+      {activeTab === "customer" && (
+        <CustomerDetails trip={trip} isBase64={isBase64} />
+      )}
+
+      {activeTab === "driver" && (
+        <DriverDetails trip={trip} isBase64={isBase64} />
+      )}
+
+      {activeTab === "vehicle" && (
+        <VehicleDetails trip={trip} isBase64={isBase64} />
+      )}
+    </div>
+  </InfoCard>
+</div>
+
          
           </div>
  
@@ -272,7 +262,7 @@ const [activeTab, setActiveTab] = useState("customer");
                 onGetPrint={() => setShowPrintModal(true)}
               />
             </div>
-            <div className="max-h-[700px] overflow-y-auto pr-2">
+            <div className="max-h-[780px] overflow-y-auto pr-2">
 
           <InfoCardSub title="Trip Summary">
             <div className="bg-gray-100 p-1 rounded-lg">

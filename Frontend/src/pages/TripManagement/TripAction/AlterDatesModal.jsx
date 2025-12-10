@@ -49,7 +49,7 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
           type="datetime-local"
           value={leavingDate}
           onChange={(e) => setLeavingDate(e.target.value)}
-          className="w-full border rounded px-3 py-2 mb-4"
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-4"
         />
 
         {/* Actual Return Date */}
@@ -58,7 +58,7 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
           type="datetime-local"
           value={returnDate}
           onChange={(e) => setReturnDate(e.target.value)}
-          className="w-full border rounded px-3 py-2 mb-4"
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-4"
         />
 
         <div className="flex justify-end gap-3">
@@ -72,7 +72,7 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
           <button
             onClick={submitDates}
             disabled={loading}
-            className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+            className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded hover:bg-indigo-700"
           >
             {loading ? "Saving..." : "Update"}
           </button>

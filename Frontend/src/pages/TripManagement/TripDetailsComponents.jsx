@@ -95,8 +95,8 @@ export const OneColumnRow = ({ label, value }) => (
 export const OneColumnRowSub = ({ label, value }) => (
   <div className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-white-50 transition">
     <span className="text-white font-medium">{label}</span>
-    <span className="font-semibold text-gray-90text-gray-600 font-medium0">{value ?? "-"}</span>
-  </div>
+    <span className="font-semibold text-white text-gray-600 font-medium0">{value ?? "-"}</span>
+  </div> 
 );
 
 /* ------------------ CustomerDetails ------------------ */
@@ -201,7 +201,7 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
 export const DriverDetails = ({ trip, isBase64 }) => {
   if (!trip.driver)
     return (
-      <div className="text-sm font-semibold text-gray-500 mt-2">
+      <div className="text-sm font-semibold text-gray-100 mt-2">
         No driver assigned
       </div>
     );
@@ -213,29 +213,29 @@ export const DriverDetails = ({ trip, isBase64 }) => {
     : null;
 
   return (
-    <div className="bg-gray-100 border-gray-200 rounded-xl shadow-md p-4 flex flex-col items-center text-sm">
+    <div className="bg-gradient-to-r from-indigo-500 to-violet-600 border-gray-200 rounded-xl shadow-md p-4 flex flex-col items-center text-sm">
 
       {/* Driver Profile Image */}
       {driverImg && (
         <img
           src={driverImg}
           alt="Driver"
-          className="w-40 h-40 object-cover rounded-full shadow mb-4 border"
+          className="w-40 h-40 object-cover rounded-full shadow mb-4 border-2 border-white"
         />
       )}
 
       {/* Driver Name */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-1">
+      <h3 className="text-lg font-semibold text-gray-100 mb-1">
         {trip.driver.name}
       </h3>
 
       {/* Driver Info */}
       <div className="w-full flex flex-col gap-2 mt-2">
-        <OneColumnRow label="Phone" value={trip.driver.phone_number} />
-        <OneColumnRow label="NIC" value={trip.driver.nic} />
-        <OneColumnRow label="Age" value={trip.driver.age} />
-        <OneColumnRow label="License No." value={trip.driver.license_number} />
-        <OneColumnRow label="Charges" value={`Rs. ${trip.driver.driver_charges}`} />
+        <OneColumnRowSub label="Phone" value={trip.driver.phone_number} />
+        <OneColumnRowSub label="NIC" value={trip.driver.nic} />
+        <OneColumnRowSub label="Age" value={trip.driver.age} />
+        <OneColumnRowSub label="License No." value={trip.driver.license_number} />
+        <OneColumnRowSub label="Charges" value={`Rs. ${trip.driver.driver_charges}`} />
       </div>
     </div>
   );
@@ -248,7 +248,7 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
 
   if (!vehicle)
     return (
-      <div className="text-sm font-semibold text-gray-500 mt-2">
+      <div className="text-sm font-semibold text-gray-100 mt-2">
         No vehicle assigned
       </div>
     );
@@ -260,28 +260,28 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
     : null;
 
   return (
-    <div className="bg-gray-100 border-gray-200 rounded-xl shadow-md p-4 flex flex-col items-center text-sm">
+    <div className="bg-gradient-to-r from-indigo-500 to-violet-600 border-gray-200 rounded-xl shadow-md p-4 flex flex-col items-center text-sm">
 
       {/* Vehicle Image */}
       {vehicleImg && (
         <img
           src={vehicleImg}
           alt="Vehicle"
-          className="w-56 h-40 object-cover rounded-xl shadow mb-4 border"
+          className="w-56 h-40 object-cover rounded-xl shadow mb-4 border-2 border-white"
         />
       )}
 
       {/* Vehicle Title */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-1">
+      <h3 className="text-lg font-semibold text-gray-100 mb-1">
         {vehicle.name}
       </h3>
 
       {/* Vehicle Details */}
       <div className="w-full flex flex-col gap-2 mt-2">
-        <OneColumnRow label="Number" value={vehicle.vehicle_number} />
-        <OneColumnRow label="Type" value={vehicle.type} />
-        <OneColumnRow label="AC Type" value={vehicle.ac_type} />
-        <OneColumnRow
+        <OneColumnRowSub label="Number" value={vehicle.vehicle_number} />
+        <OneColumnRowSub label="Type" value={vehicle.type} />
+        <OneColumnRowSub label="AC Type" value={vehicle.ac_type} />
+        <OneColumnRowSub
           label="Fuel Efficiency"
           value={
             vehicle.vehicle_fuel_efficiency
@@ -289,7 +289,7 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
               : "-"
           }
         />
-        <OneColumnRow
+        <OneColumnRowSub
           label="License Expiry"
           value={
             vehicle.license_expiry_date
@@ -297,7 +297,7 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
               : "-"
           }
         />
-        <OneColumnRow
+        <OneColumnRowSub
           label="Insurance Expiry"
           value={
             vehicle.insurance_expiry_date
@@ -305,7 +305,7 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
               : "-"
           }
         />
-        <OneColumnRow
+        <OneColumnRowSub
           label="Last Service Meter"
           value={vehicle.last_service_meter_number}
         />
