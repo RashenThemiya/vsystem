@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import StatsCards from "../StatsCards";
 
 const TripsTab = ({
   trips,
@@ -13,6 +14,11 @@ const TripsTab = ({
   setTripSelectedYear,
 }) => {
   const statusOptions = ["all", "Pending", "Ongoing", "Ended", "Completed", "Cancelled"];
+
+  const filteredTripsCount =
+  filterStatus === "all"
+    ? trips.length
+    : trips.filter((t) => t.trip_status === filterStatus).length;
 
   return (
     <>
@@ -50,6 +56,17 @@ const TripsTab = ({
           />
         )}
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Trips</div>
+          <div className="text-2xl font-bold mt-2">{filteredTripsCount}</div>
+        </div>
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Earnings</div>
+          <div className="text-xl font-bold mt-2">Rs. {totalEarning.toLocaleString()}</div>
+          <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2 mb-3">
         {statusOptions.map((status) => (
@@ -57,7 +74,7 @@ const TripsTab = ({
             key={status}
             className={`px-3 py-1 rounded-full text-sm font-semibold transition ${
               filterStatus === status
-                ? "bg-purple-600 text-white shadow-md"
+                ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-md"
                 : "bg-gray-200 text-gray-800 hover:bg-purple-400 hover:text-white"
             }`}
             onClick={() => setFilterStatus(status)}
@@ -67,16 +84,12 @@ const TripsTab = ({
         ))}
       </div>
 
-      <div className="bg-green-100 p-2 rounded-lg shadow text-md font-semibold text-green-800 mb-3">
-        Total Earnings (Completed Trips Only): Rs. {totalEarning.toLocaleString()}
-      </div>
-
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl">
+      <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4">
         {!trips.length ? (
           <p className="p-4 text-center text-gray-500">No trips found.</p>
         ) : (
           <table className="w-full table-auto border-collapse text-sm">
-            <thead className="bg-gray-200">
+            <thead className="bg-white border-b">
               <tr>
                 <th className="p-2 text-left">Trip ID</th>
                 <th className="p-2 text-left">Customer</th>
@@ -94,7 +107,7 @@ const TripsTab = ({
             </thead>
             <tbody>
               {trips.map((t) => (
-                <tr key={t.trip_id} className="border-b hover:bg-gray-50 transition">
+                <tr key={t.trip_id} className="hover:bg-gray-50 transition">
                   <td className="p-1">{t.trip_id}</td>
                   <td className="p-1">{t.customer_id}</td>
                   <td className="p-1">{t.driver_id || "-"}</td>

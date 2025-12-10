@@ -7,25 +7,24 @@ export const InfoCard = ({ title, children, footer }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="bg-gradient-to-r from-violet-100 to-indigo-200 shadow-md rounded-2xl p-6 border border-gray-200 transition hover:shadow-lg mb-6">
+    <div className="bg-gradient-to-r from-indigo-600 to-violet-700  rounded-2xl p-6 200 transition hover:shadow-lg mb-6">
 
       {/* Header Row */}
       
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-              <div className="w-2 h-8 bg-indigo-800 rounded mr-3"></div>
-             <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+      <div className="flex items-center justify-between mb-3" onClick={() => setCollapsed(!collapsed)}>
+        <div className="flex items-center" >
+             <h2 className="text-xl font-semibold text-white">{title}</h2>
             </div>
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-sm text-blue-800 underline hover:text-blue-800 transition"
+          
+          className="text-sm text-white underline-white hover:text-gray-100 transition"
         >
           {collapsed ? <FaChevronDown/> : <FaChevronUp/>}
         </button>
       </div>
 
       {/* Divider Under Header */}
-      <div className="border-b pb-2 mb-4"></div>
+      <div className="border-b pb-2 mb-4 border-white"></div>
 
       {/* Collapsible Body */}
       {!collapsed && (
@@ -48,7 +47,7 @@ export const InfoCardSub = ({ title, children, footer }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="bg-white shadow-md rounded-2xl p-6 border border-gray-200 transition hover:shadow-lg mb-6">
+    <div className="bg-white shadow-sm rounded-2xl p-4 border border-white transition hover:shadow-lg mb-6">
 
       {/* Header Row */}
       
@@ -93,6 +92,12 @@ export const OneColumnRow = ({ label, value }) => (
     <span className="font-semibold text-gray-90text-gray-600 font-medium0">{value ?? "-"}</span>
   </div>
 );
+export const OneColumnRowSub = ({ label, value }) => (
+  <div className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-white-50 transition">
+    <span className="text-white font-medium">{label}</span>
+    <span className="font-semibold text-gray-90text-gray-600 font-medium0">{value ?? "-"}</span>
+  </div>
+);
 
 /* ------------------ CustomerDetails ------------------ */
 export const CustomerDetails = ({ trip, isBase64 }) => {
@@ -100,7 +105,7 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
 
   if (!customer)
     return (
-      <div className="text-sm font-semibold text-gray-500 mt-2">
+      <div className="text-sm font-semibold text-white mt-2">
         No customer data
       </div>
     );
@@ -134,58 +139,59 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
       .toUpperCase() || "?";
 
   return (
-    <div className="bg-gray-100 border-gray-200 rounded-xl shadow-md p-4 flex flex-col items-center text-sm">
+    <div className="bg-gradient-to-r from-indigo-500 to-violet-600 rounded-xl  p-4 flex flex-col items-center text-sm">
 
-      {/* Avatar Image */}
-      {avatarImg ? (
-        <img
-          src={avatarImg}
-          alt="Customer Avatar"
-          className="w-32 h-32 object-cover rounded-full shadow border mb-4"
-        />
-      ) : (
-        <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-gray-700 shadow mb-4">
-          {initials}
-        </div>
-      )}
-
-      {/* Name */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-1">
-        {customer.name}
-      </h3>
-
-      {/* Fields */}
-      <div className="w-full flex flex-col gap-2 mt-2">
-        <OneColumnRow label="NIC" value={customer.nic} />
-        <OneColumnRow label="Phone" value={customer.phone_number} />
-        <OneColumnRow label="Email" value={customer.email} />
-      </div>
-
-      {/* NIC Images at Bottom */}
-      <div className="flex gap-3 mt-4 flex-wrap justify-center">
-        {nicFront && (
-          <div className="flex flex-col items-center">
-            <img
-              src={nicFront}
-              alt="NIC Front"
-              className="w-36 h-24 object-cover rounded-lg shadow border"
-            />
-            <span className="text-xs text-gray-500 mt-1">NIC Front</span>
-          </div>
-        )}
-
-        {nicBack && (
-          <div className="flex flex-col items-center">
-            <img
-              src={nicBack}
-              alt="NIC Back"
-              className="w-36 h-24 object-cover rounded-lg shadow border"
-            />
-            <span className="text-xs text-gray-500 mt-1">NIC Back</span>
-          </div>
-        )}
-      </div>
+  {/* Avatar Image */}
+  {avatarImg ? (
+    <img
+      src={avatarImg}
+      alt="Customer Avatar"
+      className="w-32 h-32 object-cover rounded-full shadow border mb-4"
+    />
+  ) : (
+    <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-black shadow mb-4">
+      {initials}
     </div>
+  )}
+
+  {/* Name */}
+  <h3 className="text-lg font-semibold text-white mb-1">
+    {customer.name}
+  </h3>
+
+  {/* Fields */}
+  <div className="w-full flex flex-col gap-2 mt-2 text-white">
+    <OneColumnRowSub label="NIC" value={customer.nic} />
+    <OneColumnRowSub label="Phone" value={customer.phone_number} />
+    <OneColumnRowSub label="Email" value={customer.email} />
+  </div>
+
+  {/* NIC Images */}
+  <div className="flex gap-3 mt-4 flex-wrap justify-center">
+    {nicFront && (
+      <div className="flex flex-col items-center">
+        <img
+          src={nicFront}
+          alt="NIC Front"
+          className="w-36 h-24 object-cover rounded-lg shadow border-2 border-white"
+        />
+        <span className="text-xs text-white mt-1">NIC Front</span>
+      </div>
+    )}
+
+    {nicBack && (
+      <div className="flex flex-col items-center">
+        <img
+          src={nicBack}
+          alt="NIC Back"
+          className="w-36 h-24 object-cover rounded-lg shadow border-2 border-white"
+        />
+        <span className="text-xs text-white mt-1">NIC Back</span>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
 

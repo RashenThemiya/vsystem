@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
-import { FiEdit } from "react-icons/fi";
 import api from "../../utils/axiosInstance";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
   const [form, setForm] = useState({ ...customer });
@@ -9,59 +9,35 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
 
-  // NEW
   const [nicError, setNicError] = useState("");
-  const [contactError, setContactError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     setForm({ ...customer });
   }, [customer]);
 
-  if (!customer) return null;
+  // Validation
+  const validateNIC = (nic) =>
+    /^[0-9]{9}[vVxX]$/.test(nic) || /^[0-9]{12}$/.test(nic);
 
-  // --- VALIDATION FUNCTIONS ---
-  const validateNIC = (nic) => {
-    const oldNIC = /^[0-9]{9}[vVxX]$/;
-    const newNIC = /^[0-9]{12}$/;
-    return oldNIC.test(nic) || newNIC.test(nic);
-  };
+  const validatePhone = (num) => /^0[0-9]{9}$/.test(num);
 
-  const validateContact = (number) => {
-    const contact = /^0[0-9]{9}$/; // must start with 0 and be 10 digits
-    return contact.test(number);
-  };
-
-  // --- HANDLE INPUT ---
+  // Input Change Handler
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // NIC validation
     if (name === "nic") {
-      setForm({ ...form, nic: value });
-
-      if (value === "" || validateNIC(value)) {
-        setNicError("");
-      } else {
-        setNicError("Invalid NIC format (9 digits + V or 12 digits)");
-      }
-      return;
+      setNicError(!validateNIC(value) ? "Invalid NIC format." : "");
     }
 
-    // Phone validation
     if (name === "phone_number") {
-      setForm({ ...form, phone_number: value });
-
-      if (value === "" || validateContact(value)) {
-        setContactError("");
-      } else {
-        setContactError("Phone number must be 10 digits and start with 0");
-      }
-      return;
+      setPhoneError(!validatePhone(value) ? "Phone must start with 0 and contain 10 digits." : "");
     }
 
     setForm({ ...form, [name]: value });
   };
 
+  // File Change Handler
   const handleFileChange = (e, key) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -71,23 +47,15 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
     reader.readAsDataURL(file);
   };
 
-  // --- SAVE ---
+  // Save Handler
   const handleSave = async () => {
+    if (nicError || phoneError) {
+      setError("Please fix validation errors before saving.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
-
-    // Final validation check
-    if (!validateNIC(form.nic)) {
-      setError("Invalid NIC format.");
-      setLoading(false);
-      return;
-    }
-
-    if (!validateContact(form.phone_number)) {
-      setError("Invalid phone number format");
-      setLoading(false);
-      return;
-    }
 
     try {
       const updateData = {
@@ -102,15 +70,11 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
       const response = await api.put(
         `/api/customers/${customer.customer_id}`,
         updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
-      onSuccess(response.data.data);
       setSuccessMsg("Customer updated successfully!");
+      onSuccess(response.data.data);
 
       setTimeout(() => {
         setSuccessMsg("");
@@ -123,141 +87,145 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
     }
   };
 
+  if (!customer) return null;
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white-100">
-      <div className="bg-white p-1 rounded-lg w-full h-full max-w-md">
+    <div className="bg-white p-3 w-full max-w-md overflow-auto relative">
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-2 rounded border mb-3">
-            {error}
-          </div>
-        )}
+      {/* Top Left: Close */}
+      <div className="absolute top-3 left-3 z-10">
+        <button
+          onClick={onCancel}
+          className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+          title="Close"
+        >
+          <FaTimes size={16} />
+        </button>
+      </div>
 
-        {successMsg && (
-          <div className="bg-green-100 text-green-700 p-2 rounded border mb-3">
-            {successMsg}
-          </div>
-        )}
+      {/* Top Right: Confirm */}
+      <div className="absolute top-3 right-3 z-10">
+        <ConfirmWrapper
+          onConfirm={handleSave}
+          message="Are you sure you want to update this customer?"
+          confirmText="Yes, Update"
+          cancelText="Cancel"
+          icon={<FaCheck />}
+          buttonBackgroundColor="bg-green-600"
+          buttonTextColor="text-white"
+        >
+          <button
+            type="button"
+            className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+            disabled={loading}
+            title="Confirm"
+          >
+            <FaCheck size={16} />
+          </button>
+        </ConfirmWrapper>
+      </div>
 
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-2 rounded text-center mb-4 mt-12">
+          ❌ {error}
+        </div>
+      )}
 
-          {/* Name */}
-          <label className="block mb-1 text-gray-600">Customer Name:</label>
+      {/* Success Message */}
+      {successMsg && (
+        <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-2 rounded text-center mb-4 mt-12">
+          ✅ {successMsg}
+        </div>
+      )}
+
+      {/* Title */}
+      <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+        Edit Customer
+      </h2>
+
+      {/* Form */}
+      <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+
+        {/* Full Name */}
+        <div>
+          <label className="block text-gray-600 font-medium">Full Name</label>
           <input
             type="text"
             name="name"
             value={form.name}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-lg"
-            placeholder="Full Name"
+            placeholder="Customer Name"
           />
+        </div>
 
-          {/* NIC */}
-          <label className="block mb-1 text-gray-600">Customer NIC:</label>
+        {/* NIC */}
+        <div>
+          <label className="block text-gray-600 font-medium">NIC Number</label>
           <input
             type="text"
             name="nic"
             value={form.nic}
             onChange={handleChange}
-            className={`w-full p-2 rounded-lg border ${
-              nicError ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full p-2 border border-gray-300 rounded-lg"
             placeholder="NIC Number"
           />
-          {nicError && <p className="text-red-500 text-sm">{nicError}</p>}
+          {nicError && <p className="text-red-600 text-sm mt-1">{nicError}</p>}
+        </div>
 
-          {/* Phone */}
-          <label className="block mb-1 text-gray-600">Phone Number:</label>
+        {/* Phone */}
+        <div>
+          <label className="block text-gray-600 font-medium">Phone Number</label>
           <input
             type="text"
             name="phone_number"
             value={form.phone_number}
             onChange={handleChange}
-            className={`w-full p-2 rounded-lg border ${
-              contactError ? "border-red-500" : "border-gray-300"
-            }`}
+            className="w-full p-2 border border-gray-300 rounded-lg"
             placeholder="07XXXXXXXX"
           />
-          {contactError && (
-            <p className="text-red-500 text-sm">{contactError}</p>
-          )}
+          {phoneError && <p className="text-red-600 text-sm mt-1">{phoneError}</p>}
+        </div>
 
-          {/* Email */}
-          <label className="block mb-1 text-gray-600">Customer Email:</label>
+        {/* Email */}
+        <div>
+          <label className="block text-gray-600 font-medium">Email Address</label>
           <input
             type="email"
             name="email"
             value={form.email}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-lg"
-            placeholder="Email Address"
+            placeholder="Email"
           />
+        </div>
 
-          {/* NIC Front */}
-          <div>
-            <label className="block mb-1 text-gray-600">NIC Photo (Front)</label>
-            {form.nic_photo_front && (
+        {/* NIC Photos */}
+        {["nic_photo_front", "nic_photo_back"].map((key) => (
+          <div key={key}>
+            <label className="block text-gray-600 font-medium mb-1">
+              NIC Photo ({key.includes("front") ? "Front" : "Back"})
+            </label>
+
+            {form[key] && (
               <img
-                src={form.nic_photo_front}
-                alt="NIC Front"
-                className="w-full h-32 object-cover rounded border mb-2"
+                src={form[key]}
+                className="w-full h-32 object-cover rounded-lg border mb-2"
+                alt={key}
               />
             )}
+
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => handleFileChange(e, "nic_photo_front")}
-              className="w-full border p-2 rounded"
+              onChange={(e) => handleFileChange(e, key)}
+              className="w-full p-2 border border-gray-300 rounded-lg"
             />
           </div>
+        ))}
 
-          {/* NIC Back */}
-          <div>
-            <label className="block mb-1 text-gray-600">NIC Photo (Back)</label>
-            {form.nic_photo_back && (
-              <img
-                src={form.nic_photo_back}
-                alt="NIC Back"
-                className="w-full h-32 object-cover rounded border mb-2"
-              />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, "nic_photo_back")}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          {/* Save (ConfirmWrapper) */}
-          <ConfirmWrapper
-            onConfirm={handleSave}
-            message="Are you sure you want to update this customer?"
-            confirmText="Yes, Update"
-            cancelText="Cancel"
-            icon={<FiEdit />}
-            buttonBackgroundColor="bg-blue-600"
-            buttonTextColor="text-white"
-          >
-            <button
-              type="button"
-              className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              disabled={loading}
-            >
-              {loading ? "Saving..." : "Save Changes"}
-            </button>
-          </ConfirmWrapper>
-
-          {/* Cancel */}
-          <button
-            type="button"
-            onClick={onCancel}
-            className="w-full p-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-          >
-            Cancel
-          </button>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }
