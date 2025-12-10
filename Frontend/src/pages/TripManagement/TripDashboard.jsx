@@ -202,13 +202,13 @@ export default function TripDashboard() {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowStartModal(false)}
-                  className="px-4 py-2 bg-gray-300 rounded-xl hover:bg-gray-400"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStartTrip}
-                  className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700"
+                  className="px-4 py-2 bg-green-600 text-white hover:bg-green-700"
                 >
                   Confirm
                 </button>
@@ -218,13 +218,13 @@ export default function TripDashboard() {
         )}
         {/* End Trip Modal */}
         {showEndModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded shadow-xl w-80">
               <h3 className="text-xl font-bold mb-4">End Trip</h3>
               <input
                 type="number"
                 placeholder="Enter end meter"
-                className="border rounded px-3 py-2 w-full mb-4"
+                className="border rounded px-3 py-2 w-full mb-4 border-gray-300"
                 value={endMeter ?? ""}
                 onChange={(e) => setEndMeter(Number(e.target.value))}
               />
