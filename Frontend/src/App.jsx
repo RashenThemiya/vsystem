@@ -48,6 +48,7 @@ import TripDashboard from './pages/TripManagement/TripDashboard';
 import DriverProfile from './pages/Drivers/DriverProfile';
 import VehicleProfile from './pages/VehicleManagement/VehicleProfile';
 import CustomerProfile from './pages/Customers/CustomerProfile';
+import BillDashboard from './pages/BillManagement/Billdashboard';
 function App() {
   return (
     <AuthProvider>
@@ -123,6 +124,9 @@ function App() {
             <Route path="/trip/:id" element={<PrivateRoute><TripDetails /></PrivateRoute>} />
             <Route path="/trip-dashboard" element={<PrivateRoute><TripDashboard /></PrivateRoute>} />
 
+            {/* Bill Management Routes */}
+            <Route path="/bill-dashboard" element={<PrivateRoute><BillDashboard /></PrivateRoute>} />
+              
             {/* Product Management Routes */}
             <Route path="/product-management" element={<PrivateRoute><ProductManagement /></PrivateRoute>} />
             <Route path="/add-product" element={<PrivateRoute><AddProduct /></PrivateRoute>} />

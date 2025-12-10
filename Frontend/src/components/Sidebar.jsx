@@ -10,6 +10,7 @@ import {
   FaTruck,
   FaUserShield,
   FaIdCard,
+  
 } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./../context/AuthContext";
@@ -30,6 +31,7 @@ const Sidebar = () => {
     { path: "/publication", icon: <FaNewspaper />, label: "Publication" },*/
     {path:"/vehicle-dashboard", icon:<FaTruck />, label:"Vehicle Management" },
     {path:"/trip-dashboard", icon:<FaBox />, label:"Trip Management" },
+    {path:"/bill-dashboard", icon:<FaBox />, label:"Bill Management" },
      /* { path: "/vehicle-dashboard", icon: <FaTruck />, label: "Vehicle Management" },
     { path: "/trip-management", icon: <FaBox />, label: "Trip Management" },*/
   ];
