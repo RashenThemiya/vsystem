@@ -81,18 +81,19 @@ export default function VehicleTable({ vehicles = [], loading, error, onSelectVe
                   </td>
 
                   <td className="py-4 px-4 text-sm text-gray-600">
-                    {v.mileage_costs.length > 0 ? (
-                        <ul className="list-disc ml-4">
-                          {v.mileage_costs.map((m) => (
-                            <li key={m.mileage_cost_id}>
-                              Base: {m.mileage_cost}, Additional: {m.mileage_cost_additional}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="text-gray-400">No data</span>
-                      )}
+                    {v.mileage_costs?.length > 0 ? (
+                      <ul className="list-disc ml-4">
+                        {v.mileage_costs.map((m) => (
+                          <li key={m.mileage_cost_id}>
+                            Base: {m.mileage_cost}, Additional: {m.mileage_cost_additional}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-gray-400">No data</span>
+                    )}
                   </td>
+
 
                   
                 </tr>

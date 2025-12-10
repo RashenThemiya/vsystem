@@ -66,6 +66,11 @@ export const createVehicleService = async (data: any) => {
             }
           : undefined,
     },
+    include: {
+    mileage_costs: true, // <-- include mileage costs in the returned object
+    owner: true,
+    fuel: true,
+  },
   });
 };
 
@@ -112,14 +117,14 @@ export const createVehicleService = async (data: any) => {
       },
 
       // 👇 Full mileage cost details (not just count)
-  mileage_costs: {
-  select: {
-    mileage_cost_id: true,
-    mileage_cost: true,
-    mileage_cost_additional: true,
-    vehicle_id: true, // optional if needed
-  },
-  orderBy: { mileage_cost_id: "desc" }, // use primary key for ordering
+      mileage_costs: {
+      select: {
+        mileage_cost_id: true,
+        mileage_cost: true,
+        mileage_cost_additional: true,
+        vehicle_id: true, // optional if needed
+      },
+      orderBy: { mileage_cost_id: "desc" }, // use primary key for ordering
 },
 
       // 👇 Keep counts for other reference data
