@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+
 import api from "../../utils/axiosInstance";
 import {
   InfoCard,
@@ -37,6 +38,8 @@ const [showAlterDatesModal, setShowAlterDatesModal] = useState(false);
 const [showAlterMeterModal, setShowAlterMeterModal] = useState(false);
 const [showCompleteModal, setShowCompleteModal] = useState(false);
 const [showPrintModal, setShowPrintModal] = useState(false);
+const [activeTab, setActiveTab] = useState("customer");
+
  
  
  
@@ -82,61 +85,126 @@ const [showPrintModal, setShowPrintModal] = useState(false);
 
     {/* Top Row: Trip ID / Status + Back & Refresh */}
     <div className="flex justify-between items-center mb-4">
-      {/* Left: Trip ID & Status */}
-      <div>
-        <div className="flex items-center mb-1">
-          <div className="w-2 h-8 bg-blue-800 rounded mr-3"></div>
-          <h1 className="text-3xl font-bold text-gray-800">Trip #{trip.trip_id}</h1>
-        </div>
-        <p className="text-md text-gray-700 font-semibold">
-          <span className={`text-md font-bold px-2 py-1 rounded-md mr-1 ${trip.trip_status === "Pending" ? "bg-yellow-100 text-yellow-800" : trip.trip_status === "Ongoing" ? "bg-blue-100 text-blue-800" : trip.trip_status === "Completed" ? "bg-green-100 text-green-800" : trip.trip_status === "Ended" ? "bg-gray-200 text-gray-700" : trip.trip_status === "Cancelled" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-700"}`}>
-            {trip.trip_status}
-          </span>
-          <span className={`text-md font-bold px-2 py-1 rounded-md ${trip.payment_status === "Paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-            {trip.payment_status}
-          </span>
-        </p>
-      </div>
-
-      {/* Right: Back & Refresh */}
-      <div className="flex gap-2">
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition flex items-center gap-2"
-        >
-          <FaArrowLeft /> Back
-        </button>
-        <button
-          onClick={fetchTrip}
-          className="px-4 py-2 bg-gray-500 text-gray-100 rounded hover:bg-teal-700 transition flex items-center gap-2"
-        >
-          <FaRedo /> Refresh
-        </button>
-      </div>
     </div>
 
-    {/* Header: Action Buttons */}
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <TripActionButtons
-        onAddPayment={() => setShowPaymentModal(true)}
-        onAddDamage={() => setOpenDamageModal(true)}
-        onCompleteTrip={() => setShowCompleteModal(true)}
-        onAlterReturnDate={() => setShowAlterDatesModal(true)}
-        onAlterMeter={() => setShowAlterMeterModal(true)}
-        onGetPrint={() => setShowPrintModal(true)}
-      />
-    </div>
+    
 
 
-   
- 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Participants & Actions */}
           <div className="space-y-4">
-            {/* Action Buttons */}
+            <div className="bg-gradient-to-r from-indigo-500 to-violet-600 h-220 p-2 rounded-xl shadow-md mb-6">
+
+  {/* Top Row: Back Button + Trip ID + Status */}
+  <div className="flex items-center justify-between mb-2">
+
+    {/* LEFT → Back Button */}
+    <button
+      onClick={() => navigate(-1)}
+      className="px-3 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition flex items-center -mt-11 gap-2"
+    >
+      <FaArrowLeft size={18} />
+    </button>
+
+    {/* CENTER → Trip ID + Status */}
+    <div className="flex flex-col items-center flex-1">
+      <h2 className="text-2xl font-bold text-white mb-3 mt-2">
+        Trip ID: {trip.trip_id}
+      </h2>
+
+      <div className="flex flex-wrap gap-2 items-center justify-center mb-4">
+        <span
+          className={`px-2 py-1 rounded-md font-semibold ${
+            trip.trip_status === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : trip.trip_status === "Ongoing"
+              ? "bg-blue-100 text-blue-800"
+              : trip.trip_status === "Completed"
+              ? "bg-green-100 text-green-800"
+              : trip.trip_status === "Ended"
+              ? "bg-gray-200 text-gray-700"
+              : trip.trip_status === "Cancelled"
+              ? "bg-red-100 text-red-800"
+              : "bg-gray-100 text-gray-700"
+          }`}
+        >
+          {trip.trip_status}
+        </span>
+
+        <span
+          className={`px-2 py-1 rounded-md font-semibold ${
+            trip.payment_status === "Paid"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {trip.payment_status}
+        </span>
+      </div>
+    </div>
+
+    {/* RIGHT → Spacer to keep center alignment */}
+    <div className="w-10"></div>
+  </div>
+
+  {/* Trip Participants */}
+  <InfoCard title="Trip Participants">
+    {/* Tabs */}
+    <div className="flex gap-4 border-b border-gray-200 pb-2">
+      <button
+        onClick={() => setActiveTab("customer")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "customer"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Customer
+      </button>
+
+      <button
+        onClick={() => setActiveTab("driver")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "driver"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Driver
+      </button>
+
+      <button
+        onClick={() => setActiveTab("vehicle")}
+        className={`px-4 py-2 font-semibold transition ${
+          activeTab === "vehicle"
+            ? "border-b-2 border-white text-white"
+            : "text-white hover:text-white"
+        }`}
+      >
+        Vehicle
+      </button>
+    </div>
+
+    {/* Tab Content */}
+    <div className="mt-4">
+      {activeTab === "customer" && (
+        <CustomerDetails trip={trip} isBase64={isBase64} />
+      )}
+
+      {activeTab === "driver" && (
+        <DriverDetails trip={trip} isBase64={isBase64} />
+      )}
+
+      {activeTab === "vehicle" && (
+        <VehicleDetails trip={trip} isBase64={isBase64} />
+      )}
+    </div>
+  </InfoCard>
+</div>
+
          
- 
+          </div>
  
 <DamageCostModal
   open={openDamageModal}
@@ -178,107 +246,89 @@ const [showPrintModal, setShowPrintModal] = useState(false);
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
- 
-       
-           
-          
-            <InfoCardSub title="Trip Participants">
-             
-              {/* Customer */}
-              <div className="mb-3">
-                <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
-                  onClick={() => setShowCustomer((s) => !s)}
-                >
-                  <span className="flex items-center gap-2">
-                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Customer</h3>
-                  </span>
-                  <span className="text-blue-600 underline">{showCustomer ? <FaChevronUp/> : <FaChevronDown/>}</span>
-                </div>
-                <br></br>
-                {showCustomer && <CustomerDetails trip={trip} isBase64={isBase64} />}
-              </div>
- 
-              {/* Driver */}
-              <div className="mb-3">
-                <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
-                  onClick={() => setShowDriver((s) => !s)}
-                >
-                  <span className="flex items-center gap-2">
-                    <FaUser /> <h3 className="text-lg font-bold text-gray-670">Driver</h3>
-                  </span>
-                  <span className="text-blue-600 underline">{showDriver ? <FaChevronUp/> : <FaChevronDown/>}</span>
-                </div>
-                <br></br>
-                {showDriver && <DriverDetails trip={trip} isBase64={isBase64} />}
-              </div>
- 
-              {/* Vehicle */}
-              <div className="mb-3">
-                <div
-                  className="flex justify-between items-center cursor-pointer text-gray-700 font-semibold hover:text-grey-900 transition"
-                  onClick={() => setShowVehicle((s) => !s)}
-                >
-                  <span className="flex items-center gap-2">
-                    <FaCar /> <h3 className="text-lg font-bold text-gray-670">Vehicle</h3>
-                  </span>
-                  <span className="text-blue-600 underline">{showVehicle ? <FaChevronUp/> : <FaChevronDown/>}</span>
-                </div>
-                <br></br>
-                {showVehicle && <VehicleDetails trip={trip} isBase64={isBase64} />}
-              </div>
-           
-            </InfoCardSub>
-           
-          </div>
+
+         
  
           {/* Right Column: Trip Info */}
           <div className="lg:col-span-2 space-y-6">
-            <InfoCardSub title="Trip Summary">
-              <div className="bg-gray-100 p-1 rounded-lg">
+            {/* RIGHT → Action Buttons */}
+            <div className="flex justify-end">
+              <TripActionButtons
+                onAddPayment={() => setShowPaymentModal(true)}
+                onAddDamage={() => setOpenDamageModal(true)}
+                onCompleteTrip={() => setShowCompleteModal(true)}
+                onAlterReturnDate={() => setShowAlterDatesModal(true)}
+                onAlterMeter={() => setShowAlterMeterModal(true)}
+                onGetPrint={() => setShowPrintModal(true)}
+              />
+            </div>
+            <div className="max-h-[780px] overflow-y-auto pr-2">
+
+          <InfoCardSub title="Trip Summary">
+            <div className="bg-gray-100 p-1 rounded-lg">
               <OneColumnRow label="From" value={trip.from_location} />
               <OneColumnRow label="To" value={trip.to_location} />
               <OneColumnRow label="Passengers" value={trip.num_passengers} />
-              </div>
- 
-              <br></br>
-              <h3 className="text-xl font-bold text-gray-800">Distance & Route</h3>
-              <div className="border-b pb-2 mb-4"></div>
-              <div className="bg-gray-100 p-1 rounded-lg">
+            </div>
+
+            <br />
+
+            <h3 className="text-xl font-bold text-gray-800">Distance & Route</h3>
+            <div className="border-b pb-2 mb-4"></div>
+
+            <div className="bg-gray-100 p-1 rounded-lg">
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
               <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
               <OneColumnRow label="Start Meter" value={trip.start_meter} />
               <OneColumnRow label="End Meter" value={trip.end_meter} />
-              </div>
- 
-              <h4 className="mt-3 font-semibold">Route / Map</h4>
-              {trip.map?.length ? (
-                <ol className="list-decimal list-inside space-y-2 text-sm">
-                  {trip.map
-                    .slice()
-                    .sort((a, b) => a.sequence - b.sequence)
-                    .map((m) => (
-                      <li key={m.map_id}>
-                        <span className="font-medium">{m.sequence}. {m.location_name}</span>
-                        <span className="text-gray-500 text-xs"> ({m.latitude}, {m.longitude})</span>
-                      </li>
-                    ))}
-                </ol>
-              ) : (
-                <div className="text-sm text-gray-500">No map locations recorded</div>
-              )}
-              <br></br>
-              <h3 className="text-xl font-bold text-gray-800">Dates</h3>
-              <div className="border-b pb-2 mb-4"></div>
-              <div className="bg-gray-100 p-1 rounded-lg">
+            </div>
+
+            <h4 className="mt-3 font-semibold">Route / Map</h4>
+
+            {trip.map?.length ? (
+              <ol className="list-decimal list-inside space-y-2 text-sm">
+                {trip.map
+                  .slice()
+                  .sort((a, b) => a.sequence - b.sequence)
+                  .map((m) => (
+                    <li key={m.map_id}>
+                      <span className="font-medium">
+                        {m.sequence}. {m.location_name}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        {" "}
+                        ({m.latitude}, {m.longitude})
+                      </span>
+                    </li>
+                  ))}
+              </ol>
+            ) : (
+              <div className="text-sm text-gray-500">No map locations recorded</div>
+            )}
+
+            <br />
+
+            <h3 className="text-xl font-bold text-gray-800">Dates</h3>
+            <div className="border-b pb-2 mb-4"></div>
+
+            <div className="bg-gray-100 p-1 rounded-lg">
               <OneColumnRow label="Leaving Date" value={formatDate(trip.leaving_datetime)} />
               <OneColumnRow label="Estimated Return" value={formatDate(trip.estimated_return_datetime)} />
               <OneColumnRow label="Actual Return" value={formatDate(trip.actual_return_datetime)} />
               <OneColumnRow label="Estimated Days" value={trip.estimated_days} />
               <OneColumnRow label="Actual Days" value={trip.actual_days} />
-              </div>
-            </InfoCardSub>
+            </div>
+          </InfoCardSub>
+
+          <CostSummary
+            trip={trip}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+          />
+
+        </div>
+
+            
  
             {/*<InfoCard title="Distance & Route">
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
@@ -312,7 +362,7 @@ const [showPrintModal, setShowPrintModal] = useState(false);
               <OneColumnRow label="Actual Days" value={trip.actual_days} />
             </InfoCard>*/}
  
-          <CostSummary trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />
+          
             {/*<Payments trip={trip} formatCurrency={formatCurrency} formatDate={formatDate} />*/}
           </div>
         </div>

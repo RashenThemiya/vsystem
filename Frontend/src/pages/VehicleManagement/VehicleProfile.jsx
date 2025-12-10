@@ -134,7 +134,7 @@ const VehicleProfile = () => {
             onClick={() => setFilter("trips")}
             className={`px-4 py-2 text-sm font-semibold rounded-t-lg ${
               filter === "trips"
-                ? "bg-purple-600 text-white shadow"
+                ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow"
                 : "bg-gray-200 text-gray-800 hover:bg-purple-400 hover:text-white"
             }`}
           >
@@ -145,7 +145,7 @@ const VehicleProfile = () => {
             onClick={() => setFilter("costs")}
             className={`px-4 py-2 text-sm font-semibold rounded-t-lg ${
               filter === "costs"
-                ? "bg-purple-600 text-white shadow"
+                ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow"
                 : "bg-gray-200 text-gray-800 hover:bg-purple-400 hover:text-white"
             }`}
           >

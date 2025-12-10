@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
 import api from "../../utils/axiosInstance";
 import EditVehicleForm from "./EditVehicle";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, onEdit }) {
+export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }) {
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({ ...vehicle });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     setForm({ ...vehicle });
@@ -22,22 +22,24 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, 
 
   if (!vehicle) return null;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
   const handleSave = async () => {
-    if (!isConfirmed) return;
-
     setLoading(true);
     setError(null);
-
     try {
       const updateData = {
+        name: form.name,
         vehicle_number: form.vehicle_number,
-        vehicle_type: form.vehicle_type,
+        type: form.type,
         owner_id: form.owner_id,
+        fuel_type: form.fuel?.type,
+        rent_cost_daily: form.rent_cost_daily,
+        owner_cost_monthly: form.owner_cost_monthly,
+        mileage_costs: form.mileage_costs,
+        image: form.image,
+        license_image: form.license_image,
+        insurance_card_image: form.insurance_card_image,
+        eco_test_image: form.eco_test_image,
+        book_image: form.book_image,
       };
 
       const response = await api.put(
@@ -48,15 +50,11 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, 
 
       onUpdated(response.data.data);
       setEditMode(false);
-      setIsConfirmed(false);
-
       setSuccessMsg("Vehicle updated successfully!");
       setTimeout(() => setSuccessMsg(""), 2000);
-
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to update vehicle.");
-      setIsConfirmed(false);
     } finally {
       setLoading(false);
     }
@@ -65,17 +63,13 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, 
   const handleDelete = async () => {
     setLoading(true);
     setError(null);
-
     try {
       await api.delete(`/api/vehicles/${vehicle.vehicle_id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-
       onDelete(vehicle.vehicle_id);
-
       setSuccessMsg("Vehicle deleted successfully!");
       setTimeout(() => setSuccessMsg(""), 2000);
-
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to delete vehicle.");
@@ -84,168 +78,118 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated, 
     }
   };
 
-  const handleConfirmSave = () => {
-    setIsConfirmed(true);
-    handleSave();
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white-100">
-      <div className="bg-white p-10 rounded-lg  w-full h-full max-w-600px overflow-auto max-h-full relative">
-        
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          {editMode ? "Edit Vehicle" : "Vehicle Details"}
-        </h2>
+    <div className="flex justify-center items-center w-100 h-full bg-gray-100">
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md overflow-auto h-full relative">
 
+        {/* Error & Success Messages */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center">
+          <div className="bg-red-100 text-red-800 border border-red-300 px-4 py-2 rounded text-center mb-4">
             ❌ {error}
           </div>
         )}
-
         {successMsg && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 text-center">
+          <div className="bg-green-100 text-green-800 border border-green-300 px-4 py-2 rounded text-center mb-4">
             ✅ {successMsg}
           </div>
         )}
 
-        {/* ----------- VIEW MODE ----------- */}
         {!editMode && (
-          <div className="space-y-4 text-gray-700">
-            <p><strong>Vehicle:</strong> {vehicle.name}</p>
-            <p>
-              <strong>Vehicle Number:</strong>{" "}
-              <Link
-                to={`/vehicles/${vehicle.vehicle_id}`}
-                className="text-blue-600 underline hover:text-blue-800"
-              >
-                {vehicle.vehicle_number}
-              </Link>
-            </p>
-            <p><strong>Vehicle Type:</strong> {vehicle.type}</p>
-            <p><strong>Fuel Type:</strong> {vehicle.fuel?.type}</p>
-            <p><strong>Owner Name:</strong> {vehicle.owner?.owner_name}</p>
-            <p><strong>Contact:</strong> {vehicle.owner?.contact_number}</p>
-            <p><strong>Daily Rent Cost:</strong> {vehicle.rent_cost_daily}</p>
-            <p><strong>Monthly Owner Cost:</strong> {vehicle.owner_cost_monthly}</p>
-            <p><strong>Mileage Cost:</strong> {vehicle.mileage_costs.length > 0 ? (
-                        <ul className="list-disc ml-4">
-                          {vehicle.mileage_costs.map((m) => (
-                            <li key={m.mileage_cost_id}>
-                              Base: {m.mileage_cost}, Additional: {m.mileage_cost_additional}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="text-gray-400">No data</span>
-                      )}</p>
-            
-
-            <div>
-  <h3 className="font-bold mb-2">Images:</h3>
-
-  {vehicle.image && (
-    <div>
-      <p className="font-semibold">Main Image:</p>
-      <img
-        src={`data:image/jpeg;base64,${vehicle.image}`}
-        className="w-full h-40 object-cover rounded border mb-3"
-        alt="main vehicle"
-      />
-    </div>
-  )}
-
-  {vehicle.license_image && (
-    <div>
-      <p className="font-semibold">License Image:</p>
-      <img
-        src={`data:image/jpeg;base64,${vehicle.license_image}`}
-        className="w-full h-40 object-cover rounded border mb-3"
-        alt="license"
-      />
-    </div>
-  )}
-
-  {vehicle.insurance_card_image && (
-    <div>
-      <p className="font-semibold">Insurance Card:</p>
-      <img
-        src={`data:image/jpeg;base64,${vehicle.insurance_card_image}`}
-        className="w-full h-40 object-cover rounded border mb-3"
-        alt="insurance"
-      />
-    </div>
-  )}
-
-  {vehicle.eco_test_image && (
-    <div>
-      <p className="font-semibold">Eco Test Image:</p>
-      <img
-        src={`data:image/jpeg;base64,${vehicle.eco_test_image}`}
-        className="w-full h-40 object-cover rounded border mb-3"
-        alt="eco test"
-      />
-    </div>
-  )}
-
-  {vehicle.book_image && (
-    <div>
-      <p className="font-semibold">Book Image:</p>
-      <img
-        src={`data:image/jpeg;base64,${vehicle.book_image}`}
-        className="w-full h-40 object-cover rounded border mb-3"
-        alt="book"
-      />
-    </div>
-  )}
-</div>
-
-            <button
-              onClick={() => {
-                onEdit(); // call the dashboard handler to open modal
-              }}
-              className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-gray-900 transition"
-            >
-              Edit Vehicle
-            </button>
-
-            <ConfirmWrapper
-              onConfirm={handleDelete}
-              onCancel={() => {}}
-              message="Are you sure you want to delete this vehicle?"
-              confirmText="Yes, Delete"
-              cancelText="Cancel"
-              icon={<FiTrash2 />}
-              buttonBackgroundColor="bg-red-600"
-              buttonTextColor="text-white"
-            >
+          <div className="space-y-6">
+            {/* Top Buttons */}
+            <div className="absolute top-3 left-3 flex gap-3">
               <button
-                type="button"
-                className="w-full py-2 bg-black text-white rounded-lg hover:bg-red-700 transition"
-                disabled={loading}
+                onClick={onClose}
+                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+                title="Close"
               >
-                Delete Vehicle
+                <FaTimes size={16} />
               </button>
-            </ConfirmWrapper>
+              <button
+                onClick={() => setEditMode(true)}
+                className="p-2 rounded-full bg-blue-200 hover:bg-blue-300 text-blue-700 shadow"
+                title="Edit Vehicle"
+              >
+                <FaEdit size={16} />
+              </button>
+            </div>
 
-            <button
-              onClick={onClose}
-              className="w-full py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-            >
-              Close
-            </button>
+            {/* Delete Button */}
+            <div className="absolute top-3 right-3">
+              <ConfirmWrapper
+                onConfirm={handleDelete}
+                message="Are you sure you want to delete this vehicle?"
+                confirmText="Yes, Delete"
+                cancelText="Cancel"
+                icon={<FaTrash />}
+                buttonBackgroundColor="bg-red-600"
+                buttonTextColor="text-white"
+              >
+                <button
+                  className="p-2 rounded-full bg-red-200 hover:bg-red-300 text-red-700 shadow"
+                  disabled={loading}
+                >
+                  <FaTrash size={16} />
+                </button>
+              </ConfirmWrapper>
+            </div>
+
+            {/* Title & Vehicle Image */}
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Vehicle Profile</h2>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-28 h-28 rounded-2xl bg-gray-200 shadow border flex items-center justify-center overflow-hidden cursor-pointer" 
+                onClick={() => navigate(`/vehicles/${vehicle.vehicle_id}`)}
+              >
+                {vehicle.image ? (
+                  <img src={vehicle.image} alt="Vehicle" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl font-bold text-gray-700">{vehicle.name?.charAt(0)?.toUpperCase() || "V"}</span>
+                )}
+              </div>
+              <h3 className="text-xl font-semibold text-black mt-3 cursor-pointer" onClick={() => navigate(`/vehicles/${vehicle.vehicle_id}`)}>
+                {vehicle.name}
+              </h3>
+              <p className="text-sm text-gray-500">Vehicle ID: #{vehicle.vehicle_id}</p>
+            </div>
+
+            {/* Vehicle Details */}
+            <div className="bg-gray-50 rounded-xl p-4 shadow-inner">
+              <h4 className="text-lg font-semibold text-gray-800 mb-3">Details</h4>
+              <div className="grid grid-cols-2 gap-y-3 text-sm">
+                <p><strong>Vehicle Number:</strong> <br /> {vehicle.vehicle_number || "-"}</p>
+                <p><strong>Type:</strong> <br /> {vehicle.type || "-"}</p>
+                <p><strong>Owner:</strong> <br /> {vehicle.owner?.owner_name || "-"}</p>
+                <p><strong>Contact:</strong> <br /> {vehicle.owner?.contact_number || "-"}</p>
+                <p><strong>Fuel Type:</strong> <br /> {vehicle.fuel?.type || "-"}</p>
+                <p><strong>Daily Rent:</strong> <br /> {vehicle.rent_cost_daily || "-"}</p>
+                <p><strong>Monthly Owner Cost:</strong> <br /> {vehicle.owner_cost_monthly || "-"}</p>
+                <p><strong>Mileage Cost:</strong> <br /> {vehicle.mileage_costs?.[0] ? `Base: ${vehicle.mileage_costs[0].mileage_cost}, Additional: ${vehicle.mileage_costs[0].mileage_cost_additional}` : "-"}</p>
+              </div>
+
+              {/* Vehicle Images */}
+              <div className="mt-4">
+                <h4 className="font-semibold mb-2">Documents & Images</h4>
+                {["image", "license_image", "insurance_card_image", "eco_test_image", "book_image"].map((key) => (
+                  vehicle[key] && (
+                    <div key={key} className="mb-3">
+                      <p className="font-semibold">{key.replace("_", " ").toUpperCase()}:</p>
+                      <img src={vehicle[key]} className="w-full h-40 object-cover rounded border" alt={key} />
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
-        {/* ----------- EDIT MODE ----------- */}
         {editMode && (
           <EditVehicleForm
             vehicle={vehicle}
-            onUpdated={(updatedVehicle) => {
-              onUpdated(updatedVehicle);
+            onCancel={() => setEditMode(false)}
+            onSuccess={(updated) => {
+              onUpdated(updated);
               setEditMode(false);
             }}
-            onCancel={() => setEditMode(false)}
           />
         )}
       </div>

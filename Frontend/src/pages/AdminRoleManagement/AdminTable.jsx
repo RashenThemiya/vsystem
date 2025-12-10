@@ -54,7 +54,7 @@ export default function AdminRoleTable({ admins = [], loading, error, onSelectAd
                     >
                       <button
                         type="button"
-                        className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 transition"
+                        className="bg-indigo-500 text-white px-3 py-1 rounded-xl hover:bg-red-800 transition"
                         disabled={loading}
                       >
                         Delete 

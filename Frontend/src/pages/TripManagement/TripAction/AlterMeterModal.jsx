@@ -47,7 +47,7 @@ const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
           type="number"
           value={startMeter}
           onChange={(e) => setStartMeter(e.target.value)}
-          className="w-full border rounded px-3 py-2 mb-4"
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-4"
           placeholder="Enter start meter"
         />
 
@@ -57,7 +57,7 @@ const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
           type="number"
           value={endMeter}
           onChange={(e) => setEndMeter(e.target.value)}
-          className="w-full border rounded px-3 py-2 mb-4"
+          className="w-full border border-gray-300 rounded px-3 py-2 mb-4"
           placeholder="Enter end meter"
         />
 
@@ -72,7 +72,7 @@ const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
           <button
             onClick={submitMeters}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded hover:bg-indigo-700"
           >
             {loading ? "Saving..." : "Update"}
           </button>

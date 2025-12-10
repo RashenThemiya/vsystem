@@ -304,7 +304,7 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
           </button>
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
+            className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded hover:bg-indigo-700"
           >
             Print
           </button>
