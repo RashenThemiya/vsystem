@@ -7,6 +7,7 @@ import {
   deleteTripService,
   startTripService,
   addTripPaymentService,
+  cancelTripService,
 } from "../services/tripService.js";
 
 import {endTripService } from "./../services/endtripService.js";
@@ -240,5 +241,20 @@ export const completeTripController = async (req: Request, res: Response) => {
       success: false,
       message: error.message,
     });
+  }
+};
+/** ---------------- CANCEL TRIP ---------------- */
+export const cancelTripController = async (req: Request, res: Response) => {
+  try {
+    const trip_id = parseInt(req.params.id);
+    const cancelledTrip = await cancelTripService(trip_id);
+
+    res.status(200).json({
+      success: true,
+      message: "Trip cancelled successfully",
+      data: cancelledTrip,
+    });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };

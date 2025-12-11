@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { FaCar, FaUser, FaUsers, FaMoneyBillWave, FaClipboardList } from "react-icons/fa";
+import FuelEditModal from "./FuelEditModal";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA336A"];
 
@@ -20,31 +21,38 @@ const DashboardKPIs = () => {
   const [kpis, setKpis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewType, setViewType] = useState("monthly"); // monthly or yearly
+  const [viewType, setViewType] = useState("monthly");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
 
-  useEffect(() => {
-    const fetchKPIs = async () => {
-      try {
-        const res = await api.get("api/dashboard/kpis");
-        const data = res.data.data;
-        setKpis(data);
+  const [showFuelModal, setShowFuelModal] = useState(false);
+  const [selectedFuel, setSelectedFuel] = useState(null);
 
-        // Set default selected month/year
-        if (data.monthlyTripStatusCounts.length > 0) {
-          setSelectedMonth(data.monthlyTripStatusCounts[0].month);
-        }
-        if (data.yearlyTripStatusCounts.length > 0) {
-          setSelectedYear(data.yearlyTripStatusCounts[0].year);
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch dashboard KPIs.");
-      } finally {
-        setLoading(false);
+  const fetchKPIs = async () => {
+    try {
+      const res = await api.get("api/dashboard/kpis");
+      const data = res.data.data;
+
+      if (data.fuelPrices && data.fuelPrices.length > 0) {
+        data.fuelPrices = data.fuelPrices.map((fuel) => ({
+          fuel_id: fuel.fuel_id,
+          type: fuel.type,
+          cost: fuel.cost,
+        }));
       }
-    };
+
+      setKpis(data);
+      if (data.monthlyTripStatusCounts.length > 0) setSelectedMonth(data.monthlyTripStatusCounts[0].month);
+      if (data.yearlyTripStatusCounts.length > 0) setSelectedYear(data.yearlyTripStatusCounts[0].year);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch dashboard KPIs.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchKPIs();
   }, []);
 
@@ -52,7 +60,6 @@ const DashboardKPIs = () => {
   if (error) return <div className="text-red-600">{error}</div>;
   if (!kpis) return null;
 
-  // KPI Cards
   const kpiCards = [
     { label: "Total Trips", value: kpis.totalTrips, icon: <FaClipboardList /> },
     { label: "Total Vehicles", value: kpis.totalVehicles, icon: <FaCar /> },
@@ -61,7 +68,6 @@ const DashboardKPIs = () => {
     { label: "Pending Bills", value: kpis.pendingBillsCount, icon: <FaMoneyBillWave /> },
   ];
 
-  // Filter data based on selected month/year
   const chartData =
     viewType === "monthly"
       ? kpis.monthlyTripStatusCounts
@@ -71,9 +77,15 @@ const DashboardKPIs = () => {
           .filter((item) => item.year === Number(selectedYear))
           .map((item) => ({ name: item.trip_status, value: item.count }));
 
-  // Get unique months and years for dropdown
   const months = [...new Set(kpis.monthlyTripStatusCounts.map((item) => item.month))];
   const years = [...new Set(kpis.yearlyTripStatusCounts.map((item) => item.year))];
+
+  // Handle fuel bar click
+  const handleFuelClick = (data, index) => {
+    const fuel = kpis.fuelPrices[index];
+    setSelectedFuel(fuel);
+    setShowFuelModal(true);
+  };
 
   return (
     <div className="p-4 space-y-6">
@@ -99,10 +111,7 @@ const DashboardKPIs = () => {
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={Object.keys(kpis.tripStatusCounts).map((key, i) => ({
-                name: key,
-                value: kpis.tripStatusCounts[key],
-              }))}
+              data={Object.keys(kpis.tripStatusCounts).map((key) => ({ name: key, value: kpis.tripStatusCounts[key] }))}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -176,17 +185,36 @@ const DashboardKPIs = () => {
 
       {/* Fuel Prices Bar Chart */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-2">Fuel Prices</h3>
+        <h3 className="text-lg font-semibold mb-2">Fuel Prices (Click bar to edit)</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={kpis.fuelPrices}>
             <XAxis dataKey="type" />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="cost" name="Fuel Cost" fill="#0088FE" />
+            <Bar
+              dataKey="cost"
+              name="Fuel Cost"
+              fill="#FF8042"
+              onClick={handleFuelClick} // click opens edit modal
+            >
+              {kpis.fuelPrices.map((_, index) => (
+                <Cell key={`fuel-${index}`} cursor="pointer" />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Fuel Edit Modal */}
+      {showFuelModal && selectedFuel && (
+        <FuelEditModal
+          open={showFuelModal}
+          fuel={selectedFuel}
+          onClose={() => setShowFuelModal(false)}
+          onSuccess={fetchKPIs}
+        />
+      )}
     </div>
   );
 };

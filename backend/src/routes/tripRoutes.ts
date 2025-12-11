@@ -10,7 +10,8 @@ import {
   addDamageCostController,
   addTripPaymentController,
   updateTripDatesController ,
-  updateTripMeterController  // ✅ import endTripController
+  updateTripMeterController,
+  cancelTripController, // ✅ import cancelTripController
 } from "../controllers/tripController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
@@ -65,5 +66,6 @@ router.patch(
   authorizeRoles("Admin", "SuperAdmin"),
   completeTripController
 );
+router.patch("/:id/cancel", authorizeRoles("Admin", "SuperAdmin"), cancelTripController); // ✅ new
 
 export default router;
