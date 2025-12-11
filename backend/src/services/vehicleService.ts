@@ -1,4 +1,4 @@
-import { prisma } from "../config/prismaClient";
+import { prisma } from "../config/prismaClient.js";
 type AnyObj = Record<string, any>;
 
 const toBufferIfBase64 = (val: any) => {

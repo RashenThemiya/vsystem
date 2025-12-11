@@ -1,8 +1,8 @@
 // src/services/tripService.ts
 
-import { prisma } from "../config/prismaClient";
+import { prisma } from "../config/prismaClient.js";
 import { Prisma } from "@prisma/client";
-import { calculateActualTripCost, TripWithRelations } from "./tripCostCalculator";
+import { calculateActualTripCost, TripWithRelations } from "./tripCostCalculator.js";
 import { TripStatus, PaymentStatus } from "@prisma/client";
 
 export interface EndTripDTO {

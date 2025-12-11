@@ -1,4 +1,4 @@
-import { prisma } from "../config/prismaClient";
+import { prisma } from "../config/prismaClient.js";
 import { Bill_Upload, BillStatus } from "@prisma/client";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";

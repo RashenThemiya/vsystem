@@ -1,4 +1,4 @@
-import { prisma } from "../config/prismaClient";
+import { prisma } from "../config/prismaClient.js";
 import { Vehicle_Other_Cost, BillStatus, Prisma } from "@prisma/client";
 
 type VehicleCostCreateInput = Omit<Vehicle_Other_Cost, "vehicle_other_cost_id"> & {

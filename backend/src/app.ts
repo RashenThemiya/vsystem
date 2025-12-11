@@ -6,11 +6,12 @@ import ownerRoutes from "./routes/ownerRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import AdminRoleRoutes from "./routes/adminRoleRoutes.js";
-import vehicleRoutes from "./routes/vehicleRoutes";
-import fuelRoutes from "./routes/fuelRoutes";
-import Triproutes from "./routes/tripRoutes";
+import vehicleRoutes from "./routes/vehicleRoutes.js";
+import fuelRoutes from "./routes/fuelRoutes.js";
+import Triproutes from "./routes/tripRoutes.js";
 import BillUploadRoutes from "./routes/billUploadRoutes.js";
 import VehicleOtherCostRoutes from "./routes/vehicleOtherCostRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/fuels", fuelRoutes);
 app.use("/api/trips", Triproutes);
 app.use("/api/bill-uploads", BillUploadRoutes);
 app.use("/api/vehicle-other-costs", VehicleOtherCostRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
   res.send("🚗 Vehicle Rent Management API is running...");

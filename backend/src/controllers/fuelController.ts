@@ -5,7 +5,7 @@ import {
   getFuelByIdService,
   updateFuelService,
   deleteFuelService,
-} from "../services/fuelService";
+} from "../services/fuelService.js";
 
 /**
  * 🟢 Create Fuel
