@@ -3,7 +3,7 @@ export default function BillTable({ bills, onSelect, onUpdateCost }) {
     <div className="bg-white rounded-xl shadow-md p-4 overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b">
+          <tr className="border-b text-gray-600">
             <th className="p-2 text-left">Bill ID</th>
             <th className="p-2 text-left">Vehicle ID</th>
             <th className="p-2 text-left">Driver ID</th>
@@ -18,7 +18,7 @@ export default function BillTable({ bills, onSelect, onUpdateCost }) {
           {bills.map((bill) => (
             <tr
               key={bill.bill_id}
-              className="border-b hover:bg-gray-100 cursor-pointer"
+              className="hover:bg-gray-100 cursor-pointer"
             >
               <td className="p-2">{bill.bill_id}</td>
               <td className="p-2">{bill.vehicle_id}</td>
@@ -42,9 +42,9 @@ export default function BillTable({ bills, onSelect, onUpdateCost }) {
                 {bill.bill_status === "pending" && (
                   <button
                     onClick={() => onUpdateCost(bill)}
-                    className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 text-xs"
+                    className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-2 py-1 rounded hover:bg-indigo-700 text-xs"
                   >
-                    Update Other Cost
+                    <p className="mb-1">Update Other Cost</p>
                   </button>
                 )}
               </td>

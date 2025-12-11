@@ -103,7 +103,7 @@ const openEndTrip = (tripId, meter) => {
   if (!trip) return <div className="text-center mt-20 text-gray-600">Trip not found</div>;
  
   return (
- <div className="min-h-screen bg-gray-50 p-6">
+ <div className="min-h-screen  bg-gray-50 p-6">
   <div className="max-w-7xl mx-auto space-y-6">
 
     {/* Top Row: Trip ID / Status + Back & Refresh */}

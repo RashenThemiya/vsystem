@@ -1,5 +1,5 @@
+import { FaTimes, FaCheck, FaCarSide, FaUpload } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { FaCarSide, FaUpload } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
@@ -94,6 +94,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConfirmed) return;
+
     setLoading(true);
     setError(null);
 
@@ -109,14 +110,12 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
           },
         }
       );
+
       if (res.status === 200 || res.status === 201) {
         setShowSuccess(true);
         onSuccess(res.data.data);
 
-        setTimeout(() => {
-          onClose();
-          
-        }, 2000);
+        setTimeout(() => onClose(), 2000);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add vehicle");
@@ -128,14 +127,49 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
 
   const handleConfirm = () => {
     setIsConfirmed(true);
-    //handleSubmit(new Event("submit"));
   };
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-6xl mt-12">
-        <h2 className="text-xl font-semibold mb-6 text-center text-black-700 flex items-center justify-center gap-2">
-           Add New Vehicle
+    <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl mt-12 relative p-8">
+
+        {/* Top Buttons */}
+        <div className="absolute top-4 left-4">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+            title="Close"
+          >
+            <FaTimes size={18} />
+          </button>
+        </div>
+
+        <div className="absolute top-4 right-4">
+          <ConfirmWrapper
+            onConfirm={handleConfirm}
+            onCancel={() => setIsConfirmed(false)}
+            message="Confirm Adding Vehicle"
+            additionalInfo="Please verify all vehicle details before submission."
+            confirmText="Yes, Add Vehicle"
+            cancelText="No, Go Back"
+            icon={<FaCarSide />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
+          >
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+              disabled={loading}
+              title="Confirm"
+            >
+              <FaCheck size={18} />
+            </button>
+          </ConfirmWrapper>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+          Add New Vehicle
         </h2>
 
         {/* Alerts */}
@@ -150,7 +184,8 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Form */}
+         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="label">Vehicle Number</label>
@@ -413,9 +448,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
               </div>
             ))}
           </div>
-
-
-          <ConfirmWrapper
+          {/*<ConfirmWrapper
             onConfirm={handleConfirm}
             onCancel={() => setIsConfirmed(false)}
             message="Confirm Adding Vehicle"
@@ -433,15 +466,9 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
             >
               {loading ? "Adding..." : "Add Vehicle"}
             </button>
-          </ConfirmWrapper>
+          </ConfirmWrapper>*/}
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
-          >
-            Cancel
-          </button>
+
         </form>
       </div>
     </div>

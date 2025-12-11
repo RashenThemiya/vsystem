@@ -13,32 +13,37 @@ export default function OwnerTable({ owners = [], loading, error, onSelectOwner 
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
-            <thead className="text-left text-sm text-gray-600 border-b">
+            <thead className="text-left text-sm text-gray-600 border-b bg-white sticky top-0 z-10">
               <tr>
                 <th className="py-3 px-4">Vehicle Owner</th>
                 <th className="py-3 px-4">Phone Number</th>
               </tr>
             </thead>
-
-            <tbody>
-              {owners.map((o) => (
-                <tr
-                  key={o.owner_id}
-                  className="hover:bg-gray-50 cursor-pointer transition"
-                  onClick={() => onSelectOwner(o)}
-                >
-                  <td className="py-4 px-4 flex items-center gap-3">
-                    <Avatar name={o.owner_name} src={o.avatar_url} />
-                    <div>
-                      <div className="font-medium">{o.owner_name}</div>
-                      <div className="text-xs text-gray-400">{o.owner_id}</div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{o.contact_number}</td>
-                </tr>
-              ))}
-            </tbody>
           </table>
+
+          {/* Scrollable rows */}
+          <div className="max-h-[420px] overflow-y-auto">
+            <table className="min-w-full table-auto">
+              <tbody>
+                {owners.map((o) => (
+                  <tr
+                    key={o.owner_id}
+                    className="hover:bg-gray-50 cursor-pointer transition"
+                    onClick={() => onSelectOwner(o)}
+                  >
+                    <td className="py-4 px-4 flex items-center gap-3">
+                      <Avatar name={o.owner_name} src={o.avatar_url} />
+                      <div>
+                        <div className="font-medium">{o.owner_name}</div>
+                        <div className="text-xs text-gray-400">{o.owner_id}</div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-600">{o.contact_number}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -62,7 +62,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-start z-50 overflow-auto p-6">
       <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mt-12">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 justify-center">
           <FaMoneyBill /> Update Other Cost
         </h2>
 
@@ -72,17 +72,27 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
             <img
               src={bill.bill_image} // dynamically use the backend URL
               alt="Bill"
-              className="w-32 h-32 object-cover rounded-full mb-2 border border-gray-300"
+              className="w-32 h-32 object-cover rounded-lg mb-2 border border-gray-300"
               onError={(e) => {
                 e.target.src = "/placeholder.png"; // fallback if image not loaded
               }}
             />
           )}
-          <p>Bill Type: {bill.bill_type.replace("_", " ")}</p>
-          <p>Bill Date: {new Date(bill.bill_date).toLocaleDateString()}</p>
-          <p>Status: {bill.bill_status}</p>
-          <p>Vehicle: {bill.vehicle_name} (ID: {bill.vehicle_id})</p>
-          <p>Driver: {bill.driver_name} (ID: {bill.driver_id})</p>
+          <div className=" space-y-2 items-center">
+          {[
+            ["Bill Type", bill.bill_type.replace("_", " ")],
+            ["Bill Date", new Date(bill.bill_date).toLocaleDateString()],
+            ["Status", bill.bill_status],
+            ["Vehicle", `${bill.vehicle_name} (ID: ${bill.vehicle_id})`],
+            ["Driver", `${bill.driver_name} (ID: ${bill.driver_id})`],
+          ].map(([label, value]) => (
+            <div key={label} className="grid grid-cols-3 gap-2">
+              <span className="font-semibold">{label}:</span>
+              <span className="col-span-2 text-right">{value}</span>
+            </div>
+          ))}
+        </div>
+          
         </div>
 
         {error && (
@@ -120,7 +130,7 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
 
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-2 rounded hover:bg-indigo-700"
             disabled={loading}
           >
             {loading ? "Updating..." : "Update Cost"}

@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import StatsCards from "../StatsCards";
+import { useNavigate } from "react-router-dom";
 
 const TripsTab = ({
   trips,
@@ -14,6 +15,8 @@ const TripsTab = ({
   setTripSelectedYear,
 }) => {
   const statusOptions = ["all", "Pending", "Ongoing", "Ended", "Completed", "Cancelled"];
+  
+  const navigate = useNavigate();
 
   const filteredTripsCount =
   filterStatus === "all"
@@ -108,7 +111,7 @@ const TripsTab = ({
             <tbody>
               {trips.map((t) => (
                 <tr key={t.trip_id} className="hover:bg-gray-50 transition">
-                  <td className="p-1">{t.trip_id}</td>
+                  <td className="p-1 cursor-pointer" onClick={()=> navigate(`/trip/${t.trip_id}`)}>{t.trip_id}</td>
                   <td className="p-1">{t.customer_id}</td>
                   <td className="p-1">{t.driver_id || "-"}</td>
                   <td className="p-1">{t.from_location}</td>
