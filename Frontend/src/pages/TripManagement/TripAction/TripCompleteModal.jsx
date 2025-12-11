@@ -19,10 +19,9 @@ const TripCompleteModal = ({ open, onClose, tripId, onSuccess }) => {
           },
         }
       );
-
-      alert("Trip completed successfully!");
       onSuccess(); // refresh trip
       onClose();
+      alert("Trip Completed!");
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to complete trip");

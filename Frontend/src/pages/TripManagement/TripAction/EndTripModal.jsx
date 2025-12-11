@@ -25,6 +25,9 @@ const EndTripModal = ({ open, tripId, currentMeter, onClose, onSuccess }) => {
       );
       onSuccess();
       onClose();
+      setTimeout(() => {
+      alert("Trip Ended!");
+    }, 100);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to end trip");

@@ -23,7 +23,6 @@ import TripPrintModal from "./TripAction/TripPrintModule";
 import StartTripModal from "./TripAction/StartTripModal";
 import EndTripModal from "./TripAction/EndTripModal";
 import CancelTripModal from "./TripAction/CancelTripModal";
-
  
 const TripDetails = () => {
   const { id } = useParams();
@@ -45,26 +44,12 @@ const [showPrintModal, setShowPrintModal] = useState(false);
 const [activeTab, setActiveTab] = useState("customer");
 const [showStartTripModal, setShowStartTripModal] = useState(false);
 const [showEndTripModal, setShowEndTripModal] = useState(false);
-const [selectedTripId, setSelectedTripId] = useState(null);
-const [currentMeter, setCurrentMeter] = useState(null); // for EndTrip modal
 const [showCancelModal, setShowCancelModal] = useState(false);
 
- const openStartTrip = (tripId) => {
-  setSelectedTripId(tripId);
-  setShowStartTripModal(true);
-};
 
-const openEndTrip = (tripId, meter) => {
-  setSelectedTripId(tripId);
-  setCurrentMeter(meter || 0);
-  setShowEndTripModal(true);
-};
 
- const openCancelTrip = (tripId) => {
-  setSelectedTripId(tripId);
-  setShowCancelModal(true);
-};
-
+ 
+ 
  
   useEffect(() => {
     fetchTrip();
@@ -269,26 +254,31 @@ const openEndTrip = (tripId, meter) => {
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
-<StartTripModal
-  open={showStartTripModal}
-  tripId={selectedTripId}
-  onClose={() => setShowStartTripModal(false)}
-  onSuccess={fetchTrip}
-/>
 
-<EndTripModal
-  open={showEndTripModal}
-  tripId={selectedTripId}
-  currentMeter={currentMeter}
-  onClose={() => setShowEndTripModal(false)}
-  onSuccess={fetchTrip}
-/>
-<CancelTripModal
-  open={showCancelModal}
-  tripId={selectedTripId}
-  onClose={() => setShowCancelModal(false)}
-  onSuccess={fetchTrip}
-/>
+ {/* Start Trip Modal */}
+      <StartTripModal
+        open={showStartTripModal}
+        tripId={trip.trip_id}
+        onClose={() => setShowStartTripModal(false)}
+        onSuccess={fetchTrip}
+      />
+
+      {/* End Trip Modal */}
+      <EndTripModal
+        open={showEndTripModal}
+        tripId={trip.trip_id}
+        currentMeter={trip.start_meter}
+        onClose={() => setShowEndTripModal(false)}
+        onSuccess={fetchTrip}
+      />
+
+      {/* Cancel Trip Modal */}
+      <CancelTripModal
+        open={showCancelModal}
+        tripId={trip.trip_id}
+        onClose={() => setShowCancelModal(false)}
+        onSuccess={fetchTrip}
+      />
 
          
  
@@ -297,16 +287,16 @@ const openEndTrip = (tripId, meter) => {
             {/* RIGHT → Action Buttons */}
             <div className="flex justify-end">
               <TripActionButtons
-                onStartTrip={() => openStartTrip(trip.trip_id)}
-                onEndTrip={() => openEndTrip(trip.trip_id, trip.start_meter)}
+                tripStatus={trip.trip_status}
+                onStartTrip={() => setShowStartTripModal(true)}
+                onEndTrip={() => setShowEndTripModal(true)}
                 onAddPayment={() => setShowPaymentModal(true)}
                 onAddDamage={() => setOpenDamageModal(true)}
-                onCompleteTrip={() => setShowCompleteModal(true)}
                 onAlterReturnDate={() => setShowAlterDatesModal(true)}
                 onAlterMeter={() => setShowAlterMeterModal(true)}
+                onCompleteTrip={() => setShowCompleteModal(true)}
                 onGetPrint={() => setShowPrintModal(true)}
-                onCancelTrip={() => openCancelTrip(trip.trip_id)} // ✅ added
-
+                onCancelTrip={() => setShowCancelModal(true)}
               />
 
             </div>

@@ -130,7 +130,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
+    <div className="fixed inset-0 bg-white/40 bg-opacity-40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl mt-12 relative p-8">
 
         {/* Top Buttons */}

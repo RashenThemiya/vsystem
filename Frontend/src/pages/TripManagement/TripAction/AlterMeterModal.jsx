@@ -28,6 +28,9 @@ const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess();
       onClose();
+      setTimeout(() => {
+      alert("Meter Readings Updated!");
+    }, 100);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to update meter readings");
