@@ -6,8 +6,8 @@ import {
   updateBillController,
   deleteBillController,
 } from "../controllers/billUploadController.js";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
 

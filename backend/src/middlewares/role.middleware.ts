@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { RequestWithUser } from "../types/RequestWithUser";
+import { RequestWithUser } from "../types/RequestWithUser.js";
 
 export const authorizeRoles = (...roles: string[]) => {
   return (req: RequestWithUser, res: Response, next: NextFunction) => {

@@ -5,7 +5,7 @@ import {
   getVehicleByIdService,
   updateVehicleService,
   deleteVehicleService,
-} from "../services/vehicleService";
+} from "../services/vehicleService.js";
 
 /**
  * ✅ Create a new vehicle

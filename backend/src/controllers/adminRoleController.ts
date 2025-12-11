@@ -8,7 +8,7 @@ import {
   updateAdminService,
   deleteAdminService,
   getAllUsersWithoutAdminService,
-} from "../services/adminRoleService";
+} from "../services/adminRoleService.js";
 
 /**
  * 🧩 Create Admin

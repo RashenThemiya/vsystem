@@ -215,9 +215,21 @@ const handleChange = (e) => {
        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/trips`, payload, {
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     });
-      if (res.status === 200 || res.status === 201) {
-        setShowSuccess(true);
-        setTimeout(() => navigate("/trip-management"), 2000);
+     if (res.status === 200 || res.status === 201) {
+  const newTripId = res.data?.data?.trip_id || res.data?.trip_id;
+
+  // AUTO-OPEN PRINT WINDOW
+  const printURL = `/trip/${newTripId}`;
+
+  const printWindow = window.open(printURL, "_blank");
+
+  // After user closes the print dialog → go back to trip management
+  const interval = setInterval(() => {
+    if (true) {
+      clearInterval(interval);
+      navigate("/trip-dashboard");
+    }
+  }, 500);
       } else setError("Unexpected response from server.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add trip");

@@ -6,8 +6,8 @@ import {
   updateAdminController,
   deleteAdminController,
   getAllUsersWithoutAdminController,
-} from "../controllers/adminRoleController";
-import { authenticate } from "../middlewares/auth.middleware";
+} from "../controllers/adminRoleController.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
