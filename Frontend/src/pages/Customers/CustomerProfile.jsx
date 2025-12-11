@@ -12,23 +12,23 @@ const CustomerProfile = () => {
   const [error, setError] = useState(null);
   const [zoomImage, setZoomImage] = useState(null);
 
+  const fetchCustomer = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get(`/api/customers/${customerId}`);
+      setCustomer(res.data.data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch customer.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCustomer = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await api.get(`/api/customers/${customerId}`);
-        setCustomer(res.data.data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch customer.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCustomer();
   }, [customerId]);
-
   if (loading) return <p className="p-6 text-center">Loading...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
   if (!customer) return <p className="p-6 text-center">Customer not found.</p>;
@@ -36,7 +36,7 @@ const CustomerProfile = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6">
       {/* Sidebar */}
-      <CustomerSidebar customer={customer} openImage={setZoomImage} />
+      <CustomerSidebar customer={customer} openImage={setZoomImage} refreshCustomer={fetchCustomer} />
 
       {/* Main Content */}
       <div className="flex-1">

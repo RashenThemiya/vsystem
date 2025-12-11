@@ -291,7 +291,7 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
           >
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
+              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Customer"}

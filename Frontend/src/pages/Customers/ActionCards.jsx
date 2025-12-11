@@ -7,10 +7,10 @@ export default function ActionCards({ onAddCustomerClick }) {
   return (
     <div className="flex flex-col gap-4 h-full">
 
-      <div className="bg-white p-5 rounded-xl shadow flex flex-col justify-between h-full">
+      <div className="bg-white p-5 rounded-xl shadow flex flex-col justify-between h-full" onClick={onAddCustomerClick}>
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-lg bg-blue-50">
-            <PlusCircle onClick={onAddCustomerClick} className="text-blue-600" />
+            <PlusCircle  className="text-blue-600" />
           </div>
           <div className="font-semibold">Add New Customer</div>
         </div>

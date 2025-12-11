@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaReceipt, FaUpload } from "react-icons/fa";
+import { FaReceipt, FaUpload, FaTimes  } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
@@ -158,7 +158,16 @@ const AddBillModal = ({ onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-white/40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl mt-12">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl mt-12 relative">
+
+        {/* 🔴 TOP-LEFT CLOSE BUTTON */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 left-4 p-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full shadow"
+        >
+          <FaTimes size={18} />
+        </button>
+
         <h2 className="text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
           <FaReceipt /> Add New Bill
         </h2>
@@ -168,7 +177,6 @@ const AddBillModal = ({ onClose, onSuccess }) => {
             ❌ {error}
           </div>
         )}
-
         {showSuccess && (
           <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-3 rounded mb-4 text-center">
             ✅ Bill uploaded successfully!
@@ -307,20 +315,12 @@ const AddBillModal = ({ onClose, onSuccess }) => {
             >
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+                className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
                 disabled={loading}
               >
                 {loading ? "Uploading..." : "Upload Bill"}
               </button>
             </ConfirmWrapper>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition"
-            >
-              Cancel
-            </button>
           </form>
         )}
       </div>

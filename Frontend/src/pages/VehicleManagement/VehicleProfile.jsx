@@ -126,7 +126,7 @@ const VehicleProfile = () => {
 
   return (
     <div className="flex h-screen p-6 gap-6">
-      <Sidebar vehicle={vehicle} openImage={openImage} />
+      <Sidebar vehicle={vehicle} openImage={openImage} refreshVehicle={fetchVehicle}/>
       <div className="flex-1 space-y-6 overflow-y-auto">
         {/* Tabs */}
         <div className="flex gap-3 border-b pb-2">
