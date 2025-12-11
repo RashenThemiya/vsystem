@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "../config/prismaClient";
+import { prisma } from "../config/prismaClient.js";
 import { Prisma, Role, Admin, Driver, Customer } from "@prisma/client";
 
 export interface CreateAdminDTO {

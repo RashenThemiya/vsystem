@@ -5,9 +5,9 @@ import {
   getVehicleByIdController,
   updateVehicleController,
   deleteVehicleController,
-} from "../controllers/vehicleController";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+} from "../controllers/vehicleController.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
 

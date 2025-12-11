@@ -11,10 +11,10 @@ import {
   addTripPaymentController,
   updateTripDatesController ,
   updateTripMeterController  // ✅ import endTripController
-} from "../controllers/tripController";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
-import { completeTripController } from "../controllers/tripController";
+} from "../controllers/tripController.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
+import { completeTripController } from "../controllers/tripController.js";
 
 const router = Router();
 

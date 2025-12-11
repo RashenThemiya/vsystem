@@ -7,13 +7,13 @@ import {
   deleteTripService,
   startTripService,
   addTripPaymentService,
-} from "../services/tripService";
+} from "../services/tripService.js";
 
-import {endTripService } from "./../services/endtripService";
-import { updateTripDatesService, UpdateTripDatesDTO } from "../services/endtripService";
+import {endTripService } from "./../services/endtripService.js";
+import { updateTripDatesService, UpdateTripDatesDTO } from "../services/endtripService.js";
 
-import { addDamageCostService ,updateTripMeterService } from "../services/endtripService"; 
-import { completeTripService } from "../services/tripService"; 
+import { addDamageCostService ,updateTripMeterService } from "../services/endtripService.js"; 
+import { completeTripService } from "../services/tripService.js"; 
 
 /**
  * Create Trip
