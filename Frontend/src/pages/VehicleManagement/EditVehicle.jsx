@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCarSide, FaUpload } from "react-icons/fa";
+import { FaTimes, FaCheck, FaCarSide, FaUpload } from "react-icons/fa";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import api from "../../utils/axiosInstance";
 
@@ -78,7 +78,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
       const res = await api.put(`/api/vehicles/${vehicle.vehicle_id}`, vehicle, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      onSuccess(res.data); // updated vehicle back to parent
+      onSuccess(res.data); // return updated vehicle
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update vehicle");
     } finally {
@@ -89,25 +89,63 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
   const handleConfirm = () => {
     setIsConfirmed(true);
-    handleSubmit(new Event("submit"));
   };
 
-  if (loading) return <div className="flex justify-center items-center min-h-[300px] text-gray-500">Loading vehicle data...</div>;
+  if (loading)
+    return <div className="flex justify-center items-center min-h-[300px] text-gray-500">Loading vehicle data...</div>;
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-6xl mt-12">
-      <h2 className="text-xl font-semibold mb-6 text-center text-black-700 flex items-center justify-center gap-2">
-         Edit Vehicle
-      </h2>
+    <div className="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl mt-12 relative p-8">
 
-      {error && (
-        <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-3 rounded mb-4 text-center">
-          ❌ {error}
+        {/* Top Buttons */}
+        <div className="absolute top-4 left-4">
+          <button
+            onClick={onCancel}
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+            title="Close"
+          >
+            <FaTimes size={18} />
+          </button>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="absolute top-4 right-4">
+          <ConfirmWrapper
+            onConfirm={handleConfirm}
+            onCancel={() => setIsConfirmed(false)}
+            message="Confirm Vehicle Update"
+            additionalInfo="Please verify all vehicle details before submission."
+            confirmText="Yes, Update Vehicle"
+            cancelText="No, Go Back"
+            icon={<FaCarSide />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
+          >
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+              disabled={saving}
+              title="Confirm"
+            >
+              <FaCheck size={18} />
+            </button>
+          </ConfirmWrapper>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+          Edit Vehicle
+        </h2>
+
+        {/* Alerts */}
+        {error && (
+          <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-3 rounded mb-4 text-center">
+            ❌ {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -230,17 +268,6 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
             </div>
           ))}
         </div>
-
-        {/* Confirm & Cancel */}
-        <ConfirmWrapper onConfirm={handleConfirm} onCancel={() => setIsConfirmed(false)} message="Confirm Vehicle Update">
-          <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition" disabled={saving}>
-            {saving ? "Updating..." : "Save Changes"}
-          </button>
-        </ConfirmWrapper>
-
-        <button type="button" onClick={onCancel} className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition mt-2">
-          Cancel
-        </button>
       </form>
       </div>
     </div>

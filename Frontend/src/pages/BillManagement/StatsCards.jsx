@@ -1,6 +1,6 @@
 export default function BillStatsCards({ stats }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
       {[
         { label: "Total Bills", value: stats.total || 0 },
         { label: "Pending Bills", value: stats.pending || 0 },
@@ -9,10 +9,10 @@ export default function BillStatsCards({ stats }) {
       ].map((card, i) => (
         <div
           key={i}
-          className="bg-white rounded-xl shadow-md p-4 text-center border border-gray-100"
+          className="p-5 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-600 to-violet-600"
         >
-          <h2 className="text-2xl font-bold text-green-600">{card.value}</h2>
-          <p className="text-sm mt-2 text-gray-700">{card.label}</p>
+          <p className="text-md font-semibold ">{card.label}</p>
+          <p className="text-2xl font-bold text-white mt-1">{card.value}</p>
         </div>
       ))}
     </div>

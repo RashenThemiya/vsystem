@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const DriverTripsTab = ({ trips }) => {
   const [filteredTrips, setFilteredTrips] = useState([]);
@@ -7,6 +8,7 @@ const DriverTripsTab = ({ trips }) => {
   const [month, setMonth] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [totalEarning, setTotalEarning] = useState(0);
+  const navigate = useNavigate();
 
   const years = ["all", ...Array.from(new Set(trips.map(t => dayjs(t.created_at).format("YYYY")))).sort((a,b)=>b-a)];
   const months = ["all", ...Array.from({ length: 12 }, (_, i) => String(i+1).padStart(2, "0"))];
@@ -98,7 +100,7 @@ const DriverTripsTab = ({ trips }) => {
             <tbody>
               {filteredTrips.map(t => (
                 <tr key={t.trip_id} className="text-left hover:bg-gray-50 transition">
-                  <td className="p-1">{t.trip_id}</td>
+                  <td className="p-1 cursor-pointer" onClick={()=> navigate(`/trip/${t.trip_id}`)}>{t.trip_id}</td>
                   <td className="p-1">{t.from_location}</td>
                   <td className="p-1">{t.to_location}</td>
                   <td className="p-1">{t.num_passengers}</td>

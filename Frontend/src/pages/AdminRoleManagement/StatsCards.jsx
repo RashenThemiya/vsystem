@@ -11,7 +11,7 @@ export default function StatsCards({ stats }) {
 function Card({ title, value, gradient }) {
   return (
     <div className={`p-5 rounded-xl shadow-md text-white bg-gradient-to-r ${gradient}`}>
-      <div className="text-sm font-semibold opacity-90">{title}</div>
+      <div className="text-md font-semibold opacity-90">{title}</div>
       <div className="text-2xl font-bold mt-2">{value ?? 0}</div>
       
     </div>

@@ -11,49 +11,53 @@ export default function DriverTable({ drivers = [], loading, error, onSelectDriv
       ) : drivers.length === 0 ? (
         <div className="text-center py-12 text-gray-600">No drivers found.</div>
       ) : (
+        // Scroll container for the table body; keeps header visible when rows scroll
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="text-left text-sm text-gray-600 border-b">
-              <tr>
-                <th className="py-3 px-4">Driver</th>
-                <th className="py-3 px-4">Phone Number</th>
-                <th className="py-3 px-4">Driver Charges</th>
-                <th className="py-3 px-4">NIC</th>
-                <th className="py-3 px-4">Age</th>
-                <th className="py-3 px-4">License No</th>
-                <th className="py-3 px-4">License Expiry</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {drivers.map((d) => (
-                <tr
-                  key={d.driver_id}
-                  className="hover:bg-gray-50 cursor-pointer transition"
-                  onClick={() => onSelectDriver(d)}
-                >
-                  <td className="py-4 px-4 flex items-center gap-3">
-                    <Avatar name={d.name} src={d.avatar_url} />
-                    <div>
-                      <div className="font-medium">{d.name}</div>
-                      <div className="text-xs text-gray-400">{d.driver_id}</div>
-                    </div>
-                  </td>
-
-                  <td className="py-4 px-4 text-sm text-gray-600">{d.phone_number}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{d.driver_charges}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{d.nic}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{d.age}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{d.license_number}</td>
-                  <td className="py-4 px-4 text-sm text-gray-600">
-                  {d.license_expiry_date ? new Date(d.license_expiry_date).toISOString().split("T")[0] : "N/A"}
-                  </td>
-
+          <div className="max-h-[420px] overflow-y-auto rounded">
+            <table className="min-w-full table-fixed">
+              <thead className="bg-white border-b">
+                <tr>
+                  {/* set widths so columns align predictably */}
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/4 sticky top-0 z-20 bg-white">Driver</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">Phone Number</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">Driver Charges</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/8 sticky top-0 z-20 bg-white">NIC</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/12 sticky top-0 z-20 bg-white">Age</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">License No</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">License Expiry</th>
                 </tr>
-              ))}
-            </tbody>
+              </thead>
 
-          </table>
+              <tbody>
+                {drivers.map((d) => (
+                  <tr
+                    key={d.driver_id}
+                    className="hover:bg-gray-50 cursor-pointer transition"
+                    onClick={() => onSelectDriver && onSelectDriver(d)}
+                  >
+                    <td className="py-4 px-4 align-top">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={d.name} src={d.avatar_url || d.image} />
+                        <div>
+                          <div className="font-medium">{d.name}</div>
+                          <div className="text-xs text-gray-400">ID: {d.driver_id}</div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{d.phone_number || "-"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{d.driver_charges ?? "-"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{d.nic || "-"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{d.age ?? "-"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{d.license_number || "-"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
+                      {d.license_expiry_date ? new Date(d.license_expiry_date).toISOString().split("T")[0] : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

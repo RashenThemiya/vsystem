@@ -1,5 +1,7 @@
-import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleLeft, FaEdit } from "react-icons/fa";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import EditVehicleForm from "../EditVehicle";
 
 const Sidebar = ({ vehicle, openImage }) => {
   const documents = [
@@ -9,10 +11,26 @@ const Sidebar = ({ vehicle, openImage }) => {
     { label: "Eco Test", src: vehicle.eco_test_image },
     { label: "Book", src: vehicle.book_image },
   ];
+  const [showEdit, setShowEdit] = useState(false);
   const navigate = useNavigate();
 
   return (
     <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
+     
+     {/* Modal Overlay */}
+      {showEdit && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <EditVehicleForm
+            vehicle={vehicle}
+            onCancel={() => setShowEdit(false)}
+            onSuccess={() => {
+              setShowEdit(false);
+              refreshVehicle();  // 🔥 refresh parent page
+            }}
+          />
+        </div>
+      )}
+
       {/* Back Button - top left */}
   <button
     onClick={() => navigate(-1)}
@@ -27,7 +45,18 @@ const Sidebar = ({ vehicle, openImage }) => {
     alt={vehicle.name}
     className="w-32 h-32 rounded-full border-2 border-gray-100 object-cover shadow-md mt-8"
   />
-      <h2 className="text-xl font-bold text-white text-center">{vehicle.name}</h2>
+      {/* Name + Edit Button */}
+      <div className="flex items-center gap-2">
+        <h2 className="text-xl font-bold text-white">{vehicle.name}</h2>
+
+        {/* 🔥 Edit Button */}
+        <button
+          onClick={() => setShowEdit(true)}
+          className="text-white hover:text-yellow-300"
+        >
+          <FaEdit size={18} />
+        </button>
+      </div>
 
       <div className="text-sm text-white space-y-1 w-full">
         {[

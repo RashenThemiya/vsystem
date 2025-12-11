@@ -34,7 +34,7 @@ const DriverProfile = () => {
 
   return (
     <div className="flex gap-6 p-4">
-      <DriverSidebar driver={driver} openImage={setZoomImage} />
+      <DriverSidebar driver={driver} openImage={setZoomImage}  refreshDriver={fetchDriver}/>
       <DriverTripsTab trips={driver.trips || []} />
 
       {/* Zoom modal */}

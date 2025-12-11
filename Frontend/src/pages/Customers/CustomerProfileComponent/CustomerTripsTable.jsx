@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const CustomerTripsTable = ({ trips }) => {
   const [filteredTrips, setFilteredTrips] = useState([]);
@@ -7,6 +8,7 @@ const CustomerTripsTable = ({ trips }) => {
   const [month, setMonth] = useState("all");
   const [status, setStatus] = useState("all");
   const [totalPayment, setTotalPayment] = useState(0);
+  const navigate = useNavigate();
 
   const statuses = ["all", ...Array.from(new Set(trips.map(t => t.trip_status)))];
   const years = ["all", ...Array.from(new Set(trips.map(t => dayjs(t.created_at).format("YYYY")))).sort((a,b)=>b-a)];
@@ -96,7 +98,7 @@ const CustomerTripsTable = ({ trips }) => {
             <tbody>
               {filteredTrips.map(t => (
                 <tr key={t.trip_id} className=" text-left hover:bg-gray-50 transition text-center">
-                  <td className="p-1">{t.trip_id}</td>
+                  <td className="p-1 cursor-pointer"  onClick={()=> navigate(`/trip/${t.trip_id}`)}>{t.trip_id}</td>
                   <td className="p-1">{t.from_location}</td>
                   <td className="p-1">{t.to_location}</td>
                   <td className="p-1">{t.num_passengers}</td>

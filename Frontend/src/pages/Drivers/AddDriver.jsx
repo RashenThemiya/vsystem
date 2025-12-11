@@ -315,7 +315,7 @@ const AddDriver = ({ onCancel, onSuccess }) => {
           >
             <button
               type="submit"
-              className="w-full py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+              className="w-full py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:bg-blue-600"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Driver"}
