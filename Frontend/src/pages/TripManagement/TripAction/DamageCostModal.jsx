@@ -24,6 +24,7 @@ const DamageCostModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();
+      alert("Damage Cost Added!");
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to add damage cost");

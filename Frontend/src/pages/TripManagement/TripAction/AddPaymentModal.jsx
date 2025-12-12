@@ -31,6 +31,9 @@ const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // Refresh trip details
       onClose();
+       setTimeout(() => {
+      alert("Payment Added!");
+    }, 100);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to add payment");

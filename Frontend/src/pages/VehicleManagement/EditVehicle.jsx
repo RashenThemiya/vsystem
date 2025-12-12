@@ -95,7 +95,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     return <div className="flex justify-center items-center min-h-[300px] text-gray-500">Loading vehicle data...</div>;
 
   return (
-    <div className="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
+    <div className="fixed inset-0 bg-white/40 bg-opacity-40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl mt-12 relative p-8">
 
         {/* Top Buttons */}

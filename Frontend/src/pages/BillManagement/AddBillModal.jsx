@@ -157,8 +157,8 @@ const AddBillModal = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-white/40 backdrop-blur-sm flex justify-center items-start overflow-auto z-50 p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl mt-12 relative">
+    <div className="flex justify-center items-center w-100 min-h-screen bg-grey-100">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full h-full max-w-4xl mt-12 relative">
 
         {/* 🔴 TOP-LEFT CLOSE BUTTON */}
         <button

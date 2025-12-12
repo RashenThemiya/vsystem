@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaMoneyBill } from "react-icons/fa";
+import { FaMoneyBill, FaTimes } from "react-icons/fa";
 import axios from "axios";
 
 const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
@@ -18,6 +18,8 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
   const [costType, setCostType] = useState(bill.bill_type || "Lease_Cost");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [zoomImage, setZoomImage] = useState(false);
+
 
   // Update costType if bill changes
   useEffect(() => {
@@ -60,8 +62,14 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-start z-50 overflow-auto p-6">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mt-12">
+    <div className="flex justify-center items-center w-100 min-h-screen bg-grey-100">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-full h-full max-w-md mt-12 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 left-4 p-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full shadow"
+        >
+          <FaTimes size={18} />
+        </button>
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 justify-center">
           <FaMoneyBill /> Update Other Cost
         </h2>
@@ -72,7 +80,8 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
             <img
               src={bill.bill_image} // dynamically use the backend URL
               alt="Bill"
-              className="w-32 h-32 object-cover rounded-lg mb-2 border border-gray-300"
+              className="w-45 h-55 object-cover rounded-lg mb-5 border border-gray-300"
+              onClick={() => setZoomImage(true)}
               onError={(e) => {
                 e.target.src = "/placeholder.png"; // fallback if image not loaded
               }}
@@ -136,15 +145,21 @@ const UpdateOtherCostModal = ({ bill, onClose, onSuccess }) => {
             {loading ? "Updating..." : "Update Cost"}
           </button>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600"
-          >
-            Cancel
-          </button>
         </form>
       </div>
+      {zoomImage && (
+  <div
+    className="fixed inset-0 bg-white/40 backdrop-blur-sm flex justify-center items-center z-50"
+    onClick={() => setZoomImage(false)}
+  >
+    <img
+      src={bill.bill_image}
+      className="max-w-4xl max-h-[90vh] rounded-xl shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    />
+  </div>
+)}
+
     </div>
   );
 };

@@ -29,7 +29,9 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();   // close modal
-
+      setTimeout(() => {
+      alert("Dates Updated!");
+    }, 100);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to update dates");

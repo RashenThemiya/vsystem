@@ -8,26 +8,24 @@ import StatsCards from "./StatsCards";
 import ActionCards from "./ActionCards";
 import BillTable from "./BillTable";
 import AddBillModal from "./AddBillModal";
-import BillDetails from "./BillDetails";
 import BillSearchBar from "./BillSearchBar";
 import UpdateOtherCostModal from "./UpdateOtherCostModal";
 
 export default function BillDashboard() {
   const { name, role } = useAuth();
-
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBill, setSelectedBill] = useState(null);
-  const [showDetails, setShowDetails] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [showUpdateCostModal, setShowUpdateCostModal] = useState(false);
   const [billForUpdate, setBillForUpdate] = useState(null);
-  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState(null);
 
-  // Fetch Bills
+  // Fetch bills
   useEffect(() => {
     const fetchBills = async () => {
       try {
@@ -46,7 +44,7 @@ export default function BillDashboard() {
     fetchBills();
   }, []);
 
-  // Stats
+  // Compute stats
   const stats = {
     total: bills.length,
     pending: bills.filter((b) => b.bill_status === "pending").length,
@@ -58,7 +56,7 @@ export default function BillDashboard() {
     }).length,
   };
 
-  // Filtered bills
+  // Filter bills
   const filteredBills = bills.filter((b) => {
     const q = searchQuery.toLowerCase();
     return (
@@ -106,13 +104,16 @@ export default function BillDashboard() {
   const handleOpenUpdateCost = (bill) => {
     setBillForUpdate(bill);
     setShowUpdateCostModal(true);
+    setShowAddForm(false);
+    
   };
 
   const handleUpdateCostSuccess = () => {
     setShowUpdateCostModal(false);
     setSuccessMessage("Vehicle Other Cost updated successfully!");
     setTimeout(() => setSuccessMessage(""), 3000);
-    // Optionally, refresh bills after updating
+
+    // refresh bills
     const fetchBills = async () => {
       try {
         const res = await api.get("/api/bill-uploads", {
@@ -154,7 +155,7 @@ export default function BillDashboard() {
                   setShowAddForm(true);
                   setShowDetails(false);
                   setSelectedBill(null);
-                  setShowEditForm(false);
+                  setShowUpdateCostModal(false);
                 }}
               />
             </div>
@@ -171,8 +172,8 @@ export default function BillDashboard() {
               bills={filteredBills}
               loading={loading}
               error={error}
-              onSelect={(bill) => handleSelectBill(bill)}
-              onUpdateCost={handleOpenUpdateCost} // pass handler
+              onSelect={handleSelectBill}
+              onUpdateCost={handleOpenUpdateCost}
             />
           </div>
         </div>
@@ -189,14 +190,11 @@ export default function BillDashboard() {
         />
       )}
 
-      {/* Bill Details */}
-      {selectedBill && !showEditForm && showDetails && (
-        <BillDetails
+      {showEditForm && selectedBill && (
+        <AddBillModal
           bill={selectedBill}
-          onClose={handleClosePanel}
-          onDelete={handleDeleteBill}
-          onUpdated={handleBillUpdated}
-          onEdit={handleEditBill}
+          onClose={() => setShowEditForm(false)}
+          onSuccess={handleBillUpdated}
         />
       )}
 

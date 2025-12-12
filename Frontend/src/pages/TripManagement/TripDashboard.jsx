@@ -29,9 +29,13 @@ export default function TripDashboard() {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [startMeter, setStartMeter] = useState(null);
   const [endMeter, setEndMeter] = useState(null);
+ 
+
+
 
   const tripStatuses = ["Pending", "Ongoing", "Ended", "Completed", "Cancelled"];
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchTrips = async () => {
     setLoading(true);
@@ -123,6 +127,8 @@ export default function TripDashboard() {
     await api.patch(`/api/trips/${selectedTripId}/start`, { start_meter: startMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
     setShowStartModal(false);
     fetchTrips();
+    setSuccessMessage("Trip started!");
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const openEndTripModal = (tripId, currentMeter) => {
@@ -139,6 +145,8 @@ export default function TripDashboard() {
     await api.patch(`/api/trips/${selectedTripId}/end`, { end_meter: endMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
     setShowEndModal(false);
     fetchTrips();
+    setSuccessMessage("Trip Ended!");
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   return (
@@ -154,6 +162,17 @@ export default function TripDashboard() {
             </div>
             <div className="text-sm text-gray-600">
               Signed in as <span className="font-medium">{name}</span> — {role}
+              {errorMessage && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
+                ❌ {errorMessage}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="bg-green-200 border border-green-400 font-semibold text-green-700 px-4 py-3 rounded mb-4 text-center">
+                ✅ {successMessage}
+              </div>
+            )}
             </div>
           </div>
 

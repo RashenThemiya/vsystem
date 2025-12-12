@@ -21,6 +21,8 @@ const StartTripModal = ({ open, tripId, onClose, onSuccess }) => {
       );
       onSuccess();
       onClose();
+      
+      alert("Trip Started!");
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to start trip");

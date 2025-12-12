@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../utils/axiosInstance";
-import DriverSidebar from "./DriverProfileComponent/DriverSidebar";
+import DriverSidebar from "./DriverProfileComponent/DriverSideBar";
 import DriverTripsTab from "./DriverProfileComponent/DriverTripsTab";
 
 const DriverProfile = () => {
