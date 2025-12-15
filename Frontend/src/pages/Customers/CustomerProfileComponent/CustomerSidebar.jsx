@@ -15,7 +15,7 @@ const CustomerSidebar = ({ customer, openImage, refreshCustomer }) => {
       {/* ---------------- MODAL OVERLAY ---------------- */}
       {showEdit && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl w-[50%] max-w-lg relative max-h-[90vh] ">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl w-[50%] max-w-lg relative max-h-[100vh] ">
 
             <EditCustomerForm
               customer={customer}

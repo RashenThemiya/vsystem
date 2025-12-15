@@ -28,6 +28,14 @@ const COLORS = [
   "#e887bfff",
 ];
 
+const fuelColors = [
+  "#4410c6ff",
+  "#efd809ff",
+  "#be1717ff",
+  "#464440ff",
+  
+];
+
 
 
 export default function DashboardKPIs() {
@@ -189,14 +197,18 @@ export default function DashboardKPIs() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" name="Trips" fill="#7700feff" />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" name="Trips">
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
           </div>
         </div>
 
@@ -207,23 +219,26 @@ export default function DashboardKPIs() {
           <div className="bg-white p-4 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-2">Fuel Prices (Click bar to edit)</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={kpis.fuelPrices}>
-                <XAxis dataKey="type" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar
-                  dataKey="cost"
-                  name="Fuel Cost"
-                  fill="#9910c6ff"
-                  onClick={handleFuelClick}
-                >
-                  {kpis.fuelPrices.map((_, index) => (
-                    <Cell key={`fuel-${index}`} cursor="pointer" />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart data={kpis.fuelPrices}>
+              <XAxis dataKey="type" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar
+                dataKey="cost"
+                name="Fuel Cost"
+                onClick={handleFuelClick}
+              >
+                {kpis.fuelPrices.map((_, index) => (
+                  <Cell
+                    key={`fuel-${index}`}
+                    fill={fuelColors[index % fuelColors.length]}
+                    cursor="pointer"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
           </div>
         </div>
         {/* Fuel Edit Modal */}
