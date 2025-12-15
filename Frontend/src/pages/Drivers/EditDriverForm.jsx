@@ -95,7 +95,7 @@ export default function EditDriverForm({ driver, onUpdated, onCancel }) {
 
   return (
     
-      <div className="bg-white p-3 h-220 w-full max-w-md overflow-auto relative">
+      <div className="bg-white p-3 h-200 w-full max-w-md overflow-auto relative">
 
         {/* Top Left: Close */}
         <div className="absolute top-3 left-3 z-10">
