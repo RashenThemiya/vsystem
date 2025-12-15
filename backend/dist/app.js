@@ -11,6 +11,7 @@ import fuelRoutes from "./routes/fuelRoutes.js";
 import Triproutes from "./routes/tripRoutes.js";
 import BillUploadRoutes from "./routes/billUploadRoutes.js";
 import VehicleOtherCostRoutes from "./routes/vehicleOtherCostRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 dotenv.config();
 const app = express();
 // ✅ Enable CORS first
@@ -30,6 +31,7 @@ app.use("/api/fuels", fuelRoutes);
 app.use("/api/trips", Triproutes);
 app.use("/api/bill-uploads", BillUploadRoutes);
 app.use("/api/vehicle-other-costs", VehicleOtherCostRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.get("/", (req, res) => {
     res.send("🚗 Vehicle Rent Management API is running...");
 });

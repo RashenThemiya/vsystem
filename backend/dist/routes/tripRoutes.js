@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTripController, getAllTripsController, getTripByIdController, updateTripController, deleteTripController, startTripController, endTripController, addDamageCostController, addTripPaymentController, updateTripDatesController, updateTripMeterController // ✅ import endTripController
+import { createTripController, getAllTripsController, getTripByIdController, updateTripController, deleteTripController, startTripController, endTripController, addDamageCostController, addTripPaymentController, updateTripDatesController, updateTripMeterController, cancelTripController, // ✅ import cancelTripController
  } from "../controllers/tripController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
@@ -25,5 +25,6 @@ router.patch("/:id/update-dates", authorizeRoles("Admin", "SuperAdmin"), updateT
 router.patch("/:id/update-meter", authorizeRoles("Admin", "SuperAdmin"), updateTripMeterController);
 // Complete trip (Only if Ended + Paid)
 router.patch("/:id/complete", authorizeRoles("Admin", "SuperAdmin"), completeTripController);
+router.patch("/:id/cancel", authorizeRoles("Admin", "SuperAdmin"), cancelTripController); // ✅ new
 export default router;
 //# sourceMappingURL=tripRoutes.js.map

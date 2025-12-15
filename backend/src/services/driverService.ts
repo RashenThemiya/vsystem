@@ -1,5 +1,6 @@
 // services/driverService.ts
 import { prisma } from "../config/prismaClient.js";
+import { TripStatus } from "@prisma/client";
 
 interface DriverInput {
   name: string;
@@ -95,10 +96,7 @@ export const createDriverService = async (data: DriverInput) => {
  */
 export const getAllDriversService = async () => {
   const drivers = await prisma.driver.findMany({
-    include: {
-      trips: true,
-      bill_uploads: true,
-    },
+    
   });
 
   return drivers.map((d) => ({
@@ -180,4 +178,72 @@ export const updateDriverService = async (id: number, data: Partial<DriverInput>
 export const deleteDriverService = async (id: number): Promise<boolean> => {
   await prisma.driver.delete({ where: { driver_id: id } });
   return true;
+};
+
+export const getDriverTripsByStatusService = async (
+  driverId: number,
+  status: TripStatus
+) => {
+  return prisma.trip.findMany({
+    where: {
+      driver_id: driverId,
+      trip_status: status,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+    select: {
+      trip_id: true,
+      from_location: true,
+      to_location: true,
+      leaving_datetime: true,
+      estimated_return_datetime: true,
+      actual_return_datetime: true,
+      trip_status: true,
+      payment_status: true,
+      total_estimated_cost: true,
+      total_actual_cost: true,
+      created_at: true,
+
+      // ✅ Customer (NO NIC images)
+      customer: {
+        select: {
+          customer_id: true,
+          name: true,
+          phone_number: true,
+          email: true,
+        },
+      },
+
+      // ✅ Vehicle (NO images)
+      vehicle: {
+        select: {
+          vehicle_id: true,
+          vehicle_number: true,
+          name: true,
+          type: true,
+        },
+      },
+    },
+  });
+};
+
+export const getDriverDetailsOnlyService = async (id: number) => {
+  const driver = await prisma.driver.findUnique({
+    where: { driver_id: id },
+    select: {
+      driver_id: true,
+      name: true,
+      phone_number: true,
+      driver_charges: true,
+      nic: true,
+      age: true,
+      license_number: true,
+      license_expiry_date: true,
+    },
+  });
+
+  if (!driver) throw new Error("Driver not found");
+
+  return driver;
 };

@@ -1,4 +1,4 @@
-import { createTripService, getAllTripsService, getTripByIdService, updateTripService, deleteTripService, startTripService, addTripPaymentService, } from "../services/tripService.js";
+import { createTripService, getAllTripsService, getTripByIdService, updateTripService, deleteTripService, startTripService, addTripPaymentService, cancelTripService, } from "../services/tripService.js";
 import { endTripService } from "./../services/endtripService.js";
 import { updateTripDatesService } from "../services/endtripService.js";
 import { addDamageCostService, updateTripMeterService } from "../services/endtripService.js";
@@ -210,6 +210,21 @@ export const completeTripController = async (req, res) => {
             success: false,
             message: error.message,
         });
+    }
+};
+/** ---------------- CANCEL TRIP ---------------- */
+export const cancelTripController = async (req, res) => {
+    try {
+        const trip_id = parseInt(req.params.id);
+        const cancelledTrip = await cancelTripService(trip_id);
+        res.status(200).json({
+            success: true,
+            message: "Trip cancelled successfully",
+            data: cancelledTrip,
+        });
+    }
+    catch (error) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 //# sourceMappingURL=tripController.js.map

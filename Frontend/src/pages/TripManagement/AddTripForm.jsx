@@ -25,12 +25,11 @@ const AddTripForm = ({
   const [totalCost, setTotalCost] = useState(trip.total_estimated_cost || 0);
   const [profit, setProfit] = useState(trip.profit || 0);
 
-  // Ensure waypoints & other_trip_costs are arrays
   const waypoints = Array.isArray(trip.waypoints) ? trip.waypoints : [];
   const otherCosts = Array.isArray(trip.other_trip_costs) ? trip.other_trip_costs : [];
 
   // ----------------------------
-  // 🟢 CALCULATE TOTAL + PROFIT USING UTILITY
+  // 🟣 CALCULATE TOTAL + PROFIT USING UTILITY
   // ----------------------------
   useEffect(() => {
     const { totalEstimatedCost, profit: prof, discount } =
@@ -58,7 +57,7 @@ const AddTripForm = ({
   ]);
 
   // ----------------------------
-  // 🟢 HANDLE WAYPOINT CHANGE
+  // 🟣 HANDLE WAYPOINT CHANGE
   // ----------------------------
   const onWaypointChange = (index, value) => {
     setTrip(prev => {
@@ -69,7 +68,7 @@ const AddTripForm = ({
   };
 
   // ----------------------------
-  // 🟢 AUTO-FILL ADVANCE PAYMENT & STATUS
+  // 🟣 AUTO-FILL ADVANCE PAYMENT & STATUS
   // ----------------------------
   useEffect(() => {
     const payment = Number(trip.payment_amount || 0);
@@ -142,8 +141,8 @@ const AddTripForm = ({
 
       {/* Vehicle Details */}
       {selectedVehicle && (
-        <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-300 mt-4 space-y-2">
-          <h3 className="text-lg font-semibold text-yellow-700">Vehicle Details</h3>
+        <div className="bg-purple-50 p-4 rounded-xl border border-purple-300 mt-4 space-y-2">
+          <h3 className="text-lg font-semibold text-purple-700">Vehicle Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>Fuel Type: <span className="font-medium">{selectedVehicle.fuel?.type}</span></div>
             <div>Fuel Cost (Rs/L): <span className="font-medium">{selectedVehicle.fuel_cost}</span></div>
@@ -157,8 +156,8 @@ const AddTripForm = ({
 
       {/* Driver Details */}
       {selectedDriver && (
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-300 mt-4 space-y-2">
-          <h3 className="text-lg font-semibold text-blue-700">Driver Details</h3>
+        <div className="bg-pink-50 p-4 rounded-xl border border-pink-300 mt-4 space-y-2">
+          <h3 className="text-lg font-semibold text-pink-700">Driver Details</h3>
           <div>Driver Name: <span className="font-medium">{selectedDriver.name}</span></div>
           <div>Driver Cost per Day (Rs): <span className="font-medium">{selectedDriver.driver_cost}</span></div>
         </div>
@@ -200,7 +199,7 @@ const AddTripForm = ({
           <button
             type="button"
             onClick={addWaypoint}
-            className="flex items-center gap-1 px-3 py-1 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700"
+            className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-600 text-white text-sm hover:bg-purple-800"
           >
             <FaPlus /> Add
           </button>
@@ -212,9 +211,9 @@ const AddTripForm = ({
           {waypoints.map((wp, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-600"
+              className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-purple-600"
             >
-              <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">{i + 1}</div>
+              <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">{i + 1}</div>
               <input
                 type="text"
                 ref={(el) => (waypointRefs.current[i] = el)}
@@ -302,7 +301,7 @@ const AddTripForm = ({
           <button
             type="button"
             onClick={addOtherCost}
-            className="text-green-600 hover:text-green-800"
+            className="text-purple-600 hover:text-purple-800"
           >
             <FaPlus />
           </button>
@@ -365,15 +364,15 @@ const AddTripForm = ({
           <p className="text-3xl font-bold text-gray-900 mt-2">Rs {totalCost.toLocaleString()}</p>
         </div>
 
-        <div className="p-5 rounded-xl bg-green-100 border border-green-300 shadow-sm">
-          <h4 className="text-lg font-semibold text-green-700">Profit</h4>
-          <p className="text-3xl font-bold text-green-900 mt-2">Rs {profit.toLocaleString()}</p>
+        <div className="p-5 rounded-xl bg-purple-100 border border-purple-300 shadow-sm">
+          <h4 className="text-lg font-semibold text-purple-700">Profit</h4>
+          <p className="text-3xl font-bold text-purple-900 mt-2">Rs {profit.toLocaleString()}</p>
         </div>
       </div>
 
       {/* Payment Section */}
-      <div className="bg-blue-50 p-4 rounded-xl border border-blue-300">
-        <h3 className="text-lg font-semibold mb-3 text-blue-800">Payment Details</h3>
+      <div className="bg-pink-50 p-4 rounded-xl border border-pink-300">
+        <h3 className="text-lg font-semibold mb-3 text-pink-700">Payment Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="label">Payment Amount (Rs)</label>
