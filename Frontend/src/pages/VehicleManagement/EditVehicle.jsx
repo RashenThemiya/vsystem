@@ -130,6 +130,8 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
             confirmText="Yes, Update Vehicle"
             cancelText="No, Go Back"
             icon={<FaCarSide />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
           >
             <button
               type="submit"

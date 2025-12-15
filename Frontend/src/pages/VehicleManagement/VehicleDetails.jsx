@@ -166,18 +166,7 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
                 <p><strong>Mileage Cost:</strong> <br /> {vehicle.mileage_costs?.[0] ? `Base: ${vehicle.mileage_costs[0].mileage_cost}, Additional: ${vehicle.mileage_costs[0].mileage_cost_additional}` : "-"}</p>
               </div>
 
-              {/* Vehicle Images */}
-              <div className="mt-4">
-                <h4 className="font-semibold mb-2">Documents & Images</h4>
-                {["image", "license_image", "insurance_card_image", "eco_test_image", "book_image"].map((key) => (
-                  vehicle[key] && (
-                    <div key={key} className="mb-3">
-                      <p className="font-semibold">{key.replace("_", " ").toUpperCase()}:</p>
-                      <img src={vehicle[key]} className="w-full h-40 object-cover rounded border" alt={key} />
-                    </div>
-                  )
-                ))}
-              </div>
+             
             </div>
           </div>
         )}

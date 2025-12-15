@@ -15,7 +15,7 @@ export default function ActionCards({ onAddTripClick }) {
           <div className="font-semibold">Add New Trip</div>
         </div>
 
-        <p className="text-sm text-gray-500 mt-3">
+        <p className="text-sm text-gray-500 mt-1">
           Add a new Trip to the system.
         </p>
       </div>

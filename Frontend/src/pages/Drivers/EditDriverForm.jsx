@@ -146,7 +146,7 @@ export default function EditDriverForm({ driver, onUpdated, onCancel }) {
           Edit Driver
         </h2>
 
-        <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-1" onSubmit={(e) => e.preventDefault()}>
           <label className="block text-gray-600 font-medium">Driver Name:</label>
           <input
             type="text"
