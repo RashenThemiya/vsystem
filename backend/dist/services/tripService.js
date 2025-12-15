@@ -531,4 +531,25 @@ export const addTripPaymentService = async (trip_id, amount, payment_date) => {
     });
     return { payment, updatedTrip };
 };
+export const cancelTripService = async (trip_id) => {
+    // 1️⃣ Fetch the trip
+    const trip = await prisma.trip.findUnique({
+        where: { trip_id },
+        select: { trip_id: true, trip_status: true, payment_status: true },
+    });
+    if (!trip)
+        throw new Error("Trip not found");
+    // 2️⃣ Check if trip can be cancelled
+    if (trip.trip_status === TripStatus.Completed || trip.trip_status === TripStatus.Cancelled) {
+        throw new Error("Cannot cancel a completed or already cancelled trip");
+    }
+    // 3️⃣ Update trip status to Cancelled
+    const cancelledTrip = await prisma.trip.update({
+        where: { trip_id },
+        data: {
+            trip_status: TripStatus.Cancelled,
+        },
+    });
+    return cancelledTrip;
+};
 //# sourceMappingURL=tripService.js.map

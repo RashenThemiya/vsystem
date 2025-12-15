@@ -18,7 +18,7 @@ router.get("/", authorizeRoles("Admin", "SuperAdmin"), getAllBillsController);
 router.get("/:id", authorizeRoles("Admin", "SuperAdmin"), getBillByIdController);
 
 // SuperAdmin can manage
-router.post("/", authorizeRoles("SuperAdmin"), createBillController);
+router.post("/", authorizeRoles("SuperAdmin","Driver"), createBillController);
 router.put("/:id", authorizeRoles("SuperAdmin"), updateBillController);
 router.delete("/:id", authorizeRoles("SuperAdmin"), deleteBillController);
 

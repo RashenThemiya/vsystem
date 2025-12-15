@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import Sidebar from "./VehicleProfileComponent/Sidebar";
 import TripsTab from "./VehicleProfileComponent/TripsTab";
 import CostsTab from "./VehicleProfileComponent/CostsTab";
+import { PlusCircle } from "react-feather";
+import AddVehicleCostModal from "./VehicleProfileComponent/AddVehicleCostModal";
 
 const VehicleProfile = () => {
   const { id } = useParams();
@@ -16,7 +18,7 @@ const VehicleProfile = () => {
 
   const [filter, setFilter] = useState("trips");
 
-  // Trips
+  // Trips state
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [totalEarning, setTotalEarning] = useState(0);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -24,11 +26,14 @@ const VehicleProfile = () => {
   const [tripSelectedMonth, setTripSelectedMonth] = useState("");
   const [tripSelectedYear, setTripSelectedYear] = useState("");
 
-  // Costs
+  // Costs state
   const [filteredCosts, setFilteredCosts] = useState([]);
   const [costDateFilterType, setCostDateFilterType] = useState("all");
   const [costSelectedMonth, setCostSelectedMonth] = useState("");
   const [costSelectedYear, setCostSelectedYear] = useState("");
+
+  // Modal state
+  const [isAddCostModalOpen, setIsAddCostModalOpen] = useState(false);
 
   useEffect(() => {
     fetchVehicle();
@@ -50,6 +55,7 @@ const VehicleProfile = () => {
     costSelectedYear,
   ]);
 
+  // Fetch vehicle details
   const fetchVehicle = async () => {
     setLoading(true);
     setError(null);
@@ -64,6 +70,7 @@ const VehicleProfile = () => {
     }
   };
 
+  // Calculate earnings
   const calculateEarnings = (trips) => {
     const total = trips
       .filter((t) => t.trip_status === "Completed")
@@ -71,6 +78,7 @@ const VehicleProfile = () => {
     setTotalEarning(total);
   };
 
+  // Filter trips
   const applyTripFilter = () => {
     if (!vehicle?.trips) return;
 
@@ -96,6 +104,7 @@ const VehicleProfile = () => {
     calculateEarnings(trips);
   };
 
+  // Filter costs
   const applyCostFilter = () => {
     if (!vehicle?.vehicle_other_costs) return;
 
@@ -114,6 +123,7 @@ const VehicleProfile = () => {
     setFilteredCosts(costs);
   };
 
+  // Open image in new tab
   const openImage = (img) => {
     if (!img) return;
     const win = window.open();
@@ -126,7 +136,12 @@ const VehicleProfile = () => {
 
   return (
     <div className="flex h-screen p-6 gap-6">
-      <Sidebar vehicle={vehicle} openImage={openImage} refreshVehicle={fetchVehicle}/>
+      <Sidebar
+        vehicle={vehicle}
+        openImage={openImage}
+        refreshVehicle={fetchVehicle}
+      />
+
       <div className="flex-1 space-y-6 overflow-y-auto">
         {/* Tabs */}
         <div className="flex gap-3 border-b pb-2">
@@ -140,7 +155,6 @@ const VehicleProfile = () => {
           >
             Trips
           </button>
-
           <button
             onClick={() => setFilter("costs")}
             className={`px-4 py-2 text-sm font-semibold rounded-t-lg ${
@@ -153,6 +167,7 @@ const VehicleProfile = () => {
           </button>
         </div>
 
+        {/* Trips Tab */}
         {filter === "trips" && (
           <TripsTab
             trips={filteredTrips}
@@ -168,17 +183,49 @@ const VehicleProfile = () => {
           />
         )}
 
-        {filter === "costs" && (
-          <CostsTab
-            costs={filteredCosts}
-            costDateFilterType={costDateFilterType}
-            setCostDateFilterType={setCostDateFilterType}
-            costSelectedMonth={costSelectedMonth}
-            setCostSelectedMonth={setCostSelectedMonth}
-            costSelectedYear={costSelectedYear}
-            setCostSelectedYear={setCostSelectedYear}
-          />
-        )}
+        {/* Costs Tab */}
+        {/* Costs Tab */}
+{filter === "costs" && (
+  <div className="space-y-4">
+    {/* Add Vehicle Other Cost Button - right aligned */}
+    <div className="flex justify-end">
+      <div
+        className="bg-white p-5 rounded-xl shadow flex flex-col justify-between cursor-pointer hover:shadow-md transition w-80"
+        onClick={() => setIsAddCostModalOpen(true)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-lg bg-blue-50">
+            <PlusCircle className="text-blue-600" size={24} />
+          </div>
+          <div className="font-semibold">Add New Other Cost</div>
+        </div>
+        <p className="text-sm text-gray-500 mt-3">
+          Add a new cost entry for this vehicle.
+        </p>
+      </div>
+    </div>
+
+    {/* Add Cost Modal */}
+    <AddVehicleCostModal
+      vehicleId={vehicle.vehicle_id} 
+      isOpen={isAddCostModalOpen}
+      onClose={() => setIsAddCostModalOpen(false)}
+      onSuccess={fetchVehicle} 
+    />
+
+    {/* Costs Table */}
+    <CostsTab
+      costs={filteredCosts}
+      costDateFilterType={costDateFilterType}
+      setCostDateFilterType={setCostDateFilterType}
+      costSelectedMonth={costSelectedMonth}
+      setCostSelectedMonth={setCostSelectedMonth}
+      costSelectedYear={costSelectedYear}
+      setCostSelectedYear={setCostSelectedYear}
+    />
+  </div>
+)}
+
       </div>
     </div>
   );

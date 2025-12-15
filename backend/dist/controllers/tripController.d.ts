@@ -29,4 +29,6 @@ export declare const updateTripMeterController: (req: Request, res: Response) =>
  * Complete Trip (Only when status = Ended and payment is fully Paid)
  */
 export declare const completeTripController: (req: Request, res: Response) => Promise<void>;
+/** ---------------- CANCEL TRIP ---------------- */
+export declare const cancelTripController: (req: Request, res: Response) => Promise<void>;
 //# sourceMappingURL=tripController.d.ts.map
