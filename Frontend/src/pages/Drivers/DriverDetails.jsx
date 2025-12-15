@@ -221,7 +221,7 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
           <EditDriverForm
             driver={driver}
             onCancel={() => setEditMode(false)}
-            onSuccess={(updated) => {
+            onUpdated={(updated) => {
               onUpdated(updated);
               setEditMode(false);
             }}

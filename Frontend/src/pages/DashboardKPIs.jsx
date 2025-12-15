@@ -21,11 +21,11 @@ import {
 
 const COLORS = [
   
-  "#adaef7ff", // indigo-500
-  "#501adaff", // pink-500
-  "#9f1eefff", // pink-400
-  "#f116acff", // indigo-600
-  "#e887bfff", // violet-600
+  "#adaef7ff", 
+  "#6037c9ff", 
+  "#9f1eefff",
+  "#f116acff",
+  "#e887bfff",
 ];
 
 
@@ -194,7 +194,7 @@ export default function DashboardKPIs() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="value" name="Trips" fill="#0088FE" />
+                <Bar dataKey="value" name="Trips" fill="#7700feff" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -215,7 +215,7 @@ export default function DashboardKPIs() {
                 <Bar
                   dataKey="cost"
                   name="Fuel Cost"
-                  fill="#FF8042"
+                  fill="#9910c6ff"
                   onClick={handleFuelClick}
                 >
                   {kpis.fuelPrices.map((_, index) => (

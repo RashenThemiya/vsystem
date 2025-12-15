@@ -1,5 +1,6 @@
 // BillDashboard.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import api from "../../utils/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
@@ -24,6 +25,12 @@ export default function BillDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(""); // "", "pending", "completed", "newThisMonth"
+  const navigate = useNavigate();
+
+  const handleStatusFilter = (filter) => {
+  setStatusFilter(filter);
+};
 
   // Fetch bills
   useEffect(() => {
@@ -147,7 +154,8 @@ export default function BillDashboard() {
           {/* Stats + Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-1 mt-6 items-stretch">
             <div className="lg:col-span-3 h-full">
-              <StatsCards stats={stats} />
+              <StatsCards stats={stats} onClick={handleStatusFilter} />
+
             </div>
             <div className="lg:col-span-1 h-full flex flex-col">
               <ActionCards
@@ -174,6 +182,9 @@ export default function BillDashboard() {
               error={error}
               onSelect={handleSelectBill}
               onUpdateCost={handleOpenUpdateCost}
+              onSelectDriver={(bill) => navigate(`/driver-profile/${bill.driver_id}`)}
+              onSelectVehicle={(bill) => navigate(`/vehicles/${bill.vehicle_id}`)}
+              statusFilter={statusFilter} 
             />
           </div>
         </div>

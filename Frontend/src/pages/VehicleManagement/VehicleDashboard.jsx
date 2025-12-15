@@ -99,16 +99,21 @@ export default function VehicleDashboard() {
 
   // Update vehicle
   const handleVehicleUpdated = (updatedVehicle) => {
-    setVehicles((prev) =>
-      prev.map((v) => (v.vehicle_id === updatedVehicle.vehicle_id ? updatedVehicle : v))
-    );
+  if (!updatedVehicle?.vehicle_id) return; // safety check
 
-    setSelectedVehicle(updatedVehicle);
-    setShowEditForm(false);
-    setSuccessMessage("Vehicle updated successfully!");
+  setVehicles((prev) =>
+    prev.map((v) =>
+      v?.vehicle_id === updatedVehicle.vehicle_id ? updatedVehicle : v
+    )
+  );
 
-    setTimeout(() => setSuccessMessage(""), 3000);
-  };
+  setSelectedVehicle(updatedVehicle);
+  setShowEditForm(false);
+  setSuccessMessage("Vehicle updated successfully!");
+
+  setTimeout(() => setSuccessMessage(""), 3000);
+};
+
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50">

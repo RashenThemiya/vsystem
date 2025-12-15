@@ -26,6 +26,18 @@ const CustomerTripsTable = ({ trips }) => {
 
   return (
     <div className="flex flex-col gap-4">
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
+          <div className="text-sm font-semibold">Total Trips</div>
+          <div className="text-2xl font-bold mt-1">{filteredTrips.length}</div>
+        </div>
+        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
+          <div className="text-sm font-semibold">Total Payment</div>
+          <div className="text-xl font-bold mt-1">Rs. {totalPayment.toLocaleString()}</div>
+        </div>
+      </div>
       {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center">
         <div>
@@ -41,18 +53,6 @@ const CustomerTripsTable = ({ trips }) => {
           </select>
         </div>
         
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
-          <div className="text-sm font-semibold">Total Trips</div>
-          <div className="text-2xl font-bold mt-1">{filteredTrips.length}</div>
-        </div>
-        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
-          <div className="text-sm font-semibold">Total Payment</div>
-          <div className="text-xl font-bold mt-1">Rs. {totalPayment.toLocaleString()}</div>
-        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -71,6 +71,8 @@ const CustomerTripsTable = ({ trips }) => {
             ))}
           </div>
         </div>
+
+        
 
       {/* Trips Table */}
       <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4">

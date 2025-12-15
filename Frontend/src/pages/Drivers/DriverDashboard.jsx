@@ -184,7 +184,7 @@
         <EditDriverForm
           driver={selectedDriver}
           onCancel={() => setShowEditForm(false)}
-          onSuccess={handleDriverUpdated}
+          onUpdated={handleDriverUpdated}
         />
       )}
 

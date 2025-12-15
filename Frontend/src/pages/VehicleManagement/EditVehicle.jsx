@@ -66,30 +66,30 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isConfirmed) return;
+  const updateVehicle = async () => {
+  setSaving(true);
+  setError(null);
 
-    setSaving(true);
-    setError(null);
+  try {
+    const token = localStorage.getItem("token");
+    const res = await api.put(
+      `/api/vehicles/${vehicle.vehicle_id}`,
+      vehicle,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.put(`/api/vehicles/${vehicle.vehicle_id}`, vehicle, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      onSuccess(res.data); // return updated vehicle
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to update vehicle");
-    } finally {
-      setSaving(false);
-      setIsConfirmed(false);
-    }
-  };
+    const updatedVehicle = res.data.data || res.data; // make sure full vehicle object
+    onSuccess(updatedVehicle);   // send full object to dashboard
+    onCancel();                  // close modal
+  } catch (err) {
+    setError(err.response?.data?.message || "Failed to update vehicle");
+  } finally {
+    setSaving(false);
+  }
+};
 
-  const handleConfirm = () => {
-    setIsConfirmed(true);
-  };
+
+
 
   if (loading)
     return <div className="flex justify-center items-center min-h-[300px] text-gray-500">Loading vehicle data...</div>;
@@ -111,7 +111,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
         <div className="absolute top-4 right-4">
           <ConfirmWrapper
-            onConfirm={handleConfirm}
+            onConfirm={updateVehicle}
             onCancel={() => setIsConfirmed(false)}
             message="Confirm Vehicle Update"
             additionalInfo="Please verify all vehicle details before submission."
@@ -145,7 +145,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form className="space-y-6">
         {/* Basic Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>

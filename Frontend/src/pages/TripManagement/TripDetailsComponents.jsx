@@ -437,3 +437,4 @@ export const Payments = ({ trip, formatCurrency, formatDate }) => (
     )}
   </InfoCard>
 );
+  

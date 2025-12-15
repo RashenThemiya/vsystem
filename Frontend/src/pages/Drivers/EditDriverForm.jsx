@@ -4,6 +4,9 @@ import api from "../../utils/axiosInstance";
 import { FaTimes, FaCheck } from "react-icons/fa";
 
 export default function EditDriverForm({ driver, onUpdated, onCancel }) {
+
+  //console.log("EditDriverForm props:", { driver, onUpdated, onCancel });
+
   const [form, setForm] = useState({ ...driver });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,16 +43,18 @@ export default function EditDriverForm({ driver, onUpdated, onCancel }) {
   };
 
   const handleSave = async () => {
-    if (nicError || phoneError) {
-      setError("Please fix validation errors before saving.");
-      return;
-    }
+  if (nicError || phoneError) {
+    setError("Please fix validation errors before saving.");
+    return;
+  }
 
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
-    try {
-      const updateData = {
+  try {
+    const response = await api.put(
+      `/api/drivers/${driver.driver_id}`,
+      {
         name: form.name,
         phone_number: form.phone_number,
         driver_charges: form.driver_charges,
@@ -58,31 +63,39 @@ export default function EditDriverForm({ driver, onUpdated, onCancel }) {
         license_number: form.license_number,
         license_expiry_date: form.license_expiry_date,
         image: form.image,
-      };
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
-      const response = await api.put(
-        `/api/drivers/${driver.driver_id}`,
-        updateData,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+    const updatedDriver =
+      response.data?.data ||
+      response.data?.driver ||
+      response.data;
 
-      onUpdated(response.data.data);
-      setSuccessMsg("Driver updated successfully!");
+    onUpdated(updatedDriver); // ✅ NOW SAFE
+    setSuccessMsg("Driver updated successfully!");
 
-      setTimeout(() => {
-        setSuccessMsg("");
-        onCancel();
-      }, 1000);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to update driver.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setTimeout(() => {
+      setSuccessMsg("");
+      onCancel();
+    }, 1000);
+  } catch (err) {
+    console.error("Update driver error:", err);
+    console.error("Response data:", err.response?.data);
+    setError(err.response?.data?.message || "Failed to update driver.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     
-      <div className="bg-white p-3  w-full max-w-md overflow-auto relative">
+      <div className="bg-white p-3 h-220 w-full max-w-md overflow-auto relative">
 
         {/* Top Left: Close */}
         <div className="absolute top-3 left-3 z-10">
