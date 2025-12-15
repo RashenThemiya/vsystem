@@ -16,7 +16,7 @@ export default function CustomerTable({ customers = [], loading, error, onSelect
             <table className="min-w-full table-auto border-collapse">
               <thead className="bg-white sticky top-0 z-10 text-left text-sm text-gray-600 border-b">
                 <tr>
-                  <th className="py-3 px-4">Customer</th>
+                  <th className="">Customer</th>
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Phone</th>
                   <th className="py-3 px-4">NIC No</th>

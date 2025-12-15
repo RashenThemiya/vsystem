@@ -22,7 +22,9 @@ const CancelTripModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();   // close modal
-      alert("Trip Cancelled!");
+      setTimeout(() => {
+      alert("Trip Canceled!");
+    }, 100);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to cancel trip");

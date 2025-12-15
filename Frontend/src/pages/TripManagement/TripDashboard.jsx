@@ -200,6 +200,13 @@ export default function TripDashboard() {
               loading={loading}
               error={error}
               onSelectTrip={(trip) => navigate(`/trip/${trip.trip_id}`)}
+              onSelectDriver={(trip) => {
+                if (trip.driver?.driver_id) {
+                  navigate(`/driver-profile/${trip.driver?.driver_id}`);
+                }
+              }}
+              onSelectVehicle={(trip) => navigate(`/vehicles/${trip.vehicle?.vehicle_id}`)}
+              onSelectCustomer={(trip) => navigate(`/customer-profile/${trip.customer?.customer_id}`)}
               onStartTrip={openStartTripModal}
               onEndTrip={openEndTripModal}
             />

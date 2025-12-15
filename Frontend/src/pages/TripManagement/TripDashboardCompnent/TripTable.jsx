@@ -3,6 +3,9 @@ export default function TripTable({
   loading,
   error,
   onSelectTrip,
+  onSelectDriver,
+  onSelectVehicle,
+  onSelectCustomer,
   onStartTrip,
   onEndTrip,
 }) {
@@ -38,16 +41,25 @@ export default function TripTable({
                   <tr
                     key={t.trip_id}
                     className="hover:bg-gray-50 transition cursor-pointer"
-                    onClick={() => onSelectTrip(t)}
+                    
                   >
-                    <td className="px-4 py-4 text-blue-600 hover:underline">
+                    <td className="px-4 py-4 text-blue-600 hover:underline" onClick={() => onSelectTrip(t)}>
                       {t.trip_id}
                     </td>
                     <td className="px-4 py-4">{t.from_location}</td>
                     <td className="px-4 py-4">{t.to_location}</td>
-                    <td className="px-4 py-4">{t.customer?.name}</td>
-                    <td className="px-4 py-4">{t.vehicle?.name}</td>
-                    <td className="px-4 py-4">{t.driver?.name || "N/A"}</td>
+                    <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" 
+                        onClick={() => onSelectCustomer(t)}>{t.customer?.name}
+                        </td>
+                    <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" 
+                        onClick={() => onSelectVehicle(t)}>{t.vehicle?.name}
+                    </td>
+                    <td
+                        className="px-4 py-4 text-blue-600 hover:underline cursor-pointer"
+                        onClick={() => onSelectDriver(t)}
+                      >
+                        {t.driver?.name || "N/A"}
+                    </td>
                     <td className="px-4 py-4">{t.trip_status}</td>
                     <td className="px-4 py-4">{t.payment_status}</td>
                     <td className="px-4 py-4">

@@ -25,6 +25,19 @@ const TripsTab = ({
 
   return (
     <>
+    
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Trips</div>
+          <div className="text-2xl font-bold mt-2">{filteredTripsCount}</div>
+        </div>
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Earnings</div>
+          <div className="text-xl font-bold mt-2">Rs. {totalEarning.toLocaleString()}</div>
+          <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
+        </div>
+      </div>
+
       <div className="flex gap-2 items-center mb-4">
         <label className="text-sm font-semibold">Filter Trips by:</label>
         <select
@@ -58,17 +71,6 @@ const TripsTab = ({
             className="border px-2 py-1 rounded w-20"
           />
         )}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
-          <div className="text-md font-semibold opacity-100">Total Trips</div>
-          <div className="text-2xl font-bold mt-2">{filteredTripsCount}</div>
-        </div>
-        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
-          <div className="text-md font-semibold opacity-100">Total Earnings</div>
-          <div className="text-xl font-bold mt-2">Rs. {totalEarning.toLocaleString()}</div>
-          <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
-        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-3">

@@ -35,7 +35,7 @@ export default function VehicleTable({
               </thead>
 
               <tbody>
-                {vehicles.map((v) => (
+                {vehicles.filter(Boolean).map((v) => (
                   <tr
                     key={v.vehicle_id}
                     className="hover:bg-gray-50 cursor-pointer transition"
@@ -50,47 +50,22 @@ export default function VehicleTable({
                         </div>
                       </div>
                     </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.vehicle_number || "—"}
-                    </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.type || "—"}
-                    </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.ac_type || "—"}
-                    </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.fuel?.type || "—"}
-                    </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.rent_cost_daily || "—"}
-                    </td>
-
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.vehicle_number || "—"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.type || "—"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.ac_type || "—"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.fuel?.type || "—"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.rent_cost_daily || "—"}</td>
                     <td className="py-4 px-4 text-sm text-gray-600 align-top">
                       <span
                         className={`px-2 py-1 rounded-full text-white text-xs ${
-                          v.vehicle_availability === "Yes"
-                            ? "bg-green-500"
-                            : "bg-red-500"
+                          v.vehicle_availability === "Yes" ? "bg-green-500" : "bg-red-500"
                         }`}
                       >
-                        {v.vehicle_availability}
+                        {v.vehicle_availability || "—"}
                       </span>
                     </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.owner?.owner_name || "—"}
-                    </td>
-
-                    <td className="py-4 px-4 text-sm text-gray-600 align-top">
-                      {v.owner?.contact_number || "—"}
-                    </td>
-
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.owner?.owner_name || "—"}</td>
+                    <td className="py-4 px-4 text-sm text-gray-600 align-top">{v.owner?.contact_number || "—"}</td>
                     <td className="py-4 px-4 text-sm text-gray-600 align-top">
                       {v.mileage_costs?.length > 0 ? (
                         <ul className="list-disc ml-4">
@@ -107,6 +82,7 @@ export default function VehicleTable({
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
         </div>

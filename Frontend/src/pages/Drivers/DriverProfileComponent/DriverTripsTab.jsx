@@ -32,6 +32,20 @@ const DriverTripsTab = ({ trips }) => {
 
   return (
     <div className="flex flex-col gap-4">
+      
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
+          <div className="text-sm font-semibold">Total Trips</div>
+          <div className="text-2xl font-bold mt-1">{filteredTrips.length}</div>
+        </div>
+        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
+          <div className="text-sm font-semibold">Total Earnings</div>
+          <div className="text-xl font-bold mt-1">Rs. {totalEarning.toLocaleString()}</div>
+          <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <div>
@@ -45,19 +59,6 @@ const DriverTripsTab = ({ trips }) => {
           <select className="border p-2 rounded" value={month} onChange={e => setMonth(e.target.value)}>
             {months.map(m => <option key={m} value={m}>{m==="all"?"All Months":dayjs(`2025-${m}-01`).format("MMMM")}</option>)}
           </select>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
-          <div className="text-sm font-semibold">Total Trips</div>
-          <div className="text-2xl font-bold mt-1">{filteredTrips.length}</div>
-        </div>
-        <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600">
-          <div className="text-sm font-semibold">Total Earnings</div>
-          <div className="text-xl font-bold mt-1">Rs. {totalEarning.toLocaleString()}</div>
-          <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
         </div>
       </div>
 

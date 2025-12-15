@@ -18,7 +18,7 @@ const DriverSidebar = ({ driver, openImage, refreshDriver }) => {
       {/* Edit Modal */}
       {showEdit && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl w-[40%] max-w-lg relative max-h-[100vh] -mt-4">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl w-[40%] max-w-lg relative max-h-[110vh] -mt-4">
 
             <EditDriverForm
               driver={driver}

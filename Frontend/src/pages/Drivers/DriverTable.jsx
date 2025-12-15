@@ -13,18 +13,18 @@ export default function DriverTable({ drivers = [], loading, error, onSelectDriv
       ) : (
         // Scroll container for the table body; keeps header visible when rows scroll
         <div className="overflow-x-auto">
-          <div className="max-h-[420px] overflow-y-auto rounded">
+          <div className="max-h-[420px] overflow-y-auto">
             <table className="min-w-full table-fixed">
               <thead className="bg-white border-b">
                 <tr>
                   {/* set widths so columns align predictably */}
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/4 sticky top-0 z-20 bg-white">Driver</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">Phone Number</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">Driver Charges</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/8 sticky top-0 z-20 bg-white">NIC</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/12 sticky top-0 z-20 bg-white">Age</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">License No</th>
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 sticky top-0 z-20 bg-white">License Expiry</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/4 z-20 bg-white">Driver</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 z-20 bg-white">Phone Number</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 z-20 bg-white">Driver Charges</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/8  z-20 bg-white">NIC</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/12  z-20 bg-white">Age</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6  z-20 bg-white">License No</th>
+                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6  z-20 bg-white">License Expiry</th>
                 </tr>
               </thead>
 

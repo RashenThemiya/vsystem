@@ -34,7 +34,7 @@ const FuelEditModal = ({ open, onClose, fuel, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-white backdrop-blur-sm z-50 p-4">
       <div className="bg-white p-6 rounded shadow-xl w-80">
         <h2 className="text-xl font-semibold mb-4">Edit Fuel Cost</h2>
 
