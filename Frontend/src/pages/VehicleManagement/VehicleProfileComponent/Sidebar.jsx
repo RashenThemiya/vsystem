@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EditVehicleForm from "../EditVehicle";
 
-const Sidebar = ({ vehicle, openImage }) => {
+const Sidebar = ({ vehicle, openImage, refreshVehicle  }) => {
   const documents = [
     { label: "Vehicle", src: vehicle.image },
     { label: "License", src: vehicle.license_image },

@@ -68,7 +68,7 @@ const CostsTab = ({
       </div>
 
       {/* TABLE */}
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl">
+      <div className="overflow-x-auto bg-white shadow-md rounded-md">
         {!costs.length ? (
           <p className="p-4 text-center text-gray-500">No other costs found.</p>
         ) : (
@@ -85,7 +85,7 @@ const CostsTab = ({
               {costs.map((c) => (
                 <tr
                   key={c.vehicle_other_cost_id}
-                  className="border-b hover:bg-gray-50 transition"
+                  className=" hover:bg-gray-50 transition"
                 >
                   <td className="p-1">{c.vehicle_other_cost_id}</td>
                   <td className="p-1">{c.date?.split("T")[0]}</td>

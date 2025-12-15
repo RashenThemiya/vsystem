@@ -202,28 +202,52 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
         </div>
 
         {/* NIC Photos */}
-        {["nic_photo_front", "nic_photo_back"].map((key) => (
-          <div key={key}>
-            <label className="block text-gray-600 font-medium mb-1">
-              NIC Photo ({key.includes("front") ? "Front" : "Back"})
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {/* NIC Front */}
+  <div>
+    <label className="block text-gray-600 font-medium mb-1">
+      NIC Photo (Front)
+    </label>
 
-            {form[key] && (
-              <img
-                src={form[key]}
-                className="w-full h-32 object-cover rounded-lg border mb-2"
-                alt={key}
-              />
-            )}
+    {form.nic_photo_front && (
+      <img
+        src={form.nic_photo_front}
+        className="w-full h-32 object-cover rounded-lg border mb-2"
+        alt="NIC Front"
+      />
+    )}
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, key)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-        ))}
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => handleFileChange(e, "nic_photo_front")}
+      className="w-full p-2 border border-gray-300 rounded-lg"
+    />
+  </div>
+
+  {/* NIC Back */}
+  <div>
+    <label className="block text-gray-600 font-medium mb-1">
+      NIC Photo (Back)
+    </label>
+
+    {form.nic_photo_back && (
+      <img
+        src={form.nic_photo_back}
+        className="w-full h-32 object-cover rounded-lg border mb-2"
+        alt="NIC Back"
+      />
+    )}
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => handleFileChange(e, "nic_photo_back")}
+      className="w-full p-2 border border-gray-300 rounded-lg"
+    />
+  </div>
+</div>
+
 
       </form>
     </div>

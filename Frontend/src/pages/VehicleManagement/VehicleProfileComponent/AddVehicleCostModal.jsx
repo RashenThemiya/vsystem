@@ -49,7 +49,7 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-white/40 backdrop-blur-md flex justify-center items-center h-full overflow-auto z-50">
       <div className="bg-white w-96 p-6 rounded-xl shadow-xl relative">
 
         <button

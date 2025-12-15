@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext"; // adjust path if needed
+import { FaTimes } from "react-icons/fa";
+
 
 const AddOwner = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
@@ -104,7 +106,18 @@ const AddOwner = ({ onCancel, onSuccess }) => {
 
   return (
     <div className="flex justify-center items-center w-100 min-h-screen bg-white-100">
-      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md">
+      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md relative">
+        {/* Top Left: Close */}
+        <div className="absolute top-3 left-3 z-10">
+          <button
+            onClick={onCancel}
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+            title="Close"
+          >
+            <FaTimes size={16} />
+          </button>
+        </div>
+
         <h2 className="text-xl font-semibold mb-6 text-center">
           Add New Vehicle Owner
         </h2>
@@ -156,20 +169,20 @@ const AddOwner = ({ onCancel, onSuccess }) => {
           >
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+              className=" mt-5 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Owner"}
             </button>
           </ConfirmWrapper>
 
-          <button
+         {/* <button
             type="button"
              onClick={onCancel}
             className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
           >
             Cancel
-          </button>
+          </button>*/}
         </form>
       </div>
     </div>

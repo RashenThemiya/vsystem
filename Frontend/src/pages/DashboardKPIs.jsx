@@ -5,6 +5,8 @@ import ModalWrapper from "../components/ModelWrapper";
 
 import StatsCards from "./StatsCards";
 import FuelEditModal from "./FuelEditModal";
+import { useNavigate } from "react-router-dom";
+
 
 import {
   PieChart,
@@ -29,11 +31,10 @@ const COLORS = [
 ];
 
 const fuelColors = [
-  "#4410c6ff",
-  "#efd809ff",
-  "#be1717ff",
-  "#464440ff",
-  
+  "#312e81", // indigo
+  "#4f46e5", // indigo
+  "#7c3aed", // violet
+  "#c084fc", // violet-pink
 ];
 
 
@@ -49,6 +50,8 @@ export default function DashboardKPIs() {
 
   const [showFuelModal, setShowFuelModal] = useState(false);
   const [selectedFuel, setSelectedFuel] = useState(null);
+  const navigate = useNavigate();
+
 
   // Fetch KPIs
   const fetchKPIs = async () => {
@@ -122,7 +125,14 @@ export default function DashboardKPIs() {
 
           {/* Stats Cards */}
           <div className="mb-6">
-            <StatsCards stats={kpis} onStatusSelect={(status) => console.log("Filter:", status)} />
+            <StatsCards
+              stats={kpis}
+              onSelectTrips={() => navigate("/trip-dashboard")}
+              onSelectVehicles={() => navigate("/vehicle-dashboard")}
+              onSelectCustomers={() => navigate("/customer-dashboard")}
+              onSelectOwners={() => navigate("/owner-dashboard")}
+              onSelectPendingBills={() => navigate("/bill-dashboard")}
+            />
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6 mb-5">
@@ -219,7 +229,7 @@ export default function DashboardKPIs() {
           <div className="bg-white p-4 rounded-lg shadow mb-6">
             <h3 className="text-lg font-semibold mb-2">Fuel Prices (Click bar to edit)</h3>
             <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={kpis.fuelPrices}>
+            <BarChart data={kpis.fuelPrices} barCategoryGap={30}>
               <XAxis dataKey="type" />
               <YAxis />
               <Tooltip />
@@ -227,6 +237,7 @@ export default function DashboardKPIs() {
               <Bar
                 dataKey="cost"
                 name="Fuel Cost"
+                barSize={100}   
                 onClick={handleFuelClick}
               >
                 {kpis.fuelPrices.map((_, index) => (

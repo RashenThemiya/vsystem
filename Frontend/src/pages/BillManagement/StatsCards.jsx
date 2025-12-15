@@ -7,7 +7,7 @@ export default function BillStatsCards({ stats, onClick }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
       {cards.map((card, i) => (
         <div
           key={i}

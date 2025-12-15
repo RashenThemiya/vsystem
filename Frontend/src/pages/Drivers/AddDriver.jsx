@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
+import { FaTimes } from "react-icons/fa";
+
 
 const AddDriver = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
@@ -190,7 +192,19 @@ const AddDriver = ({ onCancel, onSuccess }) => {
 
   return (
     <div className="flex justify-center items-center w-100 min-h-screen bg-gray-100">
-      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md">
+      <div className="bg-white p-15 rounded-lg shadow-lg w-full h-full max-w-md relative">
+
+        {/* Top Left: Close */}
+<div className="absolute top-3 left-3 z-10">
+  <button
+    onClick={onCancel}
+    className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+    title="Close"
+  >
+    <FaTimes size={16} />
+  </button>
+</div>
+
         <h2 className="text-xl font-semibold mb-6 text-center">Add New Driver</h2>
 
         {error && (
@@ -315,20 +329,14 @@ const AddDriver = ({ onCancel, onSuccess }) => {
           >
             <button
               type="submit"
-              className="w-full py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:bg-blue-600"
+              className="mt-4 w-full py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:bg-blue-600"
               disabled={loading}
             >
               {loading ? "Adding..." : "Add Driver"}
             </button>
           </ConfirmWrapper>
 
-          <button
-            type="button"
-            onClick={onCancel}
-            className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg"
-          >
-            Cancel
-          </button>
+          
         </form>
       </div>
     </div>

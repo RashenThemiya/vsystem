@@ -243,7 +243,7 @@ const handleChange = (e) => {
     <div className="bg-gray-50 min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-semibold text-green-800 flex items-center gap-2">
+          <h2 className="text-3xl font-semibold text-violet-800 flex items-center gap-2">
             <FaMapMarkerAlt /> Trip Creation
           </h2>
           <button onClick={() => navigate("/trip-dashboard")} className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded transition">
@@ -287,7 +287,7 @@ const handleChange = (e) => {
               buttonBackgroundColor="bg-green-600"
               buttonTextColor="text-white"
             >
-              <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition mt-4" disabled={loading}>
+              <button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition mt-4" disabled={loading}>
                 {loading ? "Adding..." : "Add Trip"}
               </button>
             </ConfirmWrapper>
