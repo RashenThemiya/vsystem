@@ -19,4 +19,6 @@ export declare const updateDriverController: (req: Request, res: Response) => Pr
  * 🔴 Delete Driver
  */
 export declare const deleteDriverController: (req: Request, res: Response) => Promise<void>;
+export declare const getDriverTripsByStatusController: (req: Request, res: Response) => Promise<void>;
+export declare const getDriverDetailsOnlyController: (req: Request, res: Response) => Promise<void>;
 //# sourceMappingURL=driverController.d.ts.map

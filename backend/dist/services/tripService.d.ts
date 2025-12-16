@@ -199,6 +199,7 @@ export declare const getAllTripsService: (filters?: GetTripsFilter) => Promise<{
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: Prisma.Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         vehicle_fuel_efficiency: Prisma.Decimal | null;
         mileage_costs: {
@@ -211,7 +212,6 @@ export declare const getAllTripsService: (filters?: GetTripsFilter) => Promise<{
             fuel_id: number;
             cost: Prisma.Decimal;
         };
-        fuel_id: number;
     };
     map: {
         sequence: number;
@@ -300,6 +300,7 @@ export declare const getTripByIdService: (trip_id: number) => Promise<{
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: Prisma.Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: Prisma.Decimal;
         insurance_expiry_date: Date | null;
@@ -308,7 +309,6 @@ export declare const getTripByIdService: (trip_id: number) => Promise<{
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     } | null;
     driver_id: number | null;
     customer_id: number;

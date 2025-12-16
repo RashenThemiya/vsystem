@@ -28,6 +28,7 @@ export declare const createVehicleService: (data: any) => Promise<{
     vehicle_number: string;
     type: import(".prisma/client").$Enums.VehicleType;
     rent_cost_daily: import("@prisma/client/runtime/library.js").Decimal;
+    fuel_id: number;
     ac_type: import(".prisma/client").$Enums.AcType;
     owner_cost_monthly: import("@prisma/client/runtime/library.js").Decimal;
     license_image: import("@prisma/client/runtime/library.js").Bytes | null;
@@ -40,7 +41,6 @@ export declare const createVehicleService: (data: any) => Promise<{
     vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
     meter_number: number | null;
     last_service_meter_number: number | null;
-    fuel_id: number;
 }>;
 /**
  * Get all vehicles (no image data)
@@ -176,6 +176,7 @@ export declare const getVehicleByIdService: (id: number) => Promise<({
     vehicle_number: string;
     type: import(".prisma/client").$Enums.VehicleType;
     rent_cost_daily: import("@prisma/client/runtime/library.js").Decimal;
+    fuel_id: number;
     ac_type: import(".prisma/client").$Enums.AcType;
     owner_cost_monthly: import("@prisma/client/runtime/library.js").Decimal;
     license_image: import("@prisma/client/runtime/library.js").Bytes | null;
@@ -188,7 +189,6 @@ export declare const getVehicleByIdService: (id: number) => Promise<({
     vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
     meter_number: number | null;
     last_service_meter_number: number | null;
-    fuel_id: number;
 }) | null>;
 /**
  * Update vehicle
@@ -328,6 +328,7 @@ export declare const updateVehicleService: (id: number, data: AnyObj) => Promise
     vehicle_number: string;
     type: import(".prisma/client").$Enums.VehicleType;
     rent_cost_daily: import("@prisma/client/runtime/library.js").Decimal;
+    fuel_id: number;
     ac_type: import(".prisma/client").$Enums.AcType;
     owner_cost_monthly: import("@prisma/client/runtime/library.js").Decimal;
     license_image: import("@prisma/client/runtime/library.js").Bytes | null;
@@ -340,7 +341,6 @@ export declare const updateVehicleService: (id: number, data: AnyObj) => Promise
     vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
     meter_number: number | null;
     last_service_meter_number: number | null;
-    fuel_id: number;
 }) | null>;
 /**
  * Delete vehicle and all related data (GPS, mileage, etc.)

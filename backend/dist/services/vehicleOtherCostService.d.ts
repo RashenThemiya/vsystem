@@ -37,6 +37,7 @@ export declare const getAllVehicleCostsService: () => Promise<({
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: Prisma.Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: Prisma.Decimal;
         license_image: Prisma.Bytes | null;
@@ -49,7 +50,6 @@ export declare const getAllVehicleCostsService: () => Promise<({
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     };
     bill: {
         driver_id: number | null;
@@ -81,6 +81,7 @@ export declare const getVehicleCostByIdService: (id: number) => Promise<({
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: Prisma.Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: Prisma.Decimal;
         license_image: Prisma.Bytes | null;
@@ -93,7 +94,6 @@ export declare const getVehicleCostByIdService: (id: number) => Promise<({
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     };
     bill: {
         driver_id: number | null;
@@ -125,6 +125,7 @@ export declare const updateVehicleCostService: (id: number, data: VehicleCostUpd
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: Prisma.Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: Prisma.Decimal;
         license_image: Prisma.Bytes | null;
@@ -137,7 +138,6 @@ export declare const updateVehicleCostService: (id: number, data: VehicleCostUpd
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     };
     bill: {
         driver_id: number | null;
