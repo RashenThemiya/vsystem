@@ -199,6 +199,7 @@ const handleChange = (e) => {
   payment_status: trip.payment_status,
   trip_status: trip.trip_status,
   leaving_datetime: trip.leaving_datetime,
+  profit : Number(trip.profit || 0),
   estimated_return_datetime: trip.estimated_return_datetime,
   map_locations: (trip.map_locations || []).map((loc) => ({
     location_name: loc.location_name,
