@@ -451,6 +451,15 @@ export const CostSummary = ({ trip, formatCurrency, formatDate }) => {
           {formatCurrency(trip.total_actual_cost)}
         </div>
       </div>
+
+      <div className="mt-5 p-2 bg-gradient-to-r from-indigo-200 to-violet-200 border-l-4 border-indigo-600 rounded-xl flex items-center justify-between shadow-md">
+        <div className="text-md font-bold text-indigo-800">
+          Total Profit
+        </div>
+        <div className="text-xl font-bold text-indigo-900">
+          {formatCurrency(trip.profit)}
+        </div>
+      </div>
     </InfoCardSub>
   );
 };
