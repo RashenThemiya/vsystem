@@ -32,7 +32,7 @@ const TripActionButtons = ({
   const showComplete = tripStatus === "Ended";
   const showPrint = tripStatus === "Ended" || tripStatus === "Completed" || tripStatus === "Pending" || tripStatus === "Ongoing" || tripStatus === "Cancelled";
   const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing";
-  const showAlter = tripStatus !== "Completed" && tripStatus !== "Cancelled";
+  const showAlter = tripStatus == "Completed" || tripStatus == "Ended";
   const showAddPayment = tripStatus !== "Completed" && tripStatus !== "Cancelled";
   const showAddDamage = tripStatus !== "Completed" && tripStatus !== "Cancelled";
 

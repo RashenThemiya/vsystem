@@ -6,6 +6,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import Home from "./pages/Home";
+import CustomerProdileDashboard from './pages/CustomerProdileDashboard';
 
 
 
@@ -67,6 +68,10 @@ function App() {
               path="/admin-dashboard"
               element={<PrivateRoute><AdminDashboard /></PrivateRoute>}
             />
+            <Route
+              path="/Customer-ProdileDashboard"
+              element={<PrivateRoute><CustomerProdileDashboard /></PrivateRoute>}
+            />
            
             {/*<Route
               path="/vehicle-owner"
@@ -115,8 +120,8 @@ function App() {
             <Route path="/add-vehicle" element={<PrivateRoute><AddVehicle /></PrivateRoute>} />
             <Route path="/view-vehicles" element={<PrivateRoute><ViewVehicles /></PrivateRoute>} /> 
             <Route path="/vehicles/edit/:id" element={<PrivateRoute><EditVehicle /></PrivateRoute>} />*/}
-             <Route path="/vehicle-dashboard" element={<PrivateRoute><VehicleDashboard /></PrivateRoute>} />
-<Route path="/vehicles/:id" element={<PrivateRoute><VehicleProfile /></PrivateRoute>} />
+            <Route path="/vehicle-dashboard" element={<PrivateRoute><VehicleDashboard /></PrivateRoute>} />
+            <Route path="/vehicles/:id" element={<PrivateRoute><VehicleProfile /></PrivateRoute>} />
 
             {/* Trip Management Routes */}
          

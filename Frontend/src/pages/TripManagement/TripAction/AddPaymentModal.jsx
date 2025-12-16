@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
 import Swal from "sweetalert2";
 
-const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
+
+const AddPaymentModal = ({ open, onClose, tripId, onSuccess, paidAmount }) => {
   const [amount, setAmount] = useState("");
   const [paymentDate, setPaymentDate] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
         <input
           type="number"
           className="w-full border border-gray-300 rounded px-3 py-2 mb-3"
-          placeholder="Enter payment amount (Rs)"
+          placeholder={paidAmount ? `Due Amount: Rs ${paidAmount}` : "Enter payment amount (Rs)"}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
