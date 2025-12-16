@@ -316,16 +316,18 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
 
 
 /* ------------------ CostSummary ------------------ */
-export const CostSummary = ({ trip, formatCurrency, formatDate }) => {
+export const CostSummary = ({ trip, formatCurrency, formatDate, setDuePayment  }) => {
   if (!trip) return null;
 
   const actualCost = Number(trip.total_actual_cost || 0);
+  const estimateCost =Number(trip.total_estimated_cost || 0);
   const totalPaid = Number(trip.payment_amount || 0);
 
   const duePayment =
-    actualCost === 0 ? null : Math.max(actualCost - totalPaid, 0);
-
+    actualCost === 0 ? Math.max(estimateCost - totalPaid, 0) : Math.max(actualCost - totalPaid, 0);
+ setDuePayment && setDuePayment(duePayment);
   return (
+    
     <InfoCardSub title="Cost Summary">
       <div className="bg-gray-100 p-1 rounded-lg">
         <div className="flex flex-col gap-1 text-gray-600 font-medium">

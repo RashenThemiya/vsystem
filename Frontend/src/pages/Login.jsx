@@ -28,7 +28,7 @@ export default function PixelPerfectLogin() {
       setAuthData(token, admin.role, admin.email);
       if (admin.role === "Admin" || admin.role === "SuperAdmin") navigate("/admin-dashboard");
       else if (admin.role === "Driver") navigate("/driver-dashboard");
-      else if (admin.role === "Customer") navigate("/customer-dashboard");
+      else if (admin.role === "Customer") navigate(`/customer-profile/${admin.customer_id}`);
       else setError("Unknown role, cannot redirect.");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

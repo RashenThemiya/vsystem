@@ -46,6 +46,7 @@ const [showStartTripModal, setShowStartTripModal] = useState(false);
 const [showEndTripModal, setShowEndTripModal] = useState(false);
 const [showCancelModal, setShowCancelModal] = useState(false);
 
+const [duePayment, setDuePayment] = useState(0);
 
 
  
@@ -228,7 +229,10 @@ const [showCancelModal, setShowCancelModal] = useState(false);
  
 <AddPaymentModal
   open={showPaymentModal}
+  paidAmount={duePayment}
   tripId={trip.trip_id}
+
+  
   onClose={() => setShowPaymentModal(false)}
   onSuccess={fetchTrip}
 />
@@ -364,6 +368,8 @@ const [showCancelModal, setShowCancelModal] = useState(false);
           </InfoCardSub>
 
           <CostSummary
+            setDuePayment={setDuePayment}
+
             trip={trip}
             formatCurrency={formatCurrency}
             formatDate={formatDate}
