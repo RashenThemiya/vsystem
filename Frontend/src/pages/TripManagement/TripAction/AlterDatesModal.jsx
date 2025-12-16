@@ -1,6 +1,7 @@
 // AlterDatesModal.jsx
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
   const [leavingDate, setLeavingDate] = useState("");
@@ -29,9 +30,12 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();   // close modal
-      setTimeout(() => {
-      alert("Dates Updated!");
-    }, 100);
+      Swal.fire({
+              icon: "success",
+              title: "Dates updated",
+              timer: 2000,
+              showConfirmButton: true,
+            });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to update dates");

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FiUserPlus } from "react-icons/fi";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 const AddAdminRole = ({onClose, onSuccess}) => {
   const navigate = useNavigate();
@@ -74,51 +75,38 @@ const AddAdminRole = ({onClose, onSuccess}) => {
   };
 
   // Submit form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isConfirmed) return;
+  const handleSubmit = async () => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("token");
 
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
+    const payload = {
+      email: formData.email,
+      password: formData.password,
+      role: formData.role,
+      driver_id: formData.role === "Driver" ? formData.driver_id : null,
+      customer_id: formData.role === "Customer" ? formData.customer_id : null,
+    };
 
-      const payload = {
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
-        driver_id: formData.role === "Driver" ? formData.driver_id : null,
-        customer_id: formData.role === "Customer" ? formData.customer_id : null,
-      };
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/admin-roles`,
+      payload,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/admin-roles`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (res.status === 200 || res.status === 201) {
-        setSuccess(true);
-        onSuccess(res.data.data);
-        setTimeout(() => {
-          setSuccess(false);
-          
-        }, 2000);
-      }
-    } catch (err) {
-      console.error("Error creating admin role:", err);
-      setError(
-        err.response?.data?.message || "Failed to create admin role. Try again."
-      );
-    } finally {
-      setLoading(false);
-      setIsConfirmed(false);
+    if (res.status === 201 || res.status === 200) {
+      const newAdmin = res.data.data?.admin || res.data.data;
+      onSuccess(newAdmin);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Failed to create admin role");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleConfirm = () => {
     setIsConfirmed(true);
@@ -131,8 +119,41 @@ const AddAdminRole = ({onClose, onSuccess}) => {
 
   return (
     <div className="flex justify-center items-center w-100 min-h-screen bg-white-100">
-      <div className="bg-white p-10 rounded-lg shadow-lg  h-full w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-6 text-center">
+      <div className="bg-white p-10 rounded-lg shadow-lg  h-full w-full max-w-lg relative">
+        
+        {/* Top Buttons */}
+                <div className="absolute top-4 left-4">
+                  <button
+                    onClick={onClose}
+                    className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 shadow"
+                    title="Close"
+                  >
+                    <FaTimes size={18} />
+                  </button>
+                </div>
+                {/* Confirm Wrapper */}
+                 <div className="absolute top-4 right-4">
+          <ConfirmWrapper
+            onConfirm={handleSubmit}
+            onCancel={handleCancelConfirm}
+            message="Confirm Creating Admin Role"
+            additionalInfo="Please double-check the email, password, and role details."
+            confirmText="Yes, Create"
+            cancelText="No, Cancel"
+            icon={<FiUserPlus />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
+          >
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+              disabled={loading}
+            >
+              <FaCheck size={18} />
+            </button>
+          </ConfirmWrapper>
+          </div>
+        <h2 className=" mt-2 text-xl font-semibold mb-8 text-center">
           Create New Admin Role
         </h2>
 
@@ -231,34 +252,8 @@ const AddAdminRole = ({onClose, onSuccess}) => {
             </select>
           )}
 
-          {/* Confirm Wrapper */}
-          <ConfirmWrapper
-            onConfirm={handleConfirm}
-            onCancel={handleCancelConfirm}
-            message="Confirm Creating Admin Role"
-            additionalInfo="Please double-check the email, password, and role details."
-            confirmText="Yes, Create"
-            cancelText="No, Cancel"
-            icon={<FiUserPlus />}
-            buttonBackgroundColor="bg-blue-600"
-            buttonTextColor="text-white"
-          >
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-              disabled={loading}
-            >
-              {loading ? "Creating..." : "Create Admin Role"}
-            </button>
-          </ConfirmWrapper>
+          
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full mt-2 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition duration-300"
-          >
-            Cancel
-          </button>
         </form>
       </div>
     </div>

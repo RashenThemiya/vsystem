@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const TripCompleteModal = ({ open, onClose, tripId, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -21,9 +22,12 @@ const TripCompleteModal = ({ open, onClose, tripId, onSuccess }) => {
       );
       onSuccess(); // refresh trip
       onClose();
-      setTimeout(() => {
-      alert("Trip Completed!");
-    }, 100);
+      Swal.fire({
+              icon: "success",
+              title: "Trip Completed",
+              timer: 2000,
+              showConfirmButton: true,
+            });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to complete trip");

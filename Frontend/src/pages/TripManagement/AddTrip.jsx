@@ -166,7 +166,7 @@ const handleChange = (e) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isConfirmed) return;
+    if (!isConfirmed || loading) return;
 
     setLoading(true);
     setError(null);
@@ -241,6 +241,16 @@ const handleChange = (e) => {
 
   return (
     <div className="bg-gray-50 min-h-screen p-6">
+      {loading && (
+  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Adding trip...
+      </p>
+    </div>
+  </div>
+)}
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-semibold text-violet-800 flex items-center gap-2">

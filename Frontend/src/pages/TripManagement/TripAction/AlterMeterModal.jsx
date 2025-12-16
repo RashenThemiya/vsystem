@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
   const [startMeter, setStartMeter] = useState("");
   const [endMeter, setEndMeter] = useState("");
   const [loading, setLoading] = useState(false);
+  
 
   if (!open) return null;
 
@@ -28,9 +30,12 @@ const AlterMeterModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess();
       onClose();
-      setTimeout(() => {
-      alert("Meter Readings Updated!");
-    }, 100);
+      Swal.fire({
+        icon: "success",
+        title: "Meter readings updated",
+        timer: 2000,
+        showConfirmButton: true,
+      });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to update meter readings");

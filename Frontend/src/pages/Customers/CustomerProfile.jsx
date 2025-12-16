@@ -29,7 +29,14 @@ const CustomerProfile = () => {
   useEffect(() => {
     fetchCustomer();
   }, [customerId]);
-  if (loading) return <p className="p-6 text-center">Loading...</p>;
+  if (loading) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Loading customer details...
+      </p>
+    </div>
+  </div>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
   if (!customer) return <p className="p-6 text-center">Customer not found.</p>;
 

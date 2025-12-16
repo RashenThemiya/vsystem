@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const EndTripModal = ({ open, tripId, currentMeter, onClose, onSuccess }) => {
   const [endMeter, setEndMeter] = useState(currentMeter || "");
@@ -25,9 +26,12 @@ const EndTripModal = ({ open, tripId, currentMeter, onClose, onSuccess }) => {
       );
       onSuccess();
       onClose();
-      setTimeout(() => {
-      alert("Trip Ended!");
-    }, 100);
+      Swal.fire({
+              icon: "success",
+              title: "Trip Ended",
+              timer: 2000,
+              showConfirmButton: true,
+            });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to end trip");

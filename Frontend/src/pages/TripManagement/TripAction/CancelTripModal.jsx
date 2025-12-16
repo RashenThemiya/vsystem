@@ -1,6 +1,7 @@
 // CancelTripModal.jsx
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const CancelTripModal = ({ open, onClose, tripId, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -22,9 +23,12 @@ const CancelTripModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();   // close modal
-      setTimeout(() => {
-      alert("Trip Canceled!");
-    }, 100);
+      Swal.fire({
+              icon: "success",
+              title: "Trip Cancelled",
+              timer: 2000,
+              showConfirmButton: true,
+            });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to cancel trip");
