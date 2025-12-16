@@ -51,8 +51,8 @@ import CustomerProfile from './pages/Customers/CustomerProfile';
 import BillDashboard from './pages/BillManagement/Billdashboard';
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    
+     
         <div className="min-h-screen bg-gray-100">
           <Routes>
             {/* Public routes */}
@@ -141,8 +141,8 @@ function App() {
           </Routes>
           <ToastContainer />
         </div>
-      </Router>
-    </AuthProvider>
+      
+   
   );
 }
 

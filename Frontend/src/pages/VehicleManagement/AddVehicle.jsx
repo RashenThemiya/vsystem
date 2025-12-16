@@ -93,8 +93,6 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isConfirmed) return;
-
     setLoading(true);
     setError(null);
 
@@ -144,28 +142,32 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
           </button>
         </div>
 
-        <div className="absolute top-4 right-4">
-          <ConfirmWrapper
-            onConfirm={handleConfirm}
-            onCancel={() => setIsConfirmed(false)}
-            message="Confirm Adding Vehicle"
-            additionalInfo="Please verify all vehicle details before submission."
-            confirmText="Yes, Add Vehicle"
-            cancelText="No, Go Back"
-            icon={<FaCarSide />}
-            buttonBackgroundColor="bg-green-600"
-            buttonTextColor="text-white"
-          >
-            <button
-              type="submit"
-              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
-              disabled={loading}
-              title="Confirm"
-            >
-              <FaCheck size={18} />
-            </button>
-          </ConfirmWrapper>
-        </div>
+       <div className="absolute top-4 right-4">
+  <ConfirmWrapper
+    onConfirm={() => {
+      document
+        .getElementById("add-vehicle-form")
+        ?.requestSubmit();
+    }}
+    message="Confirm Adding Vehicle"
+    additionalInfo="Please verify all vehicle details before submission."
+    confirmText="Yes, Add Vehicle"
+    cancelText="No, Go Back"
+    icon={<FaCarSide />}
+    buttonBackgroundColor="bg-green-600"
+    buttonTextColor="text-white"
+  >
+    <button
+      type="button"
+      className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+      disabled={loading}
+      title="Confirm"
+    >
+      <FaCheck size={18} />
+    </button>
+  </ConfirmWrapper>
+</div>
+
 
         {/* Title */}
         <h2 className="text-xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
@@ -185,7 +187,11 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
         )}
 
         {/* Form */}
-         <form onSubmit={handleSubmit} className="space-y-6">
+<form
+  id="add-vehicle-form"
+  onSubmit={handleSubmit}
+  className="space-y-6"
+>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="label">Vehicle Number</label>
