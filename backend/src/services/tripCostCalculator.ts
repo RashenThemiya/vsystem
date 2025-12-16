@@ -18,6 +18,7 @@ export interface ActualCostResult {
   driverCost: number;
   otherCosts: number;
   discountApplied: number;
+  profit: number;
 }
 
 export type TripWithRelations = Trip & {
@@ -86,6 +87,8 @@ export const calculateActualTripCost = (
   if (discount > grossTripAmount) discount = grossTripAmount;
 
   const totalActualCost = grossTripAmount - discount + damageCost;
+  const actualCosts = vehicleDaily * numDays + driverCost + otherCosts + fuelCost;
+  const profit = grossTripAmount - actualCosts - discount;
 
   return {
     actualDistance,
@@ -97,5 +100,6 @@ export const calculateActualTripCost = (
     driverCost,
     otherCosts,
     discountApplied: discount,
+    profit,
   };
 };

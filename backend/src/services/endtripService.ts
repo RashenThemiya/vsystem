@@ -45,6 +45,7 @@ export const endTripService = async (trip_id: number, data: EndTripDTO) => {
       actual_days: costData.actualDays,
       total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
       trip_status: "Ended",
+      profit: new Prisma.Decimal(costData.profit),
     },
   });
 
@@ -116,7 +117,9 @@ export const addDamageCostService = async (
     data: {
       damage_cost: new Prisma.Decimal(newDamageCostNumber),
       total_actual_cost: new Prisma.Decimal(newTotalCost),
+      profit: new Prisma.Decimal(costData.profit),
       payment_status: paymentStatus,
+
     },
   });
 
@@ -161,6 +164,7 @@ export const updateTripDatesService = async (
     data: {
       leaving_datetime: leavingDate,
       actual_return_datetime: actualReturnDate,
+
     },
     include: {
       vehicle: true,
@@ -215,6 +219,9 @@ export const updateTripDatesService = async (
       total_actual_cost: new Prisma.Decimal(newTotalCost),
       actual_days: actualDays,
       payment_status: paymentStatus,
+      profit: new Prisma.Decimal(costData.profit),
+      
+      
     },
   });
 
@@ -298,6 +305,7 @@ export const updateTripMeterService = async (
       total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
       actual_distance: new Prisma.Decimal(costData.actualDistance),
       payment_status: paymentStatus,
+      profit: new Prisma.Decimal(costData.profit),
     },
   });
 

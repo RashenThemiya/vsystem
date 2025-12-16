@@ -15,3 +15,4 @@ sudo certbot --nginx -d test.sceniccottage.com
 docker-compose down
 docker-compose up -d
 ssh -i "C:\Users\Rashen\Downloads\vehcile_rent_system.pem" ubuntu@3.17.179.15
+https://rashen.sceniccottage.com

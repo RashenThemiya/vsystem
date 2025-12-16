@@ -144,7 +144,8 @@ model Trip {
   total_actual_cost          Decimal?   @db.Decimal(10,2)
   payment_status             PaymentStatus
   trip_status                TripStatus
-  additional_mileage_cost    Decimal?   @db.Decimal(10,2)  // per km after limit
+  additional_mileage_cost    Decimal?   @db.Decimal(10,2)
+  profit                     Decimal?   @db.Decimal(10,2)  // per km after limit
   fuel_cost                  Decimal?   @db.Decimal(10,2)  // total estimated fuel cost
   driver_cost                Decimal?   @db.Decimal(10,2)  // driver charge
   vehicle_rent_daily         Decimal?   @db.Decimal(10,2)
