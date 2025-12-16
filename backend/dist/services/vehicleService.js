@@ -201,7 +201,9 @@ export const updateVehicleService = async (id, data) => {
         if (data[k] !== undefined)
             scalarUpdate[k] = cast ? Number(data[k]) : data[k];
     };
-    // Core vehicle updates
+    // =========================
+    // 1️⃣ Core vehicle updates
+    // =========================
     if (data.vehicle_number !== undefined)
         scalarUpdate.vehicle_number = String(data.vehicle_number);
     if (data.name !== undefined)
@@ -215,31 +217,40 @@ export const updateVehicleService = async (id, data) => {
         scalarUpdate.ac_type = data.ac_type;
     maybeSetNumber("owner_cost_monthly");
     if (data.license_expiry_date !== undefined)
-        scalarUpdate.license_expiry_date = data.license_expiry_date ? new Date(data.license_expiry_date) : null;
+        scalarUpdate.license_expiry_date = data.license_expiry_date
+            ? new Date(data.license_expiry_date)
+            : null;
     if (data.insurance_expiry_date !== undefined)
-        scalarUpdate.insurance_expiry_date = data.insurance_expiry_date ? new Date(data.insurance_expiry_date) : null;
+        scalarUpdate.insurance_expiry_date = data.insurance_expiry_date
+            ? new Date(data.insurance_expiry_date)
+            : null;
     if (data.eco_test_expiry_date !== undefined)
-        scalarUpdate.eco_test_expiry_date = data.eco_test_expiry_date ? new Date(data.eco_test_expiry_date) : null;
+        scalarUpdate.eco_test_expiry_date = data.eco_test_expiry_date
+            ? new Date(data.eco_test_expiry_date)
+            : null;
     if (data.vehicle_fuel_efficiency !== undefined)
         scalarUpdate.vehicle_fuel_efficiency =
-            data.vehicle_fuel_efficiency !== null ? Number(data.vehicle_fuel_efficiency) : null;
+            data.vehicle_fuel_efficiency !== null
+                ? Number(data.vehicle_fuel_efficiency)
+                : null;
     if (data.vehicle_availability !== undefined)
         scalarUpdate.vehicle_availability = data.vehicle_availability;
-    scalarUpdate.meter_number =
-        data.meter_number !== undefined
-            ? data.meter_number === null
+    if (data.meter_number !== undefined)
+        scalarUpdate.meter_number =
+            data.meter_number === null ? null : Number(data.meter_number);
+    if (data.last_service_meter_number !== undefined)
+        scalarUpdate.last_service_meter_number =
+            data.last_service_meter_number === null
                 ? null
-                : Number(data.meter_number)
-            : undefined;
-    scalarUpdate.last_service_meter_number =
-        data.last_service_meter_number !== undefined
-            ? data.last_service_meter_number === null
-                ? null
-                : Number(data.last_service_meter_number)
-            : undefined;
+                : Number(data.last_service_meter_number);
     if (data.owner_id !== undefined)
-        scalarUpdate.owner_id = data.owner_id !== null ? Number(data.owner_id) : null;
-    // images (convert base64 → Buffer)
+        scalarUpdate.owner_id =
+            data.owner_id === null ? null : Number(data.owner_id);
+    // =========================
+    // 2️⃣ IMAGE HANDLING (SAFE)
+    // =========================
+    // ✅ Update ONLY if base64 string is provided
+    // ❌ null / undefined → keep old image
     const imageFields = [
         "image",
         "license_image",
@@ -247,29 +258,37 @@ export const updateVehicleService = async (id, data) => {
         "eco_test_image",
         "book_image",
     ];
-    for (const f of imageFields) {
-        if (data[f] !== undefined)
-            scalarUpdate[f] = toBufferIfBase64(data[f]);
+    for (const field of imageFields) {
+        if (typeof data[field] === "string" &&
+            data[field].trim() !== "") {
+            scalarUpdate[field] = Buffer.from(data[field], "base64");
+        }
     }
-    // (1) Update main vehicle
+    // =========================
+    // 3️⃣ Update main vehicle
+    // =========================
     await prisma.vehicle.update({
         where: { vehicle_id: id },
         data: scalarUpdate,
     });
-    // (2) Handle GPS — update or create
+    // =========================
+    // 4️⃣ GPS update or create
+    // =========================
     if (data.tracker_id !== undefined ||
         data.gps_latitude !== undefined ||
         data.gps_longitude !== undefined) {
-        const existingGPS = await prisma.gPS.findFirst({ where: { vehicle_id: id } });
-        const gpsPayload = {};
+        const existingGPS = await prisma.gPS.findFirst({
+            where: { vehicle_id: id },
+        });
+        const gpsPayload = {
+            recorded_at: new Date(),
+        };
         if (data.tracker_id !== undefined)
             gpsPayload.tracker_id = String(data.tracker_id);
         if (data.gps_latitude !== undefined)
             gpsPayload.latitude = Number(data.gps_latitude);
         if (data.gps_longitude !== undefined)
             gpsPayload.longitude = Number(data.gps_longitude);
-        // Always update timestamp
-        gpsPayload.recorded_at = new Date();
         if (existingGPS) {
             await prisma.gPS.update({
                 where: { gps_id: existingGPS.gps_id },
@@ -279,7 +298,6 @@ export const updateVehicleService = async (id, data) => {
         else if (gpsPayload.tracker_id &&
             gpsPayload.latitude !== undefined &&
             gpsPayload.longitude !== undefined) {
-            // Only create if all required GPS fields are available
             await prisma.gPS.create({
                 data: {
                     tracker_id: gpsPayload.tracker_id,
@@ -291,8 +309,11 @@ export const updateVehicleService = async (id, data) => {
             });
         }
     }
-    // (3) Handle mileage_costs
-    if (data.mileage_cost !== undefined || data.mileage_cost_additional !== undefined) {
+    // =========================
+    // 5️⃣ Mileage cost update
+    // =========================
+    if (data.mileage_cost !== undefined ||
+        data.mileage_cost_additional !== undefined) {
         const existingMileage = await prisma.mileage_Cost.findFirst({
             where: { vehicle_id: id },
         });
@@ -317,9 +338,10 @@ export const updateVehicleService = async (id, data) => {
             });
         }
     }
-    // (4) Handle owner update if provided
-    if (data.owner && data.owner.owner_id) {
-        const ownerId = Number(data.owner.owner_id);
+    // =========================
+    // 6️⃣ Owner update (optional)
+    // =========================
+    if (data.owner?.owner_id) {
         const ownerPayload = {};
         if (data.owner.owner_name !== undefined)
             ownerPayload.owner_name = String(data.owner.owner_name);
@@ -327,16 +349,14 @@ export const updateVehicleService = async (id, data) => {
             ownerPayload.contact_number = String(data.owner.contact_number);
         if (Object.keys(ownerPayload).length > 0) {
             await prisma.owner.update({
-                where: { owner_id: ownerId },
+                where: { owner_id: Number(data.owner.owner_id) },
                 data: ownerPayload,
-            });
-            await prisma.vehicle.update({
-                where: { vehicle_id: id },
-                data: { owner_id: ownerId },
             });
         }
     }
-    // (5) Return updated full vehicle
+    // =========================
+    // 7️⃣ Return updated vehicle
+    // =========================
     return prisma.vehicle.findUnique({
         where: { vehicle_id: id },
         include: {

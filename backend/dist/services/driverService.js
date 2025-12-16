@@ -63,12 +63,7 @@ export const createDriverService = async (data) => {
  * ✅ Get all drivers (with base64 images)
  */
 export const getAllDriversService = async () => {
-    const drivers = await prisma.driver.findMany({
-        include: {
-            trips: true,
-            bill_uploads: true,
-        },
-    });
+    const drivers = await prisma.driver.findMany({});
     return drivers.map((d) => ({
         ...d,
         image: fromPrismaBytes(d.image),
@@ -140,5 +135,65 @@ export const updateDriverService = async (id, data) => {
 export const deleteDriverService = async (id) => {
     await prisma.driver.delete({ where: { driver_id: id } });
     return true;
+};
+export const getDriverTripsByStatusService = async (driverId, status) => {
+    return prisma.trip.findMany({
+        where: {
+            driver_id: driverId,
+            trip_status: status,
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+        select: {
+            trip_id: true,
+            from_location: true,
+            to_location: true,
+            leaving_datetime: true,
+            estimated_return_datetime: true,
+            actual_return_datetime: true,
+            trip_status: true,
+            payment_status: true,
+            total_estimated_cost: true,
+            total_actual_cost: true,
+            created_at: true,
+            // ✅ Customer (NO NIC images)
+            customer: {
+                select: {
+                    customer_id: true,
+                    name: true,
+                    phone_number: true,
+                    email: true,
+                },
+            },
+            // ✅ Vehicle (NO images)
+            vehicle: {
+                select: {
+                    vehicle_id: true,
+                    vehicle_number: true,
+                    name: true,
+                    type: true,
+                },
+            },
+        },
+    });
+};
+export const getDriverDetailsOnlyService = async (id) => {
+    const driver = await prisma.driver.findUnique({
+        where: { driver_id: id },
+        select: {
+            driver_id: true,
+            name: true,
+            phone_number: true,
+            driver_charges: true,
+            nic: true,
+            age: true,
+            license_number: true,
+            license_expiry_date: true,
+        },
+    });
+    if (!driver)
+        throw new Error("Driver not found");
+    return driver;
 };
 //# sourceMappingURL=driverService.js.map

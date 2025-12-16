@@ -14,6 +14,7 @@ export declare const getAllOwnersService: () => Promise<({
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: import("@prisma/client/runtime/library.js").Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: import("@prisma/client/runtime/library.js").Decimal;
         license_image: import("@prisma/client/runtime/library.js").Bytes | null;
@@ -26,7 +27,6 @@ export declare const getAllOwnersService: () => Promise<({
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     }[];
 } & {
     owner_id: number;
@@ -43,6 +43,7 @@ export declare const getOwnerByIdService: (id: number) => Promise<({
         vehicle_number: string;
         type: import(".prisma/client").$Enums.VehicleType;
         rent_cost_daily: import("@prisma/client/runtime/library.js").Decimal;
+        fuel_id: number;
         ac_type: import(".prisma/client").$Enums.AcType;
         owner_cost_monthly: import("@prisma/client/runtime/library.js").Decimal;
         license_image: import("@prisma/client/runtime/library.js").Bytes | null;
@@ -55,7 +56,6 @@ export declare const getOwnerByIdService: (id: number) => Promise<({
         vehicle_availability: import(".prisma/client").$Enums.AvailabilityStatus;
         meter_number: number | null;
         last_service_meter_number: number | null;
-        fuel_id: number;
     }[];
 } & {
     owner_id: number;

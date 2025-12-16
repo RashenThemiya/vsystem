@@ -5,7 +5,7 @@ import { authorizeRoles } from "../middlewares/role.middleware.js";
 const router = Router();
 router.use(authenticate);
 router.post("/", authorizeRoles("SuperAdmin"), createVehicleController);
-router.get("/", authorizeRoles("SuperAdmin", "Admin", "Manager"), getAllVehiclesController);
+router.get("/", authorizeRoles("SuperAdmin", "Admin", "Driver"), getAllVehiclesController);
 router.get("/:id", authorizeRoles("SuperAdmin", "Admin", "Manager"), getVehicleByIdController);
 router.put("/:id", authorizeRoles("SuperAdmin"), updateVehicleController);
 router.delete("/:id", authorizeRoles("SuperAdmin"), deleteVehicleController);

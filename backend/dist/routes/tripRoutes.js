@@ -16,9 +16,9 @@ router.put("/:id", authorizeRoles("Admin", "SuperAdmin"), updateTripController);
 router.delete("/:id", authorizeRoles("Admin", "SuperAdmin"), deleteTripController);
 // ----------------- Trip Lifecycle Routes -----------------
 // Start trip (change status: Pending -> Ongoing, update vehicle & trip start_meter)
-router.patch("/:id/start", authorizeRoles("Admin", "SuperAdmin"), startTripController);
+router.patch("/:id/start", authorizeRoles("Admin", "SuperAdmin", "Driver"), startTripController);
 // End trip (change status: Ongoing -> Ended, update vehicle meter, actual distance, cost, etc.)
-router.patch("/:id/end", authorizeRoles("Admin", "SuperAdmin"), endTripController);
+router.patch("/:id/end", authorizeRoles("Admin", "SuperAdmin", "Driver"), endTripController);
 router.patch("/:id/damage", authorizeRoles("Admin", "SuperAdmin"), addDamageCostController);
 router.post("/:id/payment", authorizeRoles("Admin", "SuperAdmin"), addTripPaymentController);
 router.patch("/:id/update-dates", authorizeRoles("Admin", "SuperAdmin"), updateTripDatesController);
