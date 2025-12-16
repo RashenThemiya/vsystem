@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
   const [amount, setAmount] = useState("");
@@ -31,9 +32,12 @@ const AddPaymentModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // Refresh trip details
       onClose();
-       setTimeout(() => {
-      alert("Payment Added!");
-    }, 100);
+       Swal.fire({
+               icon: "success",
+               title: "Payment Added",
+               timer: 2000,
+               showConfirmButton: true,
+             });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to add payment");

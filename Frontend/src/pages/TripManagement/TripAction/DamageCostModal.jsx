@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../../../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const DamageCostModal = ({ open, onClose, tripId, onSuccess }) => {
   const [amount, setAmount] = useState("");
@@ -24,9 +25,12 @@ const DamageCostModal = ({ open, onClose, tripId, onSuccess }) => {
 
       onSuccess(); // refresh trip
       onClose();
-      setTimeout(() => {
-      alert("Damage Cost Added!");
-    }, 100);
+      Swal.fire({
+              icon: "success",
+              title: "Damage cost added",
+              timer: 2000,
+              showConfirmButton: true,
+            });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to add damage cost");

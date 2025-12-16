@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext"; // adjust path if needed
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 
 const AddOwner = ({ onCancel, onSuccess }) => {
@@ -117,6 +117,27 @@ const AddOwner = ({ onCancel, onSuccess }) => {
             <FaTimes size={16} />
           </button>
         </div>
+        <div className="absolute top-4 right-4">
+        <ConfirmWrapper
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+            message="Confirm Adding Vehicle Owner"
+            additionalInfo="Please verify the details before submission."
+            confirmText="Yes, Add Owner"
+            cancelText="No, Go Back"
+            icon={<FiUserPlus />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
+          >
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+              disabled={loading}
+            >
+              <FaCheck size={18} />
+            </button>
+          </ConfirmWrapper>
+        </div>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
           Add New Vehicle Owner
@@ -156,25 +177,7 @@ const AddOwner = ({ onCancel, onSuccess }) => {
           />
           {phoneError && <p className="text-red-600 text-sm mt-1">{phoneError}</p>}
 
-          <ConfirmWrapper
-            onConfirm={handleConfirm}
-            onCancel={handleCancel}
-            message="Confirm Adding Vehicle Owner"
-            additionalInfo="Please verify the details before submission."
-            confirmText="Yes, Add Owner"
-            cancelText="No, Go Back"
-            icon={<FiUserPlus />}
-            buttonBackgroundColor="bg-blue-600"
-            buttonTextColor="text-white"
-          >
-            <button
-              type="submit"
-              className=" mt-5 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Owner"}
-            </button>
-          </ConfirmWrapper>
+          
 
          {/* <button
             type="button"

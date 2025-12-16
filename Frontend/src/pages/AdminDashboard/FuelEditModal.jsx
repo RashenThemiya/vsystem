@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "../utils/axiosInstance";
+import api from "../../utils/axiosInstance";
 
 const FuelEditModal = ({ open, onClose, fuel, onSuccess }) => {
   const [cost, setCost] = useState(fuel?.cost || "");

@@ -181,7 +181,7 @@ export default function DriverDetails({ driver, onClose, onDelete, onUpdated }) 
                   <img
                     src={driver.image}
                     alt="Driver"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer"
                   />
                 ) : (
                   <span className="text-3xl font-bold text-gray-700">

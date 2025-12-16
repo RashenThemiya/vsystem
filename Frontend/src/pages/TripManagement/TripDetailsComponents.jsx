@@ -316,91 +316,145 @@ export const VehicleDetails = ({ trip, isBase64 }) => {
 
 
 /* ------------------ CostSummary ------------------ */
-export const CostSummary = ({ trip, formatCurrency,formatDate  }) => (
-  <InfoCardSub title="Cost Summary">
-    <div className="bg-gray-100 p-1 rounded-lg">
-    <div className="flex flex-col gap-1 text-gray-600 font-medium">
-      {[
-        ["Vehicle Rent (Daily)", trip.vehicle_rent_daily],
-        ["Driver Cost", trip.driver_cost],
-        ["Mileage Extra Cost", trip.additional_mileage_cost],
-        ["Mileage Cost (Applied)", trip.mileage_cost],
-        ["Discount", trip.discount],
-        ["Damage Cost", trip.damage_cost],
-      ].map(([label, val], idx) => (
-        <OneColumnRow key={idx} label={label} value={formatCurrency(val)} />
-      ))}
-    </div>
-    </div>
-    
-    {trip.other_trip_costs?.length > 0 && (
-      <div className="mt-4">
-        <h3 className="text-sm font-semibold mb-2">Other Trip Costs</h3>
-        <ul className="text-sm list-disc ml-5 space-y-1">
-          {trip.other_trip_costs.map((c) => (
-            <li key={c.trip_other_cost_id}>
-              {c.cost_type}: <span className="font-medium">{formatCurrency(c.cost_amount)}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-    <br></br>
-    <h3 className="text-xl font-bold text-gray-800">Payments</h3>
-    <div className="border-b pb-2 mb-4"></div>
-    <div className="bg-gray-100 p-1 rounded-lg">
-    <div className="flex flex-col gap-1 text-gray-600 font-medium">
-      <OneColumnRow label="Advance Payment" value={formatCurrency(trip.advance_payment)} />
-      <OneColumnRow label="Payment Amount" value={formatCurrency(trip.payment_amount)} />
-      <OneColumnRow
-        label="Payment Status"
-        value={
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              trip.payment_status === "Paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
-          >
-            {trip.payment_status}
-          </span>
-        }
-      />
-    </div>
-    </div>
+export const CostSummary = ({ trip, formatCurrency, formatDate }) => {
+  if (!trip) return null;
 
-    {trip.payments?.length > 0 && (
-      <div className="mt-4">
-        <h4 className="text-sm font-semibold mb-2">All Payments</h4>
-        <ul className="text-sm list-disc ml-5 space-y-1">
-          {trip.payments.map((p) => (
-            <li key={p.payment_id}>
-              <span className="font-medium">{formatCurrency(p.amount)}</span>{" "}
-              <span className="text-gray-500 text-xs">({formatDate(p.payment_date)})</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
+  const actualCost = Number(trip.total_actual_cost || 0);
+  const totalPaid = Number(trip.payment_amount || 0);
 
-    <div className="mt-5 p-2 bg-gradient-to-r from-indigo-100 to-violet-100 border-l-4 border-indigo-400 rounded-xl flex items-center justify-between shadow-md hover:shadow-lg transition">
-    <div className="flex items-center gap-3">
-      <FaStar className="text-indigo-600 text-xl" />
-      <div>
-        <div className="text-md font-bold text-indigo-800">Estimated Cost</div>
-      </div>
-    </div>
-    <div className="text-xl font-bold text-indigo-900">{formatCurrency(trip.total_estimated_cost)}</div>
-    </div>
-    <div className="mt-5 p-2 bg-gradient-to-r from-indigo-200 to-violet-200 border-l-4 border-indigo-600 rounded-xl flex items-center justify-between shadow-md hover:shadow-lg transition">
-      <div className="flex items-center gap-3">
-        <FaStar className="text-indigo-700 text-xl" />
-        <div>
-          <div className="text-md font-bold text-indigo-800">Total Actual Cost</div>
+  const duePayment =
+    actualCost === 0 ? null : Math.max(actualCost - totalPaid, 0);
+
+  return (
+    <InfoCardSub title="Cost Summary">
+      <div className="bg-gray-100 p-1 rounded-lg">
+        <div className="flex flex-col gap-1 text-gray-600 font-medium">
+          {[
+            ["Vehicle Rent (Daily)", trip.vehicle_rent_daily],
+            ["Driver Cost", trip.driver_cost],
+            ["Mileage Extra Cost", trip.additional_mileage_cost],
+            ["Mileage Cost (Applied)", trip.mileage_cost],
+            ["Discount", trip.discount],
+            ["Damage Cost", trip.damage_cost],
+          ].map(([label, val], idx) => (
+            <OneColumnRow
+              key={idx}
+              label={label}
+              value={formatCurrency(val)}
+            />
+          ))}
         </div>
       </div>
-      <div className="text-xl font-bold text-indigo-900">{formatCurrency(trip.total_actual_cost)}</div>
-    </div>
-  </InfoCardSub>
-);
+
+      {trip.other_trip_costs?.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold mb-2">Other Trip Costs</h3>
+          <ul className="text-sm list-disc ml-5 space-y-1">
+            {trip.other_trip_costs.map((c) => (
+              <li key={c.trip_other_cost_id}>
+                {c.cost_type}:{" "}
+                <span className="font-medium">
+                  {formatCurrency(c.cost_amount)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <br />
+      <h3 className="text-xl font-bold text-gray-800">Payments</h3>
+      <div className="border-b pb-2 mb-4"></div>
+
+      <div className="bg-gray-100 p-1 rounded-lg">
+        <div className="flex flex-col gap-1 text-gray-600 font-medium">
+          <OneColumnRow
+            label="Advance Payment"
+            value={formatCurrency(trip.advance_payment)}
+          />
+
+          <OneColumnRow
+            label="Payment Amount"
+            value={formatCurrency(trip.payment_amount)}
+          />
+
+          <OneColumnRow
+            label="Due Payment Amount"
+            value={
+              actualCost === 0 ? (
+                <span className="text-red-700 font-semibold">
+                  Trip not started yet
+                </span>
+              ) : (
+                <span
+                  className={`font-semibold ${
+                    duePayment === 0
+                      ? "text-green-700"
+                      : "text-red-700"
+                  }`}
+                >
+                  {formatCurrency(duePayment)}
+                </span>
+              )
+            }
+          />
+
+          <OneColumnRow
+            label="Payment Status"
+            value={
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  trip.payment_status === "Paid"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {trip.payment_status}
+              </span>
+            }
+          />
+        </div>
+      </div>
+
+      {trip.payments?.length > 0 && (
+        <div className="mt-4">
+          <h4 className="text-sm font-semibold mb-2">All Payments</h4>
+          <ul className="text-sm list-disc ml-5 space-y-1">
+            {trip.payments.map((p) => (
+              <li key={p.payment_id}>
+                <span className="font-medium">
+                  {formatCurrency(p.amount)}
+                </span>{" "}
+                <span className="text-gray-500 text-xs">
+                  ({formatDate(p.payment_date)})
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="mt-5 p-2 bg-gradient-to-r from-indigo-100 to-violet-100 border-l-4 border-indigo-400 rounded-xl flex items-center justify-between shadow-md">
+        <div className="text-md font-bold text-indigo-800">
+          Estimated Cost
+        </div>
+        <div className="text-xl font-bold text-indigo-900">
+          {formatCurrency(trip.total_estimated_cost)}
+        </div>
+      </div>
+
+      <div className="mt-5 p-2 bg-gradient-to-r from-indigo-200 to-violet-200 border-l-4 border-indigo-600 rounded-xl flex items-center justify-between shadow-md">
+        <div className="text-md font-bold text-indigo-800">
+          Total Actual Cost
+        </div>
+        <div className="text-xl font-bold text-indigo-900">
+          {formatCurrency(trip.total_actual_cost)}
+        </div>
+      </div>
+    </InfoCardSub>
+  );
+};
+
 
 /* ------------------ Payments ------------------ */
 export const Payments = ({ trip, formatCurrency, formatDate }) => (
@@ -408,6 +462,7 @@ export const Payments = ({ trip, formatCurrency, formatDate }) => (
     <div className="flex flex-col gap-2 text-gray-600 font-medium">
       <OneColumnRow label="Advance Payment" value={formatCurrency(trip.advance_payment)} />
       <OneColumnRow label="Payment Amount" value={formatCurrency(trip.payment_amount)} />
+      
       <OneColumnRow
         label="Payment Status"
         value={

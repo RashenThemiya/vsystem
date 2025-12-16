@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ConfirmWrapper from "../../components/ConfirmWrapper";
 import { useAuth } from "../../context/AuthContext";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 
 const AddCustomer = ({ onCancel, onSuccess }) => {
@@ -190,6 +190,27 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
           <FaTimes size={16} />
         </button>
       </div>
+      <div className="absolute top-4 right-4">
+      <ConfirmWrapper
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+            message="Confirm Adding Customer"
+            additionalInfo="Please verify the details before submission."
+            confirmText="Yes, Add Customer"
+            cancelText="No, Go Back"
+            icon={<FiUserPlus />}
+            buttonBackgroundColor="bg-green-600"
+            buttonTextColor="text-white"
+          >
+            <button
+              type="submit"
+              className="p-2 rounded-full bg-green-200 hover:bg-green-300 text-green-700 shadow"
+              disabled={loading}
+            >
+               <FaCheck size={18} />
+            </button>
+          </ConfirmWrapper>
+      </div>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
           Add New Customer
@@ -291,25 +312,7 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
             required
           />
 
-          <ConfirmWrapper
-            onConfirm={handleConfirm}
-            onCancel={handleCancel}
-            message="Confirm Adding Customer"
-            additionalInfo="Please verify the details before submission."
-            confirmText="Yes, Add Customer"
-            cancelText="No, Go Back"
-            icon={<FiUserPlus />}
-            buttonBackgroundColor="bg-green-600"
-            buttonTextColor="text-white"
-          >
-            <button
-              type="submit"
-              className="mt-4 w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-2 rounded-lg hover:bg-blue-800 transition duration-300"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Customer"}
-            </button>
-          </ConfirmWrapper>
+          
 
           {/*<button
             type="button"

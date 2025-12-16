@@ -258,7 +258,7 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
           <div class="section">
             <table>
               <tr><th>Total Estimated Cost</th><td>${formatCurrency(trip.total_estimated_cost)}</td></tr>
-              <tr><th>Total Payments</th><td>${formatCurrency((trip.payment_ammount))}</td></tr>
+              <tr><th>Total Payments</th><td>${formatCurrency((trip.payment_amount))}</td></tr>
               <tr><th>Total Actual Cost</th><td>${formatCurrency(trip.total_actual_cost)}</td></tr>
             </table>
           </div>

@@ -1,5 +1,5 @@
-import Sidebar from "../components/Sidebar";
-import DashboardKPIs from "./DashboardKPIs";
+import Sidebar from "../../components/Sidebar";
+import DashboardKPIs from "../AdminDashboard/DashboardKPIs";
 
 const AdminDashboard = () => {
   return (

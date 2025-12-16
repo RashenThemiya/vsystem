@@ -14,7 +14,6 @@ export default function ActionCards({ onAddVehicleClick }) {
           </div>
           <div className="font-semibold">Add New Vehicle</div>
         </div>
-
         <p className="text-sm text-gray-500 mt-3">
           Register a new Vehicle to the system.
         </p>

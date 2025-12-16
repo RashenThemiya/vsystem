@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import api from "../utils/axiosInstance";
-import { useAuth } from "../context/AuthContext";
-import ModalWrapper from "../components/ModelWrapper";
+import api from "../../utils/axiosInstance";
+import { useAuth } from "../../context/AuthContext";
+import ModalWrapper from "../../components/ModelWrapper";
 
-import StatsCards from "./StatsCards";
-import FuelEditModal from "./FuelEditModal";
+import StatsCards from "../AdminDashboard/StatsCards";
+import FuelEditModal from "../AdminDashboard/FuelEditModal";
 import { useNavigate } from "react-router-dom";
 
 

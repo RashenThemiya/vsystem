@@ -7,7 +7,7 @@ import Sidebar from "./VehicleProfileComponent/Sidebar";
 import TripsTab from "./VehicleProfileComponent/TripsTab";
 import CostsTab from "./VehicleProfileComponent/CostsTab";
 import { PlusCircle } from "react-feather";
-import AddVehicleCostModal from "./VehicleProfileComponent/AddVehicleCostModal";
+
 
 const VehicleProfile = () => {
   const { id } = useParams();
@@ -32,9 +32,7 @@ const VehicleProfile = () => {
   const [costSelectedMonth, setCostSelectedMonth] = useState("");
   const [costSelectedYear, setCostSelectedYear] = useState("");
 
-  // Modal state
-  const [isAddCostModalOpen, setIsAddCostModalOpen] = useState(false);
-
+  
   useEffect(() => {
     fetchVehicle();
   }, [id]);
@@ -130,7 +128,14 @@ const VehicleProfile = () => {
     win.document.write(`<img src="${img}" style="width:100%" />`);
   };
 
-  if (loading) return <p className="p-6">Loading vehicle...</p>;
+  if (loading) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Loading vehicle details...
+      </p>
+    </div>
+  </div>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!vehicle) return <p className="p-6">No vehicle found.</p>;
 
@@ -187,31 +192,8 @@ const VehicleProfile = () => {
         {/* Costs Tab */}
 {filter === "costs" && (
   <div className="space-y-4">
-    {/* Add Vehicle Other Cost Button - right aligned */}
-    <div className="flex justify-end">
-      <div
-        className="bg-white p-5 rounded-xl shadow flex flex-col justify-between cursor-pointer hover:shadow-md transition w-80"
-        onClick={() => setIsAddCostModalOpen(true)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-lg bg-blue-50">
-            <PlusCircle className="text-blue-600" size={24} />
-          </div>
-          <div className="font-semibold">Add New Other Cost</div>
-        </div>
-        <p className="text-sm text-gray-500 mt-3">
-          Add a new cost entry for this vehicle.
-        </p>
-      </div>
-    </div>
+    
 
-    {/* Add Cost Modal */}
-    <AddVehicleCostModal
-      vehicleId={vehicle.vehicle_id} 
-      isOpen={isAddCostModalOpen}
-      onClose={() => setIsAddCostModalOpen(false)}
-      onSuccess={fetchVehicle} 
-    />
 
     {/* Costs Table */}
     <CostsTab
