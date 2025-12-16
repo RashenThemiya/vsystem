@@ -198,6 +198,7 @@ const VehicleProfile = () => {
     {/* Costs Table */}
     <CostsTab
       costs={filteredCosts}
+      vehicleId={vehicle.vehicle_id}
       costDateFilterType={costDateFilterType}
       setCostDateFilterType={setCostDateFilterType}
       costSelectedMonth={costSelectedMonth}
