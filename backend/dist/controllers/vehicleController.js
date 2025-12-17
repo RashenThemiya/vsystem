@@ -1,4 +1,5 @@
-import { createVehicleService, getAllVehiclesService, getVehicleByIdService, updateVehicleService, deleteVehicleService, } from "../services/vehicleService.js";
+import { createVehicleService, getAllVehiclesService, getVehicleByIdService, updateVehicleService, deleteVehicleService, getActiveVehiclesService, // 🆕 NEW
+ } from "../services/vehicleService.js";
 /**
  * ✅ Create a new vehicle
  */
@@ -33,6 +34,18 @@ export const createVehicleController = async (req, res) => {
 export const getAllVehiclesController = async (_req, res) => {
     try {
         const vehicles = await getAllVehiclesService();
+        return res.status(200).json(vehicles);
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Failed to fetch vehicles",
+            error: error.message || error,
+        });
+    }
+};
+export const getActiveVehiclesController = async (_req, res) => {
+    try {
+        const vehicles = await getActiveVehiclesService();
         return res.status(200).json(vehicles);
     }
     catch (error) {

@@ -42,6 +42,12 @@ export declare const getCustomerByIdService: (id: number) => Promise<{
             longitude: import("@prisma/client/runtime/library.js").Decimal;
             location_name: string;
         }[];
+        payments: {
+            payment_date: Date;
+            trip_id: number;
+            amount: import("@prisma/client/runtime/library.js").Decimal;
+            payment_id: number;
+        }[];
     } & {
         driver_id: number | null;
         customer_id: number;
@@ -75,6 +81,7 @@ export declare const getCustomerByIdService: (id: number) => Promise<{
         payment_status: import(".prisma/client").$Enums.PaymentStatus;
         trip_status: import(".prisma/client").$Enums.TripStatus;
         additional_mileage_cost: import("@prisma/client/runtime/library.js").Decimal | null;
+        profit: import("@prisma/client/runtime/library.js").Decimal | null;
         fuel_cost: import("@prisma/client/runtime/library.js").Decimal | null;
         driver_cost: import("@prisma/client/runtime/library.js").Decimal | null;
         vehicle_rent_daily: import("@prisma/client/runtime/library.js").Decimal | null;
@@ -103,5 +110,19 @@ export declare const updateCustomerService: (id: number, data: Partial<CustomerI
  * ✅ Delete customer by ID
  */
 export declare const deleteCustomerService: (id: number) => Promise<boolean>;
+export declare const getCustomerKpiService: (customerId: number) => Promise<{
+    pieChart: {
+        Paid: number;
+        Partially_Paid: number;
+        Unpaid: number;
+    };
+    barChart: {
+        Pending: number;
+        Ongoing: number;
+        Ended: number;
+        Completed: number;
+        Cancelled: number;
+    };
+}>;
 export {};
 //# sourceMappingURL=customerService.d.ts.map

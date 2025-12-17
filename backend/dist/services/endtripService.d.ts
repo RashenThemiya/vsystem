@@ -36,6 +36,7 @@ export declare const endTripService: (trip_id: number, data: EndTripDTO) => Prom
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -76,6 +77,7 @@ export declare const addDamageCostService: (trip_id: number, damage_amount: numb
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -120,6 +122,7 @@ export declare const updateTripDatesService: (trip_id: number, data: UpdateTripD
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -164,6 +167,7 @@ export declare const updateTripMeterService: (trip_id: number, data: UpdateTripM
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;

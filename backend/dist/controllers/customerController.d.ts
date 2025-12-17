@@ -19,4 +19,5 @@ export declare const updateCustomerController: (req: Request, res: Response) => 
  * 🔴 Delete Customer
  */
 export declare const deleteCustomerController: (req: Request, res: Response) => Promise<void>;
+export declare const getCustomerKpiController: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=customerController.d.ts.map

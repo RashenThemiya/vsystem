@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { createVehicleController, getAllVehiclesController, getVehicleByIdController, updateVehicleController, deleteVehicleController, } from "../controllers/vehicleController.js";
+import { createVehicleController, getAllVehiclesController, getVehicleByIdController, updateVehicleController, deleteVehicleController, getActiveVehiclesController, // 🆕 NEW
+ } from "../controllers/vehicleController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 const router = Router();
 router.use(authenticate);
+router.get("/active", authorizeRoles("SuperAdmin", "Admin", "Manager", "Driver"), getActiveVehiclesController);
 router.post("/", authorizeRoles("SuperAdmin"), createVehicleController);
 router.get("/", authorizeRoles("SuperAdmin", "Admin", "Driver"), getAllVehiclesController);
 router.get("/:id", authorizeRoles("SuperAdmin", "Admin", "Manager"), getVehicleByIdController);
