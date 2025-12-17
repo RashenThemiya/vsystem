@@ -27,14 +27,20 @@ const Sidebar = ({ customer, activeTab, setActiveTab }) => {
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-indigo-700 
-        flex items-center px-4 z-50">
-        <button onClick={() => setMobileOpen(true)} className="text-white text-xl">
-          <FaBars />
-        </button>
-        <h1 className="ml-4 text-white font-semibold">Customer Dashboard</h1>
-      </div>
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-9 w-full bg-indigo-700 flex items-center px-4 z-50 shadow-md">
+      {/* Hamburger Menu */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="text-white text-2xl mr-4 p-1 rounded hover:bg-indigo-600 transition"
+      >
+        <FaBars />
+      </button>
 
+      {/* Title */}
+      <h1 className="text-white text-lg font-bold flex-1 text-center truncate">
+        Ceylon Places
+      </h1>
+    </div>  
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
@@ -53,7 +59,7 @@ const Sidebar = ({ customer, activeTab, setActiveTab }) => {
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-white/20">
-          {!collapsed && <h2 className="font-bold">Customer</h2>}
+          {!collapsed && <h2 className="font-bold">Customer Dashboard</h2>}
           <button
             onClick={() =>
               window.innerWidth < 1024

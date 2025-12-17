@@ -38,22 +38,12 @@ export default function PixelPerfectLogin() {
   };
 
   // IMPORTANT: the image path below points to the uploaded file available in the environment.
-  const leftImage = "/images/loginImage.jpeg";
+  const leftImage = "/images/footer.png";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] p-8">
       {/* custom styles for diagonal wedge, rounded inner card shadow, and subtle overlays */}
       <style>{`
-        .wedge {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 140px;
-          height: 160px;
-          transform: translate(-40px,-40px) rotate(-22deg);
-          background: white;
-          z-index: 0;
-        }
         .inner-card {
           border-radius: 14px;
           box-shadow: 0 10px 24px rgba(0,0,0,0.25);
@@ -79,23 +69,26 @@ export default function PixelPerfectLogin() {
         .social-circle { width:36px; height:36px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center; background:white; }
       `}</style>
 
-      <div className="relative w-full max-w-6xl inner-card overflow-hidden bg-white flex" style={{ borderRadius: 18 }}>
-        {/* diagonal wedge in white to match screenshot */}
-        <div className="wedge" />
+      <div className="relative w-250 max-w-6xl inner-card overflow-hidden bg-white flex" style={{ borderRadius: 18 }}>
+      
 
         {/* LEFT: Image panel with rounded corners and overlay */}
-        <div className="hidden md:block w-1/2 relative soft-rounded-left" style={{ minHeight: 540 }}>
-          <img src={leftImage} alt="hero" className="w-full h-[650px] object-cover" />
-          <div className="absolute inset-0 bg-[rgba(11,38,88,0.55)] mix-blend-multiply"></div>
+        <div className="hidden md:block w-110  relative soft-rounded-left" style={{ minHeight: 540 }}>
+          <div className="w-110 h-200 items-center pt-6">
+            <img src={leftImage} alt="hero" className="w-[640px] h-[760px] object-cover" />
+          </div>
+          
+          
 
         </div>
 
         {/* RIGHT: Form panel */}
-        <div className="w-full md:w-1/2 bg-[#164380] text-white p-14 soft-rounded-right flex flex-col justify-center" style={{ minHeight: 540 }}>
-          <div className="max-w-md mx-auto w-full">
+        <div className="w-full md:w-140 bg-gradient-to-r from-indigo-700 to-violet-700 text-white p-14 soft-rounded-right flex flex-col justify-center relative" style={{ minHeight: 540 }}>
+          <div className="max-w-md mx-auto w-full ">
             <div className="flex justify-center mb-6">
               <div style={{ borderLeft: '4px solid rgba(255,255,255,0.85)', paddingLeft: 12 }}>
-                <h2 className="text-2xl md:text-3xl font-serif tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>ADMIN LOGIN PORTAL</h2>
+              
+                <h2 className="text-2xl md:text-3xl font-serif font-semibold tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>Login Portal</h2>
               </div>
             </div>
 
