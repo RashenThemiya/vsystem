@@ -33,6 +33,7 @@ export interface CreateTripDTO {
     start_meter?: number;
     end_meter?: number;
     total_estimated_cost?: number;
+    profit?: number;
     total_actual_cost?: number;
     payment_status?: "Paid" | "Partially_Paid" | "Unpaid";
     trip_status?: "Pending" | "Ongoing" | "Ended" | "Completed" | "Cancelled";
@@ -92,6 +93,7 @@ export declare const createTripService: (data: CreateTripDTO) => Promise<{
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -131,6 +133,7 @@ export declare const updateTripService: (id: number, data: UpdateTripDTO) => Pro
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -221,8 +224,8 @@ export declare const getAllTripsService: (filters?: GetTripsFilter) => Promise<{
         location_name: string;
     }[];
     payments: {
-        amount: Prisma.Decimal;
         payment_date: Date;
+        amount: Prisma.Decimal;
         payment_id: number;
     }[];
     other_trip_costs: {
@@ -264,6 +267,7 @@ export declare const startTripService: (trip_id: number, start_meter: number) =>
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -342,6 +346,7 @@ export declare const getTripByIdService: (trip_id: number) => Promise<{
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -356,9 +361,9 @@ export declare const getTripByIdService: (trip_id: number) => Promise<{
         location_name: string;
     }[];
     payments: {
+        payment_date: Date;
         trip_id: number;
         amount: Prisma.Decimal;
-        payment_date: Date;
         payment_id: number;
     }[];
     other_trip_costs: {
@@ -402,6 +407,7 @@ export declare const completeTripService: (trip_id: number) => Promise<{
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;
@@ -416,9 +422,9 @@ export declare const completeTripService: (trip_id: number) => Promise<{
  */
 export declare const addTripPaymentService: (trip_id: number, amount: number, payment_date?: Date | string) => Promise<{
     payment: {
+        payment_date: Date;
         trip_id: number;
         amount: Prisma.Decimal;
-        payment_date: Date;
         payment_id: number;
     };
     updatedTrip: {
@@ -454,6 +460,7 @@ export declare const addTripPaymentService: (trip_id: number, amount: number, pa
         payment_status: import(".prisma/client").$Enums.PaymentStatus;
         trip_status: import(".prisma/client").$Enums.TripStatus;
         additional_mileage_cost: Prisma.Decimal | null;
+        profit: Prisma.Decimal | null;
         fuel_cost: Prisma.Decimal | null;
         driver_cost: Prisma.Decimal | null;
         vehicle_rent_daily: Prisma.Decimal | null;
@@ -494,6 +501,7 @@ export declare const cancelTripService: (trip_id: number) => Promise<{
     payment_status: import(".prisma/client").$Enums.PaymentStatus;
     trip_status: import(".prisma/client").$Enums.TripStatus;
     additional_mileage_cost: Prisma.Decimal | null;
+    profit: Prisma.Decimal | null;
     fuel_cost: Prisma.Decimal | null;
     driver_cost: Prisma.Decimal | null;
     vehicle_rent_daily: Prisma.Decimal | null;

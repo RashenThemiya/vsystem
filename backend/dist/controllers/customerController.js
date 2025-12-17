@@ -1,4 +1,4 @@
-import { createCustomerService, getAllCustomersService, getCustomerByIdService, updateCustomerService, deleteCustomerService, } from "../services/customerService.js";
+import { createCustomerService, getAllCustomersService, getCustomerByIdService, updateCustomerService, deleteCustomerService, getCustomerKpiService, } from "../services/customerService.js";
 /**
  * 🟢 Create Customer
  */
@@ -62,6 +62,21 @@ export const deleteCustomerController = async (req, res) => {
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const getCustomerKpiController = async (req, res) => {
+    try {
+        const customerId = parseInt(req.params.id);
+        if (isNaN(customerId))
+            return res.status(400).json({ message: "Invalid customer ID" });
+        const kpiData = await getCustomerKpiService(customerId);
+        return res.status(200).json({
+            success: true,
+            data: kpiData,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 //# sourceMappingURL=customerController.js.map

@@ -39,6 +39,8 @@ export const calculateActualTripCost = (trip, end_meter, actualReturnDate // ✅
     if (discount > grossTripAmount)
         discount = grossTripAmount;
     const totalActualCost = grossTripAmount - discount + damageCost;
+    const actualCosts = vehicleDaily * numDays + driverCost + otherCosts + fuelCost;
+    const profit = grossTripAmount - actualCosts - discount;
     return {
         actualDistance,
         actualDays,
@@ -49,6 +51,7 @@ export const calculateActualTripCost = (trip, end_meter, actualReturnDate // ✅
         driverCost,
         otherCosts,
         discountApplied: discount,
+        profit,
     };
 };
 //# sourceMappingURL=tripCostCalculator.js.map

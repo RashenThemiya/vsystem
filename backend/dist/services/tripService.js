@@ -63,6 +63,7 @@ export const createTripService = async (data) => {
             leaving_datetime: data.leaving_datetime ? new Date(data.leaving_datetime) : new Date(),
             estimated_return_datetime: data.estimated_return_datetime ? new Date(data.estimated_return_datetime) : null,
             actual_return_datetime: data.actual_return_datetime ? new Date(data.actual_return_datetime) : null,
+            profit: data.profit !== undefined ? new Prisma.Decimal(data.profit) : null,
             // Map locations
             map: data.map_locations
                 ? {
@@ -369,6 +370,7 @@ export const getTripByIdService = async (trip_id) => {
             vehicle_rent_daily: true,
             fuel_efficiency: true,
             created_at: true,
+            profit: true,
             // === Map ===
             map: {
                 orderBy: { sequence: "asc" },

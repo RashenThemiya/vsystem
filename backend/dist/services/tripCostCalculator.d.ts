@@ -9,6 +9,7 @@ export interface ActualCostResult {
     driverCost: number;
     otherCosts: number;
     discountApplied: number;
+    profit: number;
 }
 export type TripWithRelations = Trip & {
     vehicle: Vehicle;

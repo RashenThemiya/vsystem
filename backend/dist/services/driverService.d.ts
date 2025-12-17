@@ -72,6 +72,7 @@ export declare const getDriverByIdService: (id: number) => Promise<{
         payment_status: import(".prisma/client").$Enums.PaymentStatus;
         trip_status: import(".prisma/client").$Enums.TripStatus;
         additional_mileage_cost: import("@prisma/client/runtime/library.js").Decimal | null;
+        profit: import("@prisma/client/runtime/library.js").Decimal | null;
         fuel_cost: import("@prisma/client/runtime/library.js").Decimal | null;
         driver_cost: import("@prisma/client/runtime/library.js").Decimal | null;
         vehicle_rent_daily: import("@prisma/client/runtime/library.js").Decimal | null;

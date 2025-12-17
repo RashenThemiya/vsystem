@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createCustomerController, getAllCustomersController, getCustomerByIdController, updateCustomerController, deleteCustomerController, } from "../controllers/customerController.js";
+import { createCustomerController, getAllCustomersController, getCustomerByIdController, updateCustomerController, deleteCustomerController, getCustomerKpiController, } from "../controllers/customerController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 const router = Router();
@@ -9,7 +9,7 @@ router.use(authenticate);
  * 👥 Admin or SuperAdmin can view customers
  */
 router.get("/", authorizeRoles("Admin", "SuperAdmin"), getAllCustomersController);
-router.get("/:id", authorizeRoles("Admin", "SuperAdmin"), getCustomerByIdController);
+router.get("/:id", authorizeRoles("Admin", "SuperAdmin", "Customer"), getCustomerByIdController);
 /**
  * 🟢 Admin or SuperAdmin can create customers
  */
@@ -22,5 +22,6 @@ router.put("/:id", authorizeRoles("Admin", "SuperAdmin"), updateCustomerControll
  * 🔴 Only SuperAdmin can delete customers
  */
 router.delete("/:id", authorizeRoles("SuperAdmin"), deleteCustomerController);
+router.get("/:id/kpi", authorizeRoles("Admin", "SuperAdmin", "Customer"), getCustomerKpiController);
 export default router;
 //# sourceMappingURL=customerRoutes.js.map

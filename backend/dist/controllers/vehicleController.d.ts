@@ -7,6 +7,7 @@ export declare const createVehicleController: (req: Request, res: Response) => P
  * ✅ Get all vehicles (without heavy image data)
  */
 export declare const getAllVehiclesController: (_req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const getActiveVehiclesController: (_req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
 /**
  * ✅ Get single vehicle with all related data
  */
