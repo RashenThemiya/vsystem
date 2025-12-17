@@ -94,7 +94,7 @@ const [duePayment, setDuePayment] = useState(0);
   if (!trip) return <div className="text-center mt-20 text-gray-600">Trip not found</div>;
  
   return (
- <div className="min-h-screen  bg-gray-50 p-6">
+ <div className="max-h-screen  bg-gray-50 p-4">
   <div className="max-w-7xl mx-auto space-y-6">
 
     {/* Top Row: Trip ID / Status + Back & Refresh */}
@@ -108,7 +108,7 @@ const [duePayment, setDuePayment] = useState(0);
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Participants & Actions */}
           <div className="space-y-4">
-            <div className="bg-gradient-to-r from-indigo-500 to-violet-600 h-220 p-2 rounded-xl shadow-md mb-6">
+            <div className="bg-gradient-to-r from-indigo-500 to-violet-600 h-195 p-2 rounded-xl shadow-md mb-6">
 
   {/* Top Row: Back Button + Trip ID + Status */}
   <div className="flex items-center justify-between mb-2">
@@ -309,7 +309,7 @@ const [duePayment, setDuePayment] = useState(0);
               />
 
             </div>
-            <div className="max-h-[780px] overflow-y-auto pr-2">
+            <div className="max-h-[730px] overflow-y-auto pr-2">
 
           <InfoCardSub title="Trip Summary">
             <div className="bg-gray-100 p-1 rounded-lg">

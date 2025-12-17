@@ -6,7 +6,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import Home from "./pages/Home";
-import CustomerProdileDashboard from './pages/CustomerProdileDashboard';
+import CustomerProfileDashboard from './pages/CustomerDashboard/CustomerProfileDashboard';
 
 
 
@@ -69,8 +69,8 @@ function App() {
               element={<PrivateRoute><AdminDashboard /></PrivateRoute>}
             />
             <Route
-              path="/Customer-ProdileDashboard"
-              element={<PrivateRoute><CustomerProdileDashboard /></PrivateRoute>}
+              path="/customer-profileDashboard/:customerID"
+              element={<PrivateRoute><CustomerProfileDashboard /></PrivateRoute>}
             />
            
             {/*<Route
