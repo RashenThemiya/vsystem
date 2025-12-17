@@ -3,6 +3,7 @@ import { FaTrash } from "react-icons/fa";
 
 /* ------------------ InfoCard ------------------ */
 import { useState } from "react";
+import { number } from "framer-motion";
 
 export const InfoCard = ({ title, children, footer }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -322,12 +323,20 @@ export const CostSummary = ({
   trip,
   formatCurrency,
   formatDate,
-  duePayment, // pass this from parent
   onDeletePayment,
+  setDuePayment
 }) => {
   if (!trip) return null;
 
   const actualCost = Number(trip.total_actual_cost || 0);
+  const estimateCost = Number(trip.total_estimated_cost || 0);
+  const payments = Number(trip.payment_amount || 0);
+// Use estimated cost if actual cost is 0
+const costToUse = actualCost === 0 ? estimateCost : actualCost;
+
+// Calculate due payment
+const duePayment = costToUse - payments;
+if (setDuePayment) setDuePayment(duePayment);
 
  const handleDelete = async (payment_id) => {
   try {
