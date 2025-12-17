@@ -12,6 +12,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const availabilityOptions = ["Yes", "No"];
 
   const vehicleTypes = ["Car", "Van", "Bus", "Bike"];
   const acTypes = ["AC", "Non_AC"];
@@ -41,16 +42,41 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
     fetchMeta();
 
-    if (initialVehicle) {
-      setVehicle(initialVehicle);
-      setPreview({
-        license_image: initialVehicle.license_image,
-        insurance_card_image: initialVehicle.insurance_card_image,
-        eco_test_image: initialVehicle.eco_test_image,
-        book_image: initialVehicle.book_image,
-        image: initialVehicle.image,
-      });
-    }
+ if (initialVehicle) {
+  setVehicle({
+    ...initialVehicle,
+
+    // ✅ fuel
+    fuel_id: initialVehicle.fuel?.fuel_id || "",
+
+    // ✅ mileage costs (take latest)
+    mileage_cost: initialVehicle.mileage_costs?.[0]?.mileage_cost || "",
+    mileage_cost_additional:
+      initialVehicle.mileage_costs?.[0]?.mileage_cost_additional || "",
+
+    // ✅ format dates for input[type="date"]
+    license_expiry_date: initialVehicle.license_expiry_date
+      ? initialVehicle.license_expiry_date.split("T")[0]
+      : "",
+
+    insurance_expiry_date: initialVehicle.insurance_expiry_date
+      ? initialVehicle.insurance_expiry_date.split("T")[0]
+      : "",
+
+    eco_test_expiry_date: initialVehicle.eco_test_expiry_date
+      ? initialVehicle.eco_test_expiry_date.split("T")[0]
+      : "",
+  });
+
+  setPreview({
+    license_image: initialVehicle.license_image,
+    insurance_card_image: initialVehicle.insurance_card_image,
+    eco_test_image: initialVehicle.eco_test_image,
+    book_image: initialVehicle.book_image,
+    image: initialVehicle.image,
+  });
+}
+
 
     setLoading(false);
   }, [initialVehicle]);
@@ -248,6 +274,24 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
               <input type="date" name="eco_test_expiry_date" value={vehicle.eco_test_expiry_date} onChange={handleChange} className="input" />
             </div>
           </div>
+{/* === Vehicle Availability === */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div>
+    <label className="label">Vehicle Active Status</label>
+    <select
+      name="vehicle_availability"
+      value={vehicle.vehicle_availability || "Yes"}
+      onChange={handleChange}
+      className="input"
+    >
+      {availabilityOptions.map((status) => (
+        <option key={status} value={status}>
+          {status === "Yes" ? "Active" : "Inactive"}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
 
           {/* === Images === */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
