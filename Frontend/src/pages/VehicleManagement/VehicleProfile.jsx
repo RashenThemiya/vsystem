@@ -205,6 +205,7 @@ const VehicleProfile = () => {
       setCostSelectedMonth={setCostSelectedMonth}
       costSelectedYear={costSelectedYear}
       setCostSelectedYear={setCostSelectedYear}
+      refreshVehicle={fetchVehicle}
     />
   </div>
 )}

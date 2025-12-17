@@ -18,7 +18,7 @@ router.use(authenticate);
  * 👥 Admin or SuperAdmin can view customers
  */
 router.get("/", authorizeRoles("Admin", "SuperAdmin"), getAllCustomersController);
-router.get("/:id", authorizeRoles("Admin", "SuperAdmin"), getCustomerByIdController);
+router.get("/:id", authorizeRoles("Admin", "SuperAdmin", "Customer"), getCustomerByIdController);
 
 /**
  * 🟢 Admin or SuperAdmin can create customers
