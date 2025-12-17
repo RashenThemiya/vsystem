@@ -99,8 +99,13 @@ export const getCustomerByIdService = async (id: number) => {
     include: {
       trips: {
         include: {
-          map: {               // Include route details
-            orderBy: { sequence: "asc" } // order map points
+          map: {
+            orderBy: { sequence: "asc" },
+          },
+          payments: {
+            orderBy: {
+              payment_date: "asc", // or "desc"
+            },
           },
         },
       },
