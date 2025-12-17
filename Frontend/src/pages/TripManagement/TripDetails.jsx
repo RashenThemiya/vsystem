@@ -10,7 +10,6 @@ import {
   DriverDetails,
   VehicleDetails,
   CostSummary,
-  Payments,
 } from "./TripDetailsComponents";
 import { FaChevronDown, FaChevronUp, FaMoneyBillWave, FaCar, FaUser, FaRedo, FaArrowLeft } from "react-icons/fa";
 import TripActionButtons from "./TripAction/TripActionButtons";
@@ -48,6 +47,21 @@ const [showCancelModal, setShowCancelModal] = useState(false);
 
 const [duePayment, setDuePayment] = useState(0);
 
+const handleDeletePayment = async (payment_id) => {
+  if (!confirm("Are you sure you want to delete this payment?")) return;
+
+  try {
+    console.log("/api/payments/" + payment_id);
+    await api.delete(`/api/payments/${payment_id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    alert("Payment deleted successfully");
+    fetchTrip(); // refresh trip data to update UI
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete payment");
+  }
+};
 
  
  
@@ -369,6 +383,7 @@ const [duePayment, setDuePayment] = useState(0);
 
           <CostSummary
             setDuePayment={setDuePayment}
+            onDeletePayment={handleDeletePayment} // allows delete
 
             trip={trip}
             formatCurrency={formatCurrency}
