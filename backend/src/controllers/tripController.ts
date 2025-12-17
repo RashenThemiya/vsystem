@@ -9,20 +9,25 @@ import {
   addTripPaymentService,
   cancelTripService,
 } from "../services/tripService.js";
+import AsyncLock from "async-lock";
+
 
 import {endTripService } from "./../services/endtripService.js";
 import { updateTripDatesService, UpdateTripDatesDTO } from "../services/endtripService.js";
 
 import { addDamageCostService ,updateTripMeterService } from "../services/endtripService.js"; 
 import { completeTripService } from "../services/tripService.js"; 
+const lock = new AsyncLock();
 
 /**
  * Create Trip
  */
-export const createTripController = async (req: Request, res: Response) => {
+export const createTripController = async (req: Request, res: Response, next: unknown) => {
   try {
-    const trip = await createTripService(req.body);
-    res.status(201).json({ success: true, data: trip });
+    await lock.acquire("createTrip", async () => {
+      const trip = await createTripService(req.body);
+      res.status(201).json({ success: true, data: trip });
+    });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
