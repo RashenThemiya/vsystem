@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { FaPhoneAlt } from "react-icons/fa"; // Phone icon
 import api from "../../utils/axiosInstance";
-
+import KpiDashboard from "./KpiDashboard";
 import Sidebar from "./SideBar";
 import TripsTable from "./TripTable";
 
@@ -29,16 +30,16 @@ const CustomerProfileDashboard = () => {
     fetchCustomer();
   }, [customerID]);
 
+  const handleCall = () => {
+    alert("Calling Ceylon Places now! 📞"); // Replace with actual action if needed
+  };
+
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!customer) return <p className="p-6">Customer not found</p>;
 
-  const name=customer.name;
-  const email=customer.email;
-
-
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4 min-h-screen">
+    <div className="flex flex-col lg:flex-row gap-6 p-4 min-h-screen relative">
       <Sidebar
         customer={customer}
         activeTab={activeTab}
@@ -47,16 +48,10 @@ const CustomerProfileDashboard = () => {
 
       <div className="flex-1">
         {activeTab === "dashboard" && (
-          <div className="bg-white p-6 rounded-xl shadow">
-            <div className="flex justify-between items-center mb-6 flex-wrap">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-wide">
-                Welcome <span className="text-violet-700">{name}</span>, to Ceylon Places
-            </h1>
-            <p className="text-sm md:text-base text-gray-500 mt-2 md:mt-0">
-                Logged in as: <span className="font-medium">{customer.email}</span>
-            </p>
-            </div>
-          </div>
+          <KpiDashboard
+            customerID={customerID}
+            customerName={customer.name}
+          />
         )}
 
         {activeTab === "trips" && (
@@ -69,6 +64,15 @@ const CustomerProfileDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Floating Call Button */}
+      <button
+        onClick={handleCall}
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 z-50 flex items-center justify-center"
+        title="Call Ceylon Places"
+      >
+        <FaPhoneAlt size={20} />
+      </button>
     </div>
   );
 };

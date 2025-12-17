@@ -183,3 +183,45 @@ export const deleteCustomerService = async (id: number) => {
 
   return true;
 };
+
+export const getCustomerKpiService = async (customerId: number) => {
+  // Fetch trips of the customer
+  const trips = await prisma.trip.findMany({
+    where: { customer_id: customerId },
+    select: {
+      payment_status: true,
+      trip_status: true,
+    },
+  });
+
+  if (!trips || trips.length === 0) {
+    return {
+      pieChart: { Paid: 0, Partially_Paid: 0, Unpaid: 0 },
+      barChart: { Pending: 0, Ongoing: 0, Ended: 0, Completed: 0, Cancelled: 0 },
+    };
+  }
+
+  // Pie chart: Payment status counts
+  const pieChart = trips.reduce(
+    (acc, trip) => {
+      if (trip.payment_status === "Paid") acc.Paid += 1;
+      else if (trip.payment_status === "Partially_Paid") acc.Partially_Paid += 1;
+      else if (trip.payment_status === "Unpaid") acc.Unpaid += 1;
+      return acc;
+    },
+    { Paid: 0, Partially_Paid: 0, Unpaid: 0 }
+  );
+
+  // Bar chart: Trip status counts
+  const barChart = trips.reduce(
+    (acc, trip) => {
+      const status = trip.trip_status;
+      if (!acc[status]) acc[status] = 0;
+      acc[status] += 1;
+      return acc;
+    },
+    { Pending: 0, Ongoing: 0, Ended: 0, Completed: 0, Cancelled: 0 }
+  );
+
+  return { pieChart, barChart };
+};
