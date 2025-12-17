@@ -5,6 +5,7 @@ import {
   getCustomerByIdController,
   updateCustomerController,
   deleteCustomerController,
+  getCustomerKpiController,
 } from "../controllers/customerController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
@@ -34,5 +35,7 @@ router.put("/:id", authorizeRoles("Admin", "SuperAdmin"), updateCustomerControll
  * 🔴 Only SuperAdmin can delete customers
  */
 router.delete("/:id", authorizeRoles("SuperAdmin"), deleteCustomerController);
+router.get("/:id/kpi", authorizeRoles("Admin", "SuperAdmin", "Customer"), getCustomerKpiController);
+
 
 export default router;

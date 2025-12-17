@@ -5,6 +5,7 @@ import {
   getCustomerByIdService,
   updateCustomerService,
   deleteCustomerService,
+  getCustomerKpiService,
 } from "../services/customerService.js";
 
 /**
@@ -71,5 +72,21 @@ export const deleteCustomerController = async (req: Request, res: Response) => {
     res.status(200).json({ success: true, message: "Customer deleted successfully" });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getCustomerKpiController = async (req: Request, res: Response) => {
+  try {
+    const customerId = parseInt(req.params.id);
+    if (isNaN(customerId)) return res.status(400).json({ message: "Invalid customer ID" });
+
+    const kpiData = await getCustomerKpiService(customerId);
+
+    return res.status(200).json({
+      success: true,
+      data: kpiData,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
