@@ -139,7 +139,65 @@ export const createVehicleService = async (data: any) => {
   });
 };
 
+export const getActiveVehiclesService = async () => {
+ return prisma.vehicle.findMany({
+     where: { vehicle_availability: "Yes" },
+    select: {
+      vehicle_id: true,
+      vehicle_number: true,
+      name: true,
+      type: true,
+      rent_cost_daily: true,
+      ac_type: true,
+      owner_cost_monthly: true,
+      license_expiry_date: true,
+      insurance_expiry_date: true,
+      eco_test_expiry_date: true,
+      vehicle_fuel_efficiency: true,
+      meter_number: true,
+      last_service_meter_number: true,
+      vehicle_availability: true,
 
+      // 👇 Owner details
+      owner: {
+        select: {
+          owner_id: true,
+          owner_name: true,
+          contact_number: true,
+        },
+      },
+
+      // 👇 Fuel details
+      fuel: {
+        select: {
+          fuel_id: true,
+          type: true,
+          cost: true,
+        },
+      },
+
+      // 👇 Full mileage cost details (not just count)
+      mileage_costs: {
+      select: {
+        mileage_cost_id: true,
+        mileage_cost: true,
+        mileage_cost_additional: true,
+        vehicle_id: true, // optional if needed
+      },
+      orderBy: { mileage_cost_id: "desc" }, // use primary key for ordering
+},
+
+      // 👇 Keep counts for other reference data
+      _count: {
+        select: {
+          trips: true,
+          bill_uploads: true,
+        },
+      },
+    },
+    orderBy: { vehicle_id: "desc" },
+  });
+};
 /**
  * ✅ Get a single vehicle by ID with all related tables
  */

@@ -5,6 +5,8 @@ import {
   getVehicleByIdService,
   updateVehicleService,
   deleteVehicleService,
+  getActiveVehiclesService, // 🆕 NEW
+
 } from "../services/vehicleService.js";
 
 /**
@@ -54,6 +56,21 @@ export const getAllVehiclesController = async (_req: Request, res: Response) => 
     });
   }
 };
+
+
+export const getActiveVehiclesController = async (_req: Request, res: Response) => {
+  try {
+    const vehicles = await getActiveVehiclesService();
+    return res.status(200).json(vehicles);
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Failed to fetch vehicles",
+      error: error.message || error,
+    });
+  }
+  
+};
+
 
 /**
  * ✅ Get single vehicle with all related data

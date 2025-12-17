@@ -64,7 +64,7 @@ const AddTrip = () => {
 
       try {
         const [vehiclesRes, customersRes, driversRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/vehicles`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/vehicles/active`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/customers`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/drivers`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
