@@ -48,6 +48,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
     // ✅ fuel
     fuel_id: initialVehicle.fuel?.fuel_id || "",
+      owner_id: initialVehicle.owner?.owner_id?.toString() || "", // ✅ important
 
     // ✅ mileage costs (take latest)
     mileage_cost: initialVehicle.mileage_costs?.[0]?.mileage_cost || "",
