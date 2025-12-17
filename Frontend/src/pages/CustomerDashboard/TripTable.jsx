@@ -146,7 +146,7 @@ const TripsTable = ({ trips }) => {
 
                             {t.payments?.length > 0 ? (
                                 <>
-                                <table className="w-full text-sm border rounded">
+                                <table className="w-60 text-sm  rounded">
                                     <thead className="bg-gray-100">
                                     <tr>
                                         <th className="p-2 text-left">Date</th>
@@ -155,7 +155,7 @@ const TripsTable = ({ trips }) => {
                                     </thead>
                                     <tbody>
                                     {t.payments.map(p => (
-                                        <tr key={p.payment_id} className="border-t">
+                                        <tr key={p.payment_id} className="">
                                         <td className="p-2">
                                             {dayjs(p.payment_date).format("YYYY-MM-DD")}
                                         </td>
@@ -168,7 +168,7 @@ const TripsTable = ({ trips }) => {
                                 </table>
 
                                 {/* Total Paid */}
-                                <div className="mt-2 font-semibold text-right">
+                                <div className="mt-2 font-semibold text-left">
                                     Total Paid: Rs.{" "}
                                     {t.payments
                                     .reduce((sum, p) => sum + Number(p.amount || 0), 0)
@@ -185,7 +185,7 @@ const TripsTable = ({ trips }) => {
                                 px-3 py-1 rounded bg-indigo-600 text-white
                                 hover:bg-indigo-700"
                             >
-                                <FaPrint /> Get PDF
+                                <FaPrint /> Download Invoice
                             </button>
                             </div>
 

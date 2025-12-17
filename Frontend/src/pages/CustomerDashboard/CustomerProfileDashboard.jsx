@@ -33,6 +33,10 @@ const CustomerProfileDashboard = () => {
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!customer) return <p className="p-6">Customer not found</p>;
 
+  const name=customer.name;
+  const email=customer.email;
+
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-4 min-h-screen">
       <Sidebar
@@ -44,10 +48,14 @@ const CustomerProfileDashboard = () => {
       <div className="flex-1">
         {activeTab === "dashboard" && (
           <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-xl font-bold mb-4">Customer Overview</h2>
-            <p>Name: {customer.name}</p>
-            <p>Email: {customer.email}</p>
-            <p>Total Trips: {customer.trips?.length || 0}</p>
+            <div className="flex justify-between items-center mb-6 flex-wrap">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-wide">
+                Welcome <span className="text-violet-700">{name}</span>, to Ceylon Places
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 mt-2 md:mt-0">
+                Logged in as: <span className="font-medium">{customer.email}</span>
+            </p>
+            </div>
           </div>
         )}
 
