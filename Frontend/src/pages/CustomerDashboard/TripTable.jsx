@@ -45,8 +45,9 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
     <div className="flex flex-col gap-4">
 
       {/* Top Stats + Image */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="flex flex-wrap gap-4 w-full sm:w-auto">
+      <div className="flex items-start justify-between gap-4">
+
+        <div className="flex flex-wrap gap-4 max-w-[75%] mt-7">
           <div className="p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600 min-w-[150px]">
             <div className="text-sm font-semibold">Total Trips</div>
             <div className="text-2xl font-bold mt-1">{filteredTrips.length}</div>
@@ -61,7 +62,7 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
 
         {/* Top-right image */}
         {topRightImage && (
-          <div className="w-30 h-30 md:w-32 md:h-32">
+          <div className="w-30 h-30 md:w-32 md:h-32 mt-7">
             <img
               src={topRightImage}
               alt="Top Right"
