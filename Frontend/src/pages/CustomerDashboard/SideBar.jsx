@@ -1,67 +1,122 @@
-import { FaArrowAltCircleLeft, FaEdit } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaBars,
+  FaEdit,
+  FaHome,
+  FaRoute,
+  FaCreditCard,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import ConfirmWrapper from "../../components/ConfirmWrapper";
 
+const Sidebar = ({ customer, activeTab, setActiveTab }) => {
+  const { logout } = useAuth();
 
-const Sidebar = ({ customer, openImage, refreshCustomer }) => {
-  const navigate = useNavigate();
-  const [showEdit, setShowEdit] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleLogout = () => logout();
+
+  const menu = [
+    { key: "dashboard", label: "Dashboard", icon: <FaHome /> },
+    { key: "trips", label: "Trips", icon: <FaRoute /> },
+  ];
 
   return (
-    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 
-        shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto 
-        sticky top-0 h-screen">
-
-      {/* Avatar */}
-      <div className="mt-8 w-28 h-28 rounded-full border-2 border-white bg-gray-300 
-        flex items-center justify-center text-gray-500 text-4xl font-bold shadow">
-        {customer.name?.charAt(0)?.toUpperCase() || "?"}
-      </div>
-
-      {/* Name + Edit Button */}
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-bold text-white text-center">
-          {customer.name}
-        </h2>
-
-        <button
-          onClick={() => setShowEdit(true)}
-          className="text-white hover:text-yellow-300 transition"
-        >
-          <FaEdit size={18} />
+    <>
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-indigo-700 
+        flex items-center px-4 z-50">
+        <button onClick={() => setMobileOpen(true)} className="text-white text-xl">
+          <FaBars />
         </button>
+        <h1 className="ml-4 text-white font-semibold">Customer Dashboard</h1>
       </div>
 
-      {/* Customer Details */}
-      <div className="text-sm text-white space-y-1 w-full mt-2">
-        {[
-          ["Phone", customer.phone_number],
-          ["NIC", customer.nic],
-          ["Email", customer.email],
-        ].map(([label, value]) => (
-          <div key={label} className="flex justify-between">
-            <span className="font-semibold w-28">{label}:</span>
-            <span>{value || "-"}</span>
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+        />
+      )}
+
+      <aside
+        className={`
+          fixed lg:sticky top-0 max-h-screen z-50
+          ${collapsed ? "w-20" : "w-72"}
+          ${mobileOpen ? "left-0" : "-left-full lg:left-0"}
+          bg-gradient-to-l from-indigo-700 to-violet-800
+          text-white transition-all duration-300 flex flex-col
+        `}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center p-4 border-b border-white/20">
+          {!collapsed && <h2 className="font-bold">Customer</h2>}
+          <button
+            onClick={() =>
+              window.innerWidth < 1024
+                ? setMobileOpen(false)
+                : setCollapsed(!collapsed)
+            }
+          >
+            {collapsed ? <FaBars /> : <FaArrowLeft />}
+          </button>
+        </div>
+
+        {/* Profile */}
+        <div className="flex flex-col items-center gap-2 p-4">
+          <div className="w-16 h-16 rounded-full bg-white text-indigo-700
+            flex items-center justify-center text-2xl font-bold">
+            {customer.name?.charAt(0)?.toUpperCase()}
           </div>
-        ))}
-      </div>
 
-      {/* NIC Images */}
-      {/*<div className="flex gap-4 mt-6 justify-center w-full">
-        <img
-          src={customer.nic_photo_front || "/nic-front-placeholder.png"}
-          alt="NIC Front"
-          onClick={() => openImage(customer.nic_photo_front)}
-          className="w-32 h-20 rounded-lg object-cover border-2 border-white p-1 shadow cursor-pointer hover:scale-105 transition"
-        />
-        <img
-          src={customer.nic_photo_back || "/nic-back-placeholder.png"}
-          alt="NIC Back"
-          onClick={() => openImage(customer.nic_photo_back)}
-          className="w-32 h-20 rounded-lg object-cover border-2 border-white p-1 shadow cursor-pointer hover:scale-105 transition"
-        />
-      </div>*/}
-    </div>
+          {!collapsed && (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">{customer.name}</span>
+                <FaEdit className="cursor-pointer hover:text-yellow-300" />
+              </div>
+              <span className="text-xs opacity-80">{customer.email}</span>
+            </>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <nav className="flex-1 px-2 space-y-1">
+          {menu.map(item => (
+            <button
+              key={item.key}
+              onClick={() => {
+                setActiveTab(item.key);
+                setMobileOpen(false);
+              }}
+              className={`
+                flex items-center gap-3 px-3 py-2 w-full rounded-lg transition
+                ${activeTab === item.key
+                  ? "bg-white/20"
+                  : "hover:bg-white/10"}
+              `}
+            >
+              {item.icon}
+              {!collapsed && <span>{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <ConfirmWrapper
+          onConfirm={handleLogout}
+          message="Are you sure you want to logout?"
+        >
+          <button className="flex items-center gap-3 p-4 hover:text-red-500">
+            <FaSignOutAlt />
+            {!collapsed && <span>Logout</span>}
+          </button>
+        </ConfirmWrapper>
+      </aside>
+    </>
   );
 };
 
