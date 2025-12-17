@@ -109,8 +109,7 @@ const AddDriver = ({ onCancel, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isConfirmed) return;
-
+   
     // Stop if validation fails
     if (nicError || contactError || ageError) {
       setError("Please fix validation errors before submitting.");

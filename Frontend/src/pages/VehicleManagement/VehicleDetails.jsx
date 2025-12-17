@@ -114,25 +114,7 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
               </button>
             </div>
 
-            {/* Delete Button */}
-            <div className="absolute top-3 right-3">
-              <ConfirmWrapper
-                onConfirm={handleDelete}
-                message="Are you sure you want to delete this vehicle?"
-                confirmText="Yes, Delete"
-                cancelText="Cancel"
-                icon={<FaTrash />}
-                buttonBackgroundColor="bg-red-600"
-                buttonTextColor="text-white"
-              >
-                <button
-                  className="p-2 rounded-full bg-red-200 hover:bg-red-300 text-red-700 shadow"
-                  disabled={loading}
-                >
-                  <FaTrash size={16} />
-                </button>
-              </ConfirmWrapper>
-            </div>
+            
 
             {/* Title & Vehicle Image */}
             <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Vehicle Profile</h2>
