@@ -5,6 +5,7 @@ import api from "../../utils/axiosInstance";
 import KpiDashboard from "./KpiDashboard";
 import Sidebar from "./SideBar";
 import TripsTable from "./TripTable";
+import TripPrintModal from "../TripManagement/TripAction/TripPrintModule";
 
 const CustomerProfileDashboard = () => {
   const { customerID } = useParams();
@@ -13,6 +14,24 @@ const CustomerProfileDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+const [selectedTripId, setSelectedTripId] = useState(null);
+
+const openPrintModal = (tripId) => {
+  setSelectedTripId(tripId);
+  setPrintModalOpen(true);
+};
+
+const closePrintModal = () => {
+  setPrintModalOpen(false);
+};
+
+const onPrintSuccess = () => {
+  alert("Invoice printed successfully!");
+  setPrintModalOpen(false);
+};
+
 
   const fetchCustomer = async () => {
     try {
@@ -55,7 +74,9 @@ const CustomerProfileDashboard = () => {
         )}
 
         {activeTab === "trips" && (
-          <TripsTable trips={customer.trips || []} />
+          <TripsTable trips={customer.trips || []} 
+          onOpenPrintModal={openPrintModal}
+          />
         )}
 
         {activeTab === "payments" && (
@@ -73,6 +94,12 @@ const CustomerProfileDashboard = () => {
       >
         <FaPhoneAlt size={20} />
       </button>
+      <TripPrintModal
+        open={printModalOpen}
+        onClose={closePrintModal}
+        tripId={selectedTripId}
+        onSuccess={onPrintSuccess}
+        />
     </div>
   );
 };

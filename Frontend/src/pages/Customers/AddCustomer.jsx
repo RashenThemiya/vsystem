@@ -78,8 +78,6 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!isConfirmed) return;
 
     setLoading(true);
     setError(null);

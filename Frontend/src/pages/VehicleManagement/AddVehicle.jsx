@@ -187,11 +187,11 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
         )}
 
         {/* Form */}
-<form
-  id="add-vehicle-form"
-  onSubmit={handleSubmit}
-  className="space-y-6"
->
+        <form
+          id="add-vehicle-form"
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="label">Vehicle Number</label>
