@@ -426,15 +426,16 @@ if (setDuePayment) setDuePayment(duePayment);
                   <span className="font-medium">{formatCurrency(p.amount)}</span>{" "}
                   <span className="text-gray-500 text-xs">({formatDate(p.payment_date)})</span>
                 </div>
-                {onDeletePayment && (
-                  <button
-                    onClick={() => handleDelete(p.payment_id)}
-                    className="text-red-600 hover:text-red-800 ml-3"
-                    title="Delete Payment"
-                  >
-                    <FaTrash />
-                  </button>
-                )}
+              {onDeletePayment && trip.trip_status  !== "Completed" && (
+  <button
+    onClick={() => handleDelete(p.payment_id)}
+    className="text-red-600 hover:text-red-800 ml-3"
+    title="Delete Payment"
+  >
+    <FaTrash />
+  </button>
+)}
+
               </li>
             ))}
           </ul>
