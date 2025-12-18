@@ -14,9 +14,9 @@ import {
   updateTripMeterController,
   cancelTripController,
   completeTripController,
-} from "../controllers/tripController";
-import { authenticate } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+} from "../controllers/tripController.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
 const lock = new AsyncLock(); // initialize lock

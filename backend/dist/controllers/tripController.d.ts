@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 /**
  * Create Trip
  */
-export declare const createTripController: (req: Request, res: Response) => Promise<void>;
+export declare const createTripController: (req: Request, res: Response, next: unknown) => Promise<void>;
 export declare const startTripController: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 /**
  * Get All Trips
