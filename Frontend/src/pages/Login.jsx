@@ -74,12 +74,9 @@ export default function PixelPerfectLogin() {
 
         {/* LEFT: Image panel with rounded corners and overlay */}
         <div className="hidden md:block w-110  relative soft-rounded-left" style={{ minHeight: 540 }}>
-          <div className="w-110 h-200 items-center pt-6">
-            <img src={leftImage} alt="hero" className="w-[640px] h-[760px] object-cover" />
+          <div className="w-100 h-150 items-center pt-2 pl-9">
+            <img src={leftImage} alt="hero" className="w-[520px] h-[580px] object-cover" />
           </div>
-          
-          
-
         </div>
 
         {/* RIGHT: Form panel */}
