@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
+import Header from "./Header";
 
 export default function Home() {
   return (
@@ -24,6 +25,8 @@ export default function Home() {
             flex-shrink: 0;
             animation: slideImages 18s infinite ease-in-out;
         }`}</style>
+        <Header title="TRANSPORT" breadcrumb="Transport" />
+        
       {/* HERO SECTION */}
           <section className="relative w-full h-[85vh] overflow-hidden">
           <div className="absolute inset-0 flex transition-transform duration-[1500ms] ease-in-out animate-slide">

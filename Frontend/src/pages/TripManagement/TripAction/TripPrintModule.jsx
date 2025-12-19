@@ -26,7 +26,7 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
 
   const formatCurrency = (v) =>
     v == null ? "-" : `Rs. ${Number(v).toLocaleString()}`;
-  const formatDate = (d) => (d ? new Date(d).toLocaleString() : "-");
+  const formatDate = (d) => (d ? new Date(d).toLocaleDateString() : "-");
 
   const handlePrint = () => {
   if (!trip) return;
@@ -244,7 +244,10 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
                       </thead>
                       <tbody>
                         ${trip.payments
-                          .map(p => `<tr><td>${formatDate(p.payment_date)}</td><td>${formatCurrency(p.amount)}</td></tr>`)
+                          .map(p => 
+                            
+                            `<tr><td>${formatDate(p.payment_date).split("T")[0]}</td>
+                            <td>${formatCurrency(p.amount)}</td></tr>`)
                           .join("")}
                       </tbody>
                     </table>
