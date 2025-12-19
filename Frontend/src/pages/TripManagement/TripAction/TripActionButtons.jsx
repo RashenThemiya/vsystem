@@ -32,7 +32,8 @@ const TripActionButtons = ({
   const showComplete = tripStatus === "Ended";
   const showPrint = tripStatus === "Ended" || tripStatus === "Completed" || tripStatus === "Pending" || tripStatus === "Ongoing" || tripStatus === "Cancelled";
   const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing";
-  const showAlter = tripStatus == "Completed" || tripStatus == "Ended";
+  const showAlterDate = tripStatus !== "Completed" && tripStatus =="Pending"
+  const showAlterMeter = tripStatus !== "Completed" && tripStatus !=="Pending"
   const showAddPayment = tripStatus !== "Completed" && tripStatus !== "Cancelled";
   const showAddDamage = tripStatus !== "Completed" && tripStatus !== "Cancelled";
 
@@ -83,7 +84,7 @@ const TripActionButtons = ({
         </div>
       )}
 
-      {showAlter && (
+      {showAlterDate && (
         <>
           <div className={cardStyle} onClick={onAlterReturnDate}>
             <div className={`${iconBox} bg-purple-50`}>
@@ -91,7 +92,11 @@ const TripActionButtons = ({
             </div>
             <div>Alter Dates</div>
           </div>
+        </>
+      )}
 
+      {showAlterMeter && (
+        <>
           <div className={cardStyle} onClick={onAlterMeter}>
             <div className={`${iconBox} bg-yellow-50`}>
               <FaCar className="text-yellow-600 text-base" />

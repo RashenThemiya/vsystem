@@ -269,11 +269,10 @@ const AddBillModal = ({ onClose, onSuccess }) => {
                 onChange={handleChange}
                 className="input"
               >
-                {billStatusOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s.toUpperCase()}
+                  <option >
+                    Pending
                   </option>
-                ))}
+              
               </select>
             </div>
 
