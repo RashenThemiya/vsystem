@@ -6,6 +6,8 @@ import ModalWrapper from "../../components/ModelWrapper";
 import StatsCards from "../AdminDashboard/StatsCards";
 import FuelEditModal from "../AdminDashboard/FuelEditModal";
 import { useNavigate } from "react-router-dom";
+import ExpiryNotificationPanel from "./ExpiryNotificationPanel";
+
 
 import {
   PieChart,
@@ -128,6 +130,8 @@ export default function DashboardKPIs() {
             <div className="text-sm text-gray-600">
               Signed in as <span className="font-medium">{name}</span> — {role}
             </div>
+                    <ExpiryNotificationPanel />
+
           </div>
 
           {/* Stats Cards */}

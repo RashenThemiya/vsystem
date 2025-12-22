@@ -164,3 +164,81 @@ export const getDashboardKPIs = async () => {
     })),
   };
 };
+
+/* ================= TYPES ================= */
+
+type ExpiryNotification = {
+  vehicle_id: number;
+  vehicle_number: string;
+  expiry_type: "License" | "Insurance" | "Eco Test";
+  expiry_date: Date;
+  days_remaining: number;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+};
+
+/* ================= SERVICE ================= */
+
+export const getVehicleExpiryNotifications = async (): Promise<ExpiryNotification[]> => {
+  const vehicles = await prisma.vehicle.findMany({
+    select: {
+      vehicle_id: true,
+      vehicle_number: true,
+      license_expiry_date: true,
+      insurance_expiry_date: true,
+      eco_test_expiry_date: true,
+    },
+  });
+
+  const today = new Date();
+
+  const notifications: ExpiryNotification[] = [];
+
+  /* ---------- HELPER FUNCTION ---------- */
+  const processExpiry = (
+    vehicle: any,
+    expiryDate: Date | null,
+    type: "License" | "Insurance" | "Eco Test"
+  ) => {
+    if (!expiryDate) return;
+
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let priority: "HIGH" | "MEDIUM" | "LOW" | null = null;
+
+    if (daysRemaining < 0) {
+      priority = "HIGH"; // expired
+    } else if (daysRemaining <= 7) {
+      priority = "MEDIUM"; // within 1 week
+    } else if (daysRemaining <= 30) {
+      priority = "LOW"; // within 1 month
+    }
+
+    if (!priority) return;
+
+    notifications.push({
+      vehicle_id: vehicle.vehicle_id,
+      vehicle_number: vehicle.vehicle_number,
+      expiry_type: type,
+      expiry_date: expiryDate,
+      days_remaining: daysRemaining,
+      priority,
+    });
+  };
+
+  /* ---------- PROCESS ALL VEHICLES ---------- */
+  vehicles.forEach((vehicle) => {
+    processExpiry(vehicle, vehicle.license_expiry_date, "License");
+    processExpiry(vehicle, vehicle.insurance_expiry_date, "Insurance");
+    processExpiry(vehicle, vehicle.eco_test_expiry_date, "Eco Test");
+  });
+
+  /* ---------- SORT: HIGH → MEDIUM → LOW ---------- */
+  const priorityOrder = { HIGH: 1, MEDIUM: 2, LOW: 3 };
+
+  notifications.sort(
+    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
+  );
+
+  return notifications;
+};
