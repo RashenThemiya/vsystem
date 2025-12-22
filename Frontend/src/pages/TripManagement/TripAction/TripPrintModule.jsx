@@ -68,7 +68,7 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
           }
 
           .logo {
-            height: 80px;
+            height: 85px;
           }
 
           .title {
@@ -131,7 +131,7 @@ const TripPrintModal = ({ open, onClose, tripId, onSuccess }) => {
 
           <!-- HEADER -->
           <div class="header">
-            <img src="/images/CP-Logo.png" class="logo" alt="Company Logo" />
+            <img src="/images/logo.jpg" class="logo" alt="Company Logo" />
             <div class="title">TRIP INVOICE</div>
           </div>
 

@@ -20,7 +20,7 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
     String(i + 1).padStart(2, "0")
   )];
 
-  const topRightImage="../../images/footer.png"
+  const topRightImage="../../images/logo.png"
 
   useEffect(() => {
     let filtered = [...trips];
@@ -62,11 +62,11 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
 
         {/* Top-right image */}
         {topRightImage && (
-          <div className="w-30 h-30 md:w-32 md:h-32 mt-7">
+          <div className="w-50 h-50 md:w-30 md:h-30 mt-5">
             <img
               src={topRightImage}
               alt="Top Right"
-              className="w-full h-full object-cover rounded-full shadow-md"
+              
             />
           </div>
         )}

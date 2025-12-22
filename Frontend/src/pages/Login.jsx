@@ -38,10 +38,10 @@ export default function PixelPerfectLogin() {
   };
 
   // IMPORTANT: the image path below points to the uploaded file available in the environment.
-  const leftImage = "/images/footer.png";
+  const leftImage = "/images/logo.jpg";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] pr-20 pt-10">
+    <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] pr-10 pt-10">
       {/* custom styles for diagonal wedge, rounded inner card shadow, and subtle overlays */}
       <style>{`
         .inner-card {
@@ -75,14 +75,14 @@ export default function PixelPerfectLogin() {
      
         {/* LEFT: Image panel */}
         <div
-          className="hidden md:flex relative w-[25rem] rounded-l-2xl overflow-hidden items-center justify-center bg-gray-100"
+          className="hidden md:flex relative w-[25rem] rounded-l-2xl overflow-hidden items-center justify-center bg-white"
           style={{ minHeight: "580px" }}
         >
           <img
           src={leftImage}
           alt="hero"
           className="object-contain"
-          style={{ width: "80%", maxWidth: "100%", height: "80%" }}
+          style={{ width: "100%", maxWidth: "100%", height: "100%" }}
         />
 
         </div>
