@@ -5,7 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
-import Home from "./pages/Home";
+import Home from "./pages/HomePage/Home";
+import Vehicle from './pages/HomePage/Vehicles';
 import CustomerProfileDashboard from './pages/CustomerDashboard/CustomerProfileDashboard';
 
 
@@ -58,6 +59,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/vehicle-page" element={<Vehicle />} />
             <Route path="/login" element={<Login />} />
          
 
