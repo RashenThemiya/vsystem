@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { Bell, X, AlertTriangle } from "lucide-react";
 import axios from "../../utils/axiosInstance"; // your axios instance
+import { useNavigate } from "react-router-dom";
+
+
 
 const priorityStyles = {
-  HIGH: "bg-red-100 text-red-700 border-red-300",
-  MEDIUM: "bg-orange-100 text-orange-700 border-orange-300",
-  LOW: "bg-yellow-100 text-yellow-700 border-yellow-300",
+  HIGH: "bg-red-50 text-red-700 border-red-300",
+  MEDIUM: "bg-orange-50 text-orange-700 border-orange-300",
+  LOW: "bg-yellow-50 text-yellow-700 border-yellow-300",
 };
 
 const ExpiryNotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchNotifications = async () => {
     try {
@@ -35,7 +39,7 @@ const ExpiryNotificationPanel = () => {
       <div className="relative cursor-pointer" onClick={() => setOpen(true)}>
         <Bell className="w-6 h-6 text-gray-700" />
         {notifications.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1.5 py-0.3 rounded-full">
             {notifications.length}
           </span>
         )}
@@ -43,16 +47,17 @@ const ExpiryNotificationPanel = () => {
 
       {/* 🧾 Slide Panel */}
       {open && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-30">
+        <div className="fixed inset-0 z-50 flex justify-end bg-white/30 backdrop-blur-sm">
+
           <div className="w-full max-w-md bg-white h-full shadow-xl flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-indigo-600 to-violet-600 text-white">
               <h2 className="text-lg font-semibold flex items-center gap-2">
-                <AlertTriangle className="text-red-600" />
+                <AlertTriangle className="text-white font-bold" />
                 Vehicle Expiry Alerts
               </h2>
               <X
-                className="cursor-pointer text-gray-600"
+                className="cursor-pointer text-white"
                 onClick={() => setOpen(false)}
               />
             </div>
@@ -73,9 +78,16 @@ const ExpiryNotificationPanel = () => {
                   className={`border rounded-lg p-3 ${priorityStyles[item.priority]}`}
                 >
                   <div className="flex justify-between items-center">
-                    <h4 className="font-semibold">
+                    <h4
+                      className="font-semibold cursor-pointer underline hover:text-indigo-600 transition"
+                      onClick={() => {
+                        setOpen(false); // close panel
+                        navigate(`/vehicles/${item.vehicle_id}`);
+                      }}
+                    >
                       {item.vehicle_number}
                     </h4>
+
                     <span className="text-xs font-bold">
                       {item.priority}
                     </span>
