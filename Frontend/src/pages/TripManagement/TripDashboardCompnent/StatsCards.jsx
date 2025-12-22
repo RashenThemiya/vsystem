@@ -33,17 +33,17 @@ export default function StatsCards({ stats, onStatusSelect }) {
       />
 
       <Card
-        title="Completed"
-        value={stats.completed}
-        icon={<FaCheckCircle />}
-        onClick={() => onStatusSelect("Completed")}
-      />
-
-      <Card
         title="Ended"
         value={stats.ended}
         icon={<FaFlagCheckered />}
         onClick={() => onStatusSelect("Ended")}
+      />
+      
+      <Card
+        title="Completed"
+        value={stats.completed}
+        icon={<FaCheckCircle />}
+        onClick={() => onStatusSelect("Completed")}
       />
 
       <Card
