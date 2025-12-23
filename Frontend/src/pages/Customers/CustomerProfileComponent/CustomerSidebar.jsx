@@ -17,7 +17,7 @@ const CustomerSidebar = ({ customer, openImage, refreshCustomer }) => {
     <div
       className={`relative bg-gradient-to-r from-indigo-600 to-violet-700
       shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto
-      sticky top-0 h-screen transition-all duration-300
+      sticky top-0 max-h-screen transition-all duration-300
       ${collapsed ? "w-20" : "w-72"}`}
     >
       {/* ---------------- COLLAPSE BUTTON ---------------- */}
@@ -55,10 +55,21 @@ const CustomerSidebar = ({ customer, openImage, refreshCustomer }) => {
     )}
 
       {/* Avatar */}
-      <div className="mt-10 w-16 h-16 rounded-full border-2 border-white bg-gray-300 
-        flex items-center justify-center text-gray-500 text-2xl font-bold shadow">
-        {customer.name?.charAt(0)?.toUpperCase() || "?"}
-      </div>
+      <div className="mt-10 w-20 h-20 rounded-full border-2 border-white shadow overflow-hidden bg-gray-200">
+      {customer.profile_photo ? (
+        <img
+          src={customer.profile_photo}
+          alt="Profile"
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={() => openImage(customer.profile_photo)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-bold">
+          {customer.name?.charAt(0)?.toUpperCase() || "?"}
+        </div>
+      )}
+    </div>
+
 
       {/* Name + Edit */}
       {!collapsed && (
