@@ -8,6 +8,8 @@ export default function TripTable({
   onSelectCustomer,
   onStartTrip,
   onEndTrip,
+  onCreateAnotherTrip, // ✅ NEW
+
 }) {
   return (
     <div className="bg-white rounded-xl shadow p-4">
@@ -90,7 +92,17 @@ export default function TripTable({
                           >
                             End
                           </button>
+                          
                         )}
+                        <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCreateAnotherTrip(t);
+                            }}
+                            className="bg-indigo-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                          >
+                            + New
+                          </button>
                       </div>
                     </td>
                   </tr>

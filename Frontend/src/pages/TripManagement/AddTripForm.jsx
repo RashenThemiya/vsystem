@@ -343,7 +343,7 @@ const AddTripForm = ({
         ))}
       </div>
 
-      {/* Discount Field */}
+      {/* Discount */}
       <div>
         <label className="label font-semibold">Discount (Rs)</label>
         <input
@@ -357,7 +357,7 @@ const AddTripForm = ({
         />
       </div>
 
-      {/* Total Cost & Profit Display */}
+      {/* Total Cost & Profit */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div className="p-5 rounded-xl bg-gray-100 border border-gray-300 shadow-sm">
           <h4 className="text-lg font-semibold text-gray-700">Total Estimated Cost</h4>

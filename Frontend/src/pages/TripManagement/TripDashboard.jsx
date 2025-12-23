@@ -209,6 +209,12 @@ export default function TripDashboard() {
               onSelectCustomer={(trip) => navigate(`/customer-profile/${trip.customer?.customer_id}`)}
               onStartTrip={openStartTripModal}
               onEndTrip={openEndTripModal}
+                onCreateAnotherTrip={(trip) =>
+                        navigate("/create-trip", {
+                          state: { copyTrip: trip },
+                        })
+}
+
             />
           </div>
         </div>
