@@ -38,10 +38,10 @@ export default function PixelPerfectLogin() {
   };
 
   // IMPORTANT: the image path below points to the uploaded file available in the environment.
-  const leftImage = "/images/footer.png";
+  const leftImage = "/images/logo.jpg";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] p-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#e6e9f0] pr-10 pt-10">
       {/* custom styles for diagonal wedge, rounded inner card shadow, and subtle overlays */}
       <style>{`
         .inner-card {
@@ -69,23 +69,33 @@ export default function PixelPerfectLogin() {
         .social-circle { width:36px; height:36px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center; background:white; }
       `}</style>
 
-      <div className="relative w-250 max-w-6xl inner-card overflow-hidden bg-white flex" style={{ borderRadius: 18 }}>
+      <div className="relative w-200 max-w-6xl inner-card overflow-hidden bg-white flex" style={{ borderRadius: 18 }}>
       
 
-        {/* LEFT: Image panel with rounded corners and overlay */}
-        <div className="hidden md:block w-110  relative soft-rounded-left" style={{ minHeight: 540 }}>
-          <div className="w-100 h-150 items-center pt-2 pl-9">
-            <img src={leftImage} alt="hero" className="w-[520px] h-[580px] object-cover" />
-          </div>
+     
+        {/* LEFT: Image panel */}
+        <div
+          className="hidden md:flex relative w-[25rem] rounded-l-2xl overflow-hidden items-center justify-center bg-white"
+          style={{ minHeight: "580px" }}
+        >
+          <img
+          src={leftImage}
+          alt="hero"
+          className="object-contain"
+          style={{ width: "100%", maxWidth: "100%", height: "100%" }}
+        />
+
         </div>
 
+
+
         {/* RIGHT: Form panel */}
-        <div className="w-full md:w-140 bg-gradient-to-r from-indigo-700 to-violet-700 text-white p-14 soft-rounded-right flex flex-col justify-center relative" style={{ minHeight: 540 }}>
+        <div className="w-full md:w-110 bg-gradient-to-r from-indigo-700 to-violet-700 text-white p-6 soft-rounded-right flex flex-col justify-center relative" style={{ minHeight: 500 }}>
           <div className="max-w-md mx-auto w-full ">
             <div className="flex justify-center mb-6">
               <div style={{ borderLeft: '4px solid rgba(255,255,255,0.85)', paddingLeft: 12 }}>
               
-                <h2 className="text-2xl md:text-3xl font-serif font-semibold tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>Login Portal</h2>
+                <h2 className="text-2xl md:text-2xl font-serif font-semibold tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>Login Portal</h2>
               </div>
             </div>
 
