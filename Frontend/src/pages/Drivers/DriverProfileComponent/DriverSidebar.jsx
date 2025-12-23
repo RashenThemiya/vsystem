@@ -15,7 +15,7 @@ const DriverSidebar = ({ driver, openImage, refreshDriver }) => {
 
   return (
     <div
-      className={`relative bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen transition-all duration-300
+      className={`relative bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 max-h-screen transition-all duration-300
         ${collapsed ? "w-20" : "w-72"}`}
     >
       {/* ---------------- COLLAPSE BUTTON ---------------- */}

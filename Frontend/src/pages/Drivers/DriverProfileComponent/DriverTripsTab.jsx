@@ -81,54 +81,72 @@ const DriverTripsTab = ({ trips }) => {
       </div>
 
       {/* Trips Table */}
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4">
-        {filteredTrips.length===0 ? (
-          <p className="p-4 text-center text-gray-500">No trips found.</p>
-        ) : (
-          <table className="w-full table-auto border-collapse text-sm text-center">
-            <thead className="bg-white border-b">
-              <tr>
-                <th className="p-2">Trip ID</th>
-                <th className="p-2">From</th>
-                <th className="p-2">To</th>
-                <th className="p-2">Passengers</th>
-                <th className="p-2">Payment</th>
-                <th className="p-2">Driver Cost</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTrips.map(t => (
-                <tr key={t.trip_id} className="text-left hover:bg-gray-50 transition">
-                  <td className="p-1 cursor-pointer" onClick={()=> navigate(`/trip/${t.trip_id}`)}>{t.trip_id}</td>
-                  <td className="p-1">{t.from_location}</td>
-                  <td className="p-1">{t.to_location}</td>
-                  <td className="p-1">{t.num_passengers}</td>
-                  <td className="p-1">{t.payment_amount || "-"}</td>
-                  <td className="p-1">{t.driver_cost || "0"}</td>
-                  <td className="p-1">
-                  <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        t.trip_status === "Completed"
-                          ? "bg-green-200 text-green-800"
-                          : t.trip_status === "Pending"
-                          ? "bg-yellow-200 text-yellow-800"
-                          : t.trip_status === "Cancelled"
-                          ? "bg-red-200 text-red-800"
-                          : "bg-blue-200 text-blue-800"
-                      }`}
-                    >
-                      {t.trip_status}
-                    </span>
-                    </td>
-                  <td className="p-1">{dayjs(t.created_at).format("YYYY-MM-DD")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* Trips Table */}
+<div className="bg-white shadow-md rounded-xl p-4">
+  {filteredTrips.length === 0 ? (
+    <p className="p-4 text-center text-gray-500">No trips found.</p>
+  ) : (
+    <div className="max-h-[500px] overflow-y-auto">
+      <table className="w-full table-auto border-collapse text-sm text-center">
+        
+        {/* Sticky Header */}
+        <thead className="bg-white sticky top-0 z-10 border-b">
+          <tr>
+            <th className="p-2">Trip ID</th>
+            <th className="p-2">From</th>
+            <th className="p-2">To</th>
+            <th className="p-2">Passengers</th>
+            <th className="p-2">Payment</th>
+            <th className="p-2">Driver Cost</th>
+            <th className="p-2">Status</th>
+            <th className="p-2">Created</th>
+          </tr>
+        </thead>
+
+        {/* Scrollable Body */}
+        <tbody>
+          {filteredTrips.map(t => (
+            <tr
+              key={t.trip_id}
+              className="text-left hover:bg-gray-50 transition"
+            >
+              <td
+                className="p-2 cursor-pointer text-indigo-600 hover:underline"
+                onClick={() => navigate(`/trip/${t.trip_id}`)}
+              >
+                {t.trip_id}
+              </td>
+              <td className="p-2">{t.from_location}</td>
+              <td className="p-2">{t.to_location}</td>
+              <td className="p-2">{t.num_passengers}</td>
+              <td className="p-2">{t.payment_amount || "-"}</td>
+              <td className="p-2">{t.driver_cost || "0"}</td>
+              <td className="p-2">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    t.trip_status === "Completed"
+                      ? "bg-green-200 text-green-800"
+                      : t.trip_status === "Pending"
+                      ? "bg-yellow-200 text-yellow-800"
+                      : t.trip_status === "Cancelled"
+                      ? "bg-red-200 text-red-800"
+                      : "bg-blue-200 text-blue-800"
+                  }`}
+                >
+                  {t.trip_status}
+                </span>
+              </td>
+              <td className="p-2">
+                {dayjs(t.created_at).format("YYYY-MM-DD")}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
     </div>
   );
 };

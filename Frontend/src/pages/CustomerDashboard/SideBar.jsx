@@ -73,10 +73,21 @@ const Sidebar = ({ customer, activeTab, setActiveTab }) => {
 
         {/* Profile */}
         <div className="flex flex-col items-center gap-2 p-4">
-          <div className="w-16 h-16 rounded-full bg-white text-indigo-700
-            flex items-center justify-center text-2xl font-bold">
-            {customer.name?.charAt(0)?.toUpperCase()}
-          </div>
+          <div className="mt-10 w-20 h-20 rounded-full border-2 border-white shadow overflow-hidden bg-gray-200">
+          {customer.profile_photo ? (
+            <img
+              src={customer.profile_photo}
+              alt="Profile"
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => openImage(customer.profile_photo)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-bold">
+              {customer.name?.charAt(0)?.toUpperCase() || "?"}
+            </div>
+          )}
+        </div>
+
 
           {!collapsed && (
             <>

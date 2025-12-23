@@ -75,83 +75,86 @@ const CustomerTripsTable = ({ trips }) => {
         
 
       {/* Trips Table */}
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4">
-        {filteredTrips.length===0 ? (
-          <p className="p-4 text-center text-gray-500">No trips found.</p>
-        ) : (
-          <table className="w-full table-auto border-collapse text-sm">
-            <thead className="bg-white border-b">
-              <tr>
-                <th className="p-2">Trip ID</th>
-                <th className="p-2">From</th>
-                <th className="p-2">To</th>
-                <th className="p-2">Passengers</th>
-                <th className="p-2">Payment</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Distance</th>
-                <th className="p-2">Days</th>
-                <th className="p-2">Driver</th>
-                <th className="p-2">Fuel</th>
-                <th className="p-2">Costs</th>
-                <th className="p-2">Created</th>
-                <th className="p-2">Route</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTrips.map(t => (
-                <tr key={t.trip_id} className=" text-left hover:bg-gray-50 transition text-center">
-                  <td className="p-1 cursor-pointer"  onClick={()=> navigate(`/trip/${t.trip_id}`)}>{t.trip_id}</td>
-                  <td className="p-1">{t.from_location}</td>
-                  <td className="p-1">{t.to_location}</td>
-                  <td className="p-1">{t.num_passengers}</td>
-                  <td className="p-1">Rs. {t.payment_amount || "-"}</td>
-                  <td className="p-1">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        t.trip_status === "Completed"
-                          ? "bg-green-200 text-green-800"
-                          : t.trip_status === "Pending"
-                          ? "bg-yellow-200 text-yellow-800"
-                          : t.trip_status === "Cancelled"
-                          ? "bg-red-200 text-red-800"
-                          : "bg-blue-200 text-blue-800"
-                      }`}
-                    >
-                      {t.trip_status}
-                    </span>
-                    </td>
-                  <td className="p-1">
-                    Est: {t.estimated_distance || "-"} km <br/>
-                    Actual: {t.actual_distance || "-"} km
-                  </td>
-                  <td className="p-1">
-                    Est: {t.estimated_days || "-"} <br/>
-                    Actual: {t.actual_days || "-"}
-                  </td>
-                  <td className="p-1">
-                    {t.driver_required} (ID {t.driver_id || "-"})
-                  </td>
-                  <td className="p-1">{t.fuel_required}</td>
-                  <td className="p-1">
-                    Est: Rs. {t.total_estimated_cost?.toLocaleString() || "-"} <br/>
-                    Actual: Rs. {t.total_actual_cost?.toLocaleString() || "-"}
-                  </td>
-                  <td className="p-1">{dayjs(t.created_at).format("YYYY-MM-DD")}</td>
-                  <td className="p-1">
-                    {t.map?.length > 0 ? (
-                      <ol className="list-decimal list-inside">
-                        {t.map.map(m => (
-                          <li key={m.map_id}>{m.location_name} ({m.latitude}, {m.longitude})</li>
-                        ))}
-                      </ol>
-                    ) : "-"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div className="bg-white shadow-md rounded-xl">
+  <div className="max-h-[590px] overflow-y-auto">
+    <table className="w-full table-fixed border-collapse text-sm">
+      <thead className="sticky top-0 z-10 bg-white border-b">
+        <tr>
+          <th className="p-2">Trip ID</th>
+          <th className="p-2">From</th>
+          <th className="p-2">To</th>
+          <th className="p-2">Passengers</th>
+          <th className="p-2">Payment</th>
+          <th className="p-2">Status</th>
+          <th className="p-2">Distance</th>
+          <th className="p-2">Days</th>
+          <th className="p-2">Driver</th>
+          <th className="p-2">Fuel</th>
+          <th className="p-2">Costs</th>
+          <th className="p-2">Created</th>
+          <th className="p-2">Route</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filteredTrips.map(t => (
+          <tr
+            key={t.trip_id}
+            className="hover:bg-gray-50 transition text-center border-b border-gray-300"
+          >
+            <td className="p-1 cursor-pointer" onClick={() => navigate(`/trip/${t.trip_id}`)}>
+              {t.trip_id}
+            </td>
+            <td className="p-1">{t.from_location}</td>
+            <td className="p-1">{t.to_location}</td>
+            <td className="p-1">{t.num_passengers}</td>
+            <td className="p-1">Rs. {t.payment_amount || "-"}</td>
+            <td className="p-1">
+              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                t.trip_status === "Completed"
+                  ? "bg-green-200 text-green-800"
+                  : t.trip_status === "Pending"
+                  ? "bg-yellow-200 text-yellow-800"
+                  : t.trip_status === "Cancelled"
+                  ? "bg-red-200 text-red-800"
+                  : "bg-blue-200 text-blue-800"
+              }`}>
+                {t.trip_status}
+              </span>
+            </td>
+            <td className="p-1">
+              Est: {t.estimated_distance || "-"} km<br/>
+              Actual: {t.actual_distance || "-"} km
+            </td>
+            <td className="p-1">
+              Est: {t.estimated_days || "-"}<br/>
+              Actual: {t.actual_days || "-"}
+            </td>
+            <td className="p-1">{t.driver_required} (ID {t.driver_id || "-"})</td>
+            <td className="p-1">{t.fuel_required}</td>
+            <td className="p-1">
+              Est: Rs. {t.total_estimated_cost?.toLocaleString() || "-"}<br/>
+              Actual: Rs. {t.total_actual_cost?.toLocaleString() || "-"}
+            </td>
+            <td className="p-1">{dayjs(t.created_at).format("YYYY-MM-DD")}</td>
+            <td className="p-1">
+              {t.map?.length > 0 ? (
+                <ol className="list-decimal list-inside text-left">
+                  {t.map.map(m => (
+                    <li key={m.map_id}>
+                      {m.location_name}
+                    </li>
+                  ))}
+                </ol>
+              ) : "-"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
     </div>
   );
 };

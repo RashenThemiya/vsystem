@@ -93,7 +93,7 @@ const TripsTab = ({
   {!trips.length ? (
     <p className="p-4 text-center text-gray-500">No trips found.</p>
   ) : (
-    <div className="max-h-[400px] overflow-y-auto">
+    <div className="max-h-[500px] overflow-y-auto">
       <table className="w-full table-auto border-collapse text-sm">
         <thead className="bg-white sticky top-0 z-20 border-b border-gray-300">
           <tr>
