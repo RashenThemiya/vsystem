@@ -490,11 +490,6 @@ export const updateVehicleService = async (id: number, data: AnyObj) => {
       bill_uploads: true,
       trips: {
         include: {
-          customer: true,
-          driver: true,
-          payments: true,
-          map: true,
-          other_trip_costs: true,
         },
       },
     },

@@ -470,6 +470,7 @@ export const getTripByIdService = async (trip_id: number) => {
           email: true,
           nic_photo_front: true,
           nic_photo_back: true,
+          profile_photo: true,
         },
       },
 
