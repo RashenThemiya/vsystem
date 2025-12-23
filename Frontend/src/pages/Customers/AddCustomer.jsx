@@ -244,16 +244,11 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
               placeholder="NIC Number"
               value={customer.nic}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${
-                nicError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full p-2 border rounded-lg border-gray-300`}
               required
             />
 
-            {nicError && (
-              <p className="text-red-500 text-sm mt-1">{nicError}</p>
-            )}
-        
+    
           {/* NIC Front Image */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">

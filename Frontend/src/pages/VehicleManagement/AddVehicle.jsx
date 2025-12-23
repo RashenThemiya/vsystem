@@ -306,7 +306,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
             </div>
 
             <div>
-              <label className="label">Owner Monthly Cost (Rs)</label>
+              <label className="label">Owner Monthly Cost/ Lease Cost (Rs)</label>
               <input
                 type="number"
                 name="owner_cost_monthly"

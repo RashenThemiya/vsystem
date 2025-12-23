@@ -124,12 +124,13 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
       </div>
 
       {/* Trips Table */}
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4">
+      <div className="bg-white shadow-md rounded-xl p-4">
+        <div className="max-h-[500px] overflow-y-auto overflow-x-auto">
         {filteredTrips.length === 0 ? (
           <p className="p-4 text-center text-gray-500">No trips found.</p>
         ) : (
           <table className="w-full text-sm border-collapse min-w-[700px]">
-            <thead className="border-b">
+            <thead className="border-b sticky top-0 bg-white z-10">
               <tr>
                 <th className="p-2">Trip ID</th>
                 <th className="p-2">Created Date</th>
@@ -236,6 +237,7 @@ const TripsTable = ({ trips, onOpenPrintModal  }) => {
             </tbody>
           </table>
         )}
+        </div>
       </div>
     </div>
   );

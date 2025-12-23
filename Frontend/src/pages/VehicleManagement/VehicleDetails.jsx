@@ -144,7 +144,7 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
                 <p><strong>Contact:</strong> <br /> {vehicle.owner?.contact_number || "-"}</p>
                 <p><strong>Fuel Type:</strong> <br /> {vehicle.fuel?.type || "-"}</p>
                 <p><strong>Daily Rent:</strong> <br /> {vehicle.rent_cost_daily || "-"}</p>
-                <p><strong>Monthly Owner Cost:</strong> <br /> {vehicle.owner_cost_monthly || "-"}</p>
+                <p><strong>Monthly Owner Cost/ Lease Cost:</strong> <br /> {vehicle.owner_cost_monthly || "-"}</p>
                 <p><strong>Mileage Cost:</strong> <br /> {vehicle.mileage_costs?.[0] ? `Base: ${vehicle.mileage_costs[0].mileage_cost}, Additional: ${vehicle.mileage_costs[0].mileage_cost_additional}` : "-"}</p>
               </div>
 

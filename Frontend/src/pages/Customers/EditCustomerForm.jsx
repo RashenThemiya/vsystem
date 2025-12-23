@@ -49,7 +49,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
 
   // Save Handler
   const handleSave = async () => {
-    if (nicError || phoneError) {
+    if (phoneError) {
       setError("Please fix validation errors before saving.");
       return;
     }
@@ -171,7 +171,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
             className="w-full p-2 border border-gray-300 rounded-lg"
             placeholder="NIC Number"
           />
-          {nicError && <p className="text-red-600 text-sm mt-1">{nicError}</p>}
+          
         </div>
 
         {/* Phone */}

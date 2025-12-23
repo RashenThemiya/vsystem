@@ -1,5 +1,6 @@
 import { FaStar, FaUser, FaCar, FaMoneyBillWave, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
+import ConfirmWrapper from "../../components/ConfirmWrapper";
 
 /* ------------------ InfoCard ------------------ */
 import { useState } from "react";

@@ -89,7 +89,7 @@ const Sidebar = ({ vehicle, openImage, refreshVehicle }) => {
           ["Type", vehicle.type],
           ["Daily Rent", `Rs. ${vehicle.rent_cost_daily}`],
           ["AC", vehicle.ac_type],
-          ["Owner Cost/Month", `Rs. ${vehicle.owner_cost_monthly}`],
+          ["Owner Cost/ Lease Cost", `Rs. ${vehicle.owner_cost_monthly}`],
           ["Fuel", vehicle.fuel?.type],
           ["Fuel Cost", `Rs. ${vehicle.fuel?.cost}`],
           ["Efficiency", `${vehicle.vehicle_fuel_efficiency} km/L`],
