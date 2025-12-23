@@ -1,8 +1,10 @@
 // prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
+
 
 datasource db {
   provider = "mysql"
@@ -105,6 +107,7 @@ model Customer {
   nic              String   @db.VarChar(20)
   nic_photo_front  Bytes?
   nic_photo_back   Bytes?
+  profile_photo    Bytes?            // ✅ Customer profile photo
   name             String   @db.VarChar(100)
   phone_number     String   @db.VarChar(20)
   email            String   @db.VarChar(100) @unique

@@ -99,7 +99,6 @@ const TripMap = ({
 
         onSelect(address);
 
-        // Ensure waypoints is always an array
         setTrip((prev) => ({
           ...prev,
           waypoints: Array.isArray(prev.waypoints) ? prev.waypoints : [],
@@ -197,17 +196,22 @@ const TripMap = ({
         const km = (totalMeters / 1000).toFixed(2);
 
         setTrip((prev) => {
-          const newTrip = { ...prev };
-          newTrip.estimated_distance = km;
-          newTrip.map_locations = mapLocations;
-
           const veh = vehicles.find(
-            (v) => Number(v.vehicle_id) === Number(newTrip.vehicle_id)
+            (v) => Number(v.vehicle_id) === Number(prev.vehicle_id)
           );
-          newTrip.total_estimated_cost =
-            calculateTotalEstimatedCost(newTrip, veh);
 
-          return newTrip;
+          const { totalEstimatedCost, profit } = calculateTotalEstimatedCost({
+            trip: { ...prev, estimated_distance: km },
+            selectedVehicle: veh,
+          });
+
+          return {
+            ...prev,
+            estimated_distance: km,
+            map_locations: mapLocations,
+            total_estimated_cost: totalEstimatedCost,
+            profit,
+          };
         });
       }
     );
