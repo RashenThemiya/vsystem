@@ -91,7 +91,7 @@ const CustomerSidebar = ({ customer, openImage, refreshCustomer }) => {
         <div className="text-sm text-white space-y-1 w-full mt-2">
           {[
             ["Phone", customer.phone_number],
-            ["NIC", customer.nic],
+            ["NIC/ID", customer.nic],
             ["Email", customer.email],
           ].map(([label, value]) => (
             <div key={label} className="flex justify-between">

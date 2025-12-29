@@ -12,6 +12,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
+//router.get("/", getAllVehiclesController);
 
 router.use(authenticate);
 router.get(

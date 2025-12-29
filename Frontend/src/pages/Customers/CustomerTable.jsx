@@ -19,7 +19,7 @@ export default function CustomerTable({ customers = [], loading, error, onSelect
                   <th className="">Customer</th>
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Phone</th>
-                  <th className="py-3 px-4">NIC No</th>
+                  <th className="py-3 px-4">NIC/ID</th>
                 </tr>
               </thead>
 
@@ -31,7 +31,7 @@ export default function CustomerTable({ customers = [], loading, error, onSelect
                     onClick={() => onSelectCustomer(c)}
                   >
                     <td className="py-4 px-4 flex items-center gap-3">
-                      <Avatar name={c.name} src={c.avatar_url} />
+                      <Avatar name={c.name} src={c.profile_photo} />
                       <div>
                         <div className="font-medium">{c.name}</div>
                         <div className="text-xs text-gray-400">{c.customer_id}</div>

@@ -163,7 +163,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
 
         {/* NIC */}
         <div>
-          <label className="block text-gray-600 font-medium">NIC Number</label>
+          <label className="block text-gray-600 font-medium">NIC/ID</label>
           <input
             type="text"
             name="nic"

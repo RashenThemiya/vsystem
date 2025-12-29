@@ -35,11 +35,11 @@ export default function Header() {
 
           {/* LOGO */}
           <div className="leading-tight">
-            <h1 className="text-3xl font-serif tracking-wide font-semibold">
+            <h1 className="text-3xl font-serif tracking-wide font-semibold cursor-pointer" onClick={()=> navigate(`/`)}>
               CEYLON PLACES
             </h1>
             <p className="text-sm font-semibold tracking-widest text-gray-700">
-              Sri Lanka
+               Sri Lanka
             </p>
           </div>
 
@@ -49,7 +49,7 @@ export default function Header() {
             {/* LOGIN BUTTON */}
             <button
               onClick={() => navigate("/login")}
-              class="text-white bg-[#7800d0] hover:bg-[#7800d0]/90 focus:ring-4 
+              className="text-white bg-[#7800d0] hover:bg-[#7800d0]/90 focus:ring-4 
               focus:outline-none border rounded-xl
               border-transparent font-medium leading-5 rounded-base text-sm 
               px-3 py-2.5 text-center inline-flex items-center"    

@@ -245,7 +245,7 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
             <input
               type="text"
               name="nic"
-              placeholder="NIC Number"
+              placeholder="NIC/ID"
               value={customer.nic}
               onChange={handleChange}
               className={`w-full p-2 border rounded-lg border-gray-300`}

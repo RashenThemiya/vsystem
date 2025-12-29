@@ -99,9 +99,9 @@ export default function TripTable({
                               e.stopPropagation();
                               onCreateAnotherTrip(t);
                             }}
-                            className="bg-indigo-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded"
                           >
-                            + New
+                            Rebook
                           </button>
                       </div>
                     </td>
