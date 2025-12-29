@@ -40,9 +40,18 @@ export default function TripDashboard() {
   const fetchTrips = async () => {
     setLoading(true);
     try {
-      const startDate = `${yearFilter}-${monthFilter.toString().padStart(2,"0")}-01`;
-      const endDate = `${yearFilter}-${monthFilter.toString().padStart(2,"0")}-31`;
-      let query = `?start_date=${startDate}&end_date=${endDate}`;
+      const isValidYear = Number.isInteger(yearFilter) && yearFilter >= 2000;
+const isValidMonth = Number.isInteger(monthFilter) && monthFilter >= 1 && monthFilter <= 12;
+
+if (!isValidYear || !isValidMonth) {
+  setLoading(false);
+  return;
+}
+
+const startDate = new Date(yearFilter, monthFilter - 1, 1);
+const endDate = new Date(yearFilter, monthFilter, 0); // last day of month
+
+const query = `?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`;
 
       //if (statusFilter) query += `&trip_status=${statusFilter}`;
 
@@ -190,7 +199,19 @@ export default function TripDashboard() {
               {[...Array(12)].map((_, i) => <option key={i+1} value={i+1} className="rounded-xl bg-gray-100 text-gray-800">{new Date(0,i).toLocaleString("default",{month:"long"})}</option>)}
             </select>
             <label>Year:</label>
-            <input type="number" value={yearFilter} onChange={(e) => setYearFilter(Number(e.target.value))} className="w-25 border rounded-xl px-3 py-2 items-center w-24 border-gray-300"/>
+            <input
+              type="number"
+              min="2000"
+              max="2100"
+              value={yearFilter}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "") return;
+                setYearFilter(Number(val));
+              }}
+              className="w-24 border rounded-xl px-3 py-2 border-gray-300"
+            />
+
           </div>
 
           {/* Table */}
