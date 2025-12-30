@@ -68,7 +68,7 @@ const ExpiryNotificationPanel = () => {
 
               {!loading && notifications.length === 0 && (
                 <p className="text-sm text-gray-500">
-                  No expiry notifications 🎉
+                  No expiry notifications
                 </p>
               )}
 

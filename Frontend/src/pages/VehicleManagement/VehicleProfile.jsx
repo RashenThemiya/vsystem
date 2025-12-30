@@ -147,7 +147,7 @@ const VehicleProfile = () => {
         refreshVehicle={fetchVehicle}
       />
 
-      <div className="flex-1 space-y-6 overflow-y-auto">
+      <div className="flex-1 space-y-6 ">
         {/* Tabs */}
         <div className="flex gap-3 border-b pb-2">
           <button

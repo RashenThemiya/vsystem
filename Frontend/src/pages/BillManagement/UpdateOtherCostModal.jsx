@@ -21,6 +21,8 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
   const [insuranceExpiry, setInsuranceExpiry] = useState("");
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [ecoExpiry, setEcoExpiry] = useState("");
+  const [remarks, setRemarks] = useState("");
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,6 +34,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
       setCost(otherCost.cost || "");
       setCostType(otherCost.cost_type || bill.bill_type);
       setServiceMeter(otherCost.service_meter_number || "");
+      setRemarks(otherCost.remarks || ""); 
       setInsuranceExpiry(
         otherCost.insurance_expiry_date
           ? otherCost.insurance_expiry_date.split("T")[0]
@@ -64,6 +67,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
         cost: Number(cost),
         cost_type: costType,
         bill_id: bill.bill_id,
+        remarks: remarks, 
       };
 
       // 🔹 cost-type specific data
@@ -215,6 +219,17 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
               className="input w-full border border-gray-300 rounded px-2 py-1"
             />
           )}
+
+           <div>
+            <label className="label">Remarks</label>
+            <input
+              type="text"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className="input w-full border border-gray-300 rounded px-2 py-1"
+              required
+            />
+          </div>
 
           <button
             type="submit"
