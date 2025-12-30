@@ -19,6 +19,7 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
   const [insuranceExpiry, setInsuranceExpiry] = useState("");
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [ecoExpiry, setEcoExpiry] = useState("");
+  const [remarks, setRemarks] = useState("");
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,6 +37,8 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
       date: new Date(date).toISOString(),// ensures valid ISO-8601
       cost: Number(cost),
       cost_type: costType,
+      remarks: remarks || null,
+
     };
 
       // Conditional fields
@@ -165,6 +168,17 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
               onChange={(e) => setDate(e.target.value)}
               className="border px-2 py-2 rounded w-full"
               required
+            />
+          </div>
+
+          {/* remark */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Remark</label>
+            <input
+              type="text"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className="border px-2 py-2 rounded w-full"
             />
           </div>
 

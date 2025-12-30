@@ -153,7 +153,7 @@ const costTitle =
   {filteredCosts.length === 0 ? (
     <p className="p-4 text-center text-gray-500">No other costs found.</p>
   ) : (
-    <div className="pl-2 pr-2 max-h-[500px] overflow-y-auto">
+    <div className="pl-2 pr-2 max-h-[470px] overflow-y-auto">
       <table className="w-full table-auto border-collapse text-sm">
         <thead className="bg-white border-b sticky top-0 z-20 border-gray-500">
           <tr>
@@ -161,6 +161,7 @@ const costTitle =
             <th className="p-2 text-left">Date</th>
             <th className="p-2 text-left">Cost Type</th>
             <th className="p-2 text-left">Amount</th>
+            <th className="p-2 text-left">Remarks</th>
           </tr>
         </thead>
         <tbody>
@@ -170,6 +171,7 @@ const costTitle =
               <td className="p-2">{c.date?.split("T")[0]}</td>
               <td className="p-2">{c.cost_type}</td>
               <td className="p-2">Rs. {Number(c.cost).toLocaleString()}</td>
+              <td className="p-2">{c.remarks}</td>
             </tr>
           ))}
         </tbody>
