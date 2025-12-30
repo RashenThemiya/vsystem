@@ -187,6 +187,7 @@ model Vehicle_Other_Cost {
   vehicle_id            Int
   date                  DateTime
   cost                  Decimal   @db.Decimal(10,2)
+  remarks               String?   @db.VarChar(255)
   cost_type             VehicleCostType
   vehicle               Vehicle   @relation(fields: [vehicle_id], references: [vehicle_id])
 
