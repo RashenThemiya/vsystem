@@ -231,7 +231,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
               </select>
             </div>
             <div>
-              <label className="label">Owner Monthly Cost (Rs)</label>
+              <label className="label">Owner Monthly Cost/ Lease Cost (Rs)</label>
               <input type="number" name="owner_cost_monthly" value={vehicle.owner_cost_monthly} onChange={handleChange} className="input" />
             </div>
             <div>

@@ -123,16 +123,26 @@ export default function DashboardKPIs() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            
+            {/* Left */}
             <div>
               <h1 className="text-2xl font-semibold">Dashboard KPIs</h1>
-              <p className="text-sm text-gray-500">Overview of trips, vehicles, and fuel costs</p>
+              <p className="text-sm text-gray-500">
+                Overview of trips, vehicles, and fuel costs
+              </p>
             </div>
-            <div className="text-sm text-gray-600">
-              Signed in as <span className="font-medium">{name}</span> — {role}
-            </div>
-                    <ExpiryNotificationPanel />
 
+            {/* Right */}
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-600">
+                Signed in as <span className="font-medium">{name}</span> — {role}
+              </div>
+
+              <ExpiryNotificationPanel />
+            </div>
           </div>
+
+          
 
           {/* Stats Cards */}
           <div className="mb-6">

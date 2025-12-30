@@ -39,7 +39,7 @@ const Sidebar = ({ vehicle, openImage, refreshVehicle }) => {
   ];
 
   return (
-    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
+    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 max-h-screen">
 
       {/* ================= Modal Overlay ================= */}
       {showEdit && (
@@ -89,7 +89,7 @@ const Sidebar = ({ vehicle, openImage, refreshVehicle }) => {
           ["Type", vehicle.type],
           ["Daily Rent", `Rs. ${vehicle.rent_cost_daily}`],
           ["AC", vehicle.ac_type],
-          ["Owner Cost/Month", `Rs. ${vehicle.owner_cost_monthly}`],
+          ["Owner Cost/ Lease Cost", `Rs. ${vehicle.owner_cost_monthly}`],
           ["Fuel", vehicle.fuel?.type],
           ["Fuel Cost", `Rs. ${vehicle.fuel?.cost}`],
           ["Efficiency", `${vehicle.vehicle_fuel_efficiency} km/L`],

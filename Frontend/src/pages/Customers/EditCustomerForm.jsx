@@ -49,7 +49,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
 
   // Save Handler
   const handleSave = async () => {
-    if (nicError || phoneError) {
+    if (phoneError) {
       setError("Please fix validation errors before saving.");
       return;
     }
@@ -65,6 +65,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
         email: form.email,
         nic_photo_front: form.nic_photo_front,
         nic_photo_back: form.nic_photo_back,
+        profile_photo: form.profile_photo,
       };
 
       const response = await api.put(
@@ -171,7 +172,7 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
             className="w-full p-2 border border-gray-300 rounded-lg"
             placeholder="NIC Number"
           />
-          {nicError && <p className="text-red-600 text-sm mt-1">{nicError}</p>}
+          
         </div>
 
         {/* Phone */}
@@ -203,6 +204,28 @@ export default function EditCustomerForm({ customer, onCancel, onSuccess }) {
 
         {/* NIC Photos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {/* NIC Front */}
+  <div>
+    <label className="block text-gray-600 font-medium mb-1">
+      Profile Photo
+    </label>
+
+    {form.profile_photo && (
+      <img
+        src={form.profile_photo}
+        className="w-full h-32 object-cover rounded-lg border mb-2"
+        alt="NIC Front"
+      />
+    )}
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => handleFileChange(e, "profile_photo")}
+      className="w-full p-2 border border-gray-300 rounded-lg"
+    />
+  </div>
+
   {/* NIC Front */}
   <div>
     <label className="block text-gray-600 font-medium mb-1">

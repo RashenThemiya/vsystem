@@ -53,6 +53,7 @@ export default function CustomerDetails({ customer, onClose, onDelete, onUpdated
       email: form.email,
       nic_photo_front: form.nic_photo_front,
       nic_photo_back: form.nic_photo_back,
+      profile_photo: form.profile_photo,
     };
 
     const response = await api.put(
@@ -178,15 +179,15 @@ export default function CustomerDetails({ customer, onClose, onDelete, onUpdated
             <div className="w-28 h-28 rounded-full bg-gray-100 shadow  flex items-center justify-center overflow-hidden cursor-pointer"
             onClick={() => navigate(`/customer-profile/${customer.customer_id}`)}
             >
-              {customer.avatar ? (
+              {customer.profile_photo ? (
                 <img
-                  src={customer.avatar}
+                  src={customer.profile_photo}
                   alt="Avatar"
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="text-3xl font-bold text-gray-700">
-                  {customer.name?.charAt(0)?.toUpperCase() || "U"}
+                  {customer.profile_photo?.charAt(0)?.toUpperCase() || "U"}
                 </span>
               )}
             </div>

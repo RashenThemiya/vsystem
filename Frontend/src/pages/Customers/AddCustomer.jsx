@@ -16,6 +16,7 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
     nic_photo_back: "",
     phone_number: "",
     email: "",
+    profile_photo: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -96,6 +97,8 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
         ...customer,
         nic_photo_front: customer.nic_photo_front ? `data:image/png;base64,${customer.nic_photo_front}` : null,
         nic_photo_back: customer.nic_photo_back ? `data:image/png;base64,${customer.nic_photo_back}` : null,
+        profile_photo: customer.profile_photo ? `data:image/png;base64,${customer.profile_photo}` : null,
+
       };
 
       const response = await axios.post(
@@ -121,6 +124,7 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
           nic_photo_back: "",
           phone_number: "",
           email: "",
+          profile_photo: "",
         });
        
 
@@ -244,16 +248,24 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
               placeholder="NIC Number"
               value={customer.nic}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${
-                nicError ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full p-2 border rounded-lg border-gray-300`}
               required
             />
-
-            {nicError && (
-              <p className="text-red-500 text-sm mt-1">{nicError}</p>
-            )}
-        
+          {/* NIC Front Image */}
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Profile Photo
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              name="profile_photo"
+              onChange={handleFileChange}
+              className="w-full border p-2 rounded-lg"
+              required
+            />
+          </div>
+    
           {/* NIC Front Image */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">

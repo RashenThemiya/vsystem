@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 import api from "../../utils/axiosInstance";
 import {
@@ -48,14 +49,18 @@ const [showCancelModal, setShowCancelModal] = useState(false);
 const [duePayment, setDuePayment] = useState(0);
 
 const handleDeletePayment = async (payment_id) => {
-  if (!confirm("Are you sure you want to delete this payment?")) return;
 
   try {
     console.log("/api/payments/" + payment_id);
     await api.delete(`/api/payments/${payment_id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-    alert("Payment deleted successfully");
+   Swal.fire({
+                  icon: "success",
+                  title: "Payment Deleted",
+                  timer: 2000,
+                  showConfirmButton: true,
+                });
     fetchTrip(); // refresh trip data to update UI
   } catch (err) {
     console.error(err);

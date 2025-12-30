@@ -149,39 +149,35 @@ const costTitle =
       />
 
       {/* TABLE */}
-      <div className="overflow-x-auto bg-white shadow-md rounded-xl p-4 ">
-        {!filteredCosts.length ? (
-          <p className="p-4 text-center text-gray-500">
-            No other costs found.
-          </p>
-        ) : (
-          <table className="w-full table-auto border-collapse text-sm">
-            <thead className="bg-white border-b">
-              <tr>
-                <th className="p-2 text-left">Cost ID</th>
-                <th className="p-2 text-left">Date</th>
-                <th className="p-2 text-left">Cost Type</th>
-                <th className="p-2 text-left">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="p-3">
-              {filteredCosts.map((c) => (
-                <tr
-                  key={c.vehicle_other_cost_id}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="p-2">{c.vehicle_other_cost_id}</td>
-                  <td className="p-2">{c.date?.split("T")[0]}</td>
-                  <td className="p-2">{c.cost_type}</td>
-                  <td className="p-2">
-                    Rs. {Number(c.cost).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div className="bg-white shadow-md rounded-xl p-3">
+  {filteredCosts.length === 0 ? (
+    <p className="p-4 text-center text-gray-500">No other costs found.</p>
+  ) : (
+    <div className="pl-2 pr-2 max-h-[500px] overflow-y-auto">
+      <table className="w-full table-auto border-collapse text-sm">
+        <thead className="bg-white border-b sticky top-0 z-20 border-gray-500">
+          <tr>
+            <th className="p-2 text-left">Cost ID</th>
+            <th className="p-2 text-left">Date</th>
+            <th className="p-2 text-left">Cost Type</th>
+            <th className="p-2 text-left">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredCosts.map((c) => (
+            <tr key={c.vehicle_other_cost_id} className="hover:bg-gray-50">
+              <td className="p-2">{c.vehicle_other_cost_id}</td>
+              <td className="p-2">{c.date?.split("T")[0]}</td>
+              <td className="p-2">{c.cost_type}</td>
+              <td className="p-2">Rs. {Number(c.cost).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
     </>
   );
 };
