@@ -18,9 +18,11 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
     setEditMode(false);
     setError(null);
     setSuccessMsg("");
+    
   }, [vehicle]);
 
   if (!vehicle) return null;
+  console.log("Vehicle image:", vehicle.image);
 
   const handleSave = async () => {
     setLoading(true);

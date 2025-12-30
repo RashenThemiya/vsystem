@@ -39,7 +39,7 @@ const Sidebar = ({ vehicle, openImage, refreshVehicle }) => {
   ];
 
   return (
-    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 max-h-screen">
+    <div className="relative w-72 bg-gradient-to-r from-indigo-600 to-violet-700 shadow-lg rounded-xl p-4 flex flex-col items-center gap-4 overflow-y-auto sticky top-0 h-screen">
 
       {/* ================= Modal Overlay ================= */}
       {showEdit && (

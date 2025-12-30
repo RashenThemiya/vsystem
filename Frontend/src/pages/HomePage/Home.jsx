@@ -30,10 +30,10 @@ export default function Home() {
       {/* HERO SECTION */}
           <section className="relative w-full h-[85vh] overflow-hidden">
           <div className="absolute inset-0 flex transition-transform duration-[1500ms] ease-in-out animate-slide">
-          <img src="/images/Sri Lanka.jpeg" className="w-full h-full object-cover flex-shrink-0" />
-          <img src="/images/Sri Lanka - Advantiko.jpeg" className="w-full h-full object-cover flex-shrink-0" />
-          <img src="/images/Arugam Bay beach - SriLanka.jpeg" className="w-full h-full object-cover flex-shrink-0" />
-          <img src="/images/Kalawewa, Sri Lanka.jpeg" className="w-full h-full object-cover flex-shrink-0" />
+          <img src="/images/slider1.jpg" className="w-full h-full object-cover flex-shrink-0" />
+          <img src="/images/slider2.jpg" className="w-full h-full object-cover flex-shrink-0" />
+          <img src="/images/slider3.jpg" className="w-full h-full object-cover flex-shrink-0" />
+          <img src="/images/slider4.jpg" className="w-full h-full object-cover flex-shrink-0" />
           </div>
 
 
@@ -41,7 +41,7 @@ export default function Home() {
 
 
           <div className="relative text-center text-white px-6 max-w-3xl mx-auto top-1/2 -translate-y-1/2">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Discover Beautiful Places in Sri Lanka</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Welcome To Ceylon Places</h1>
           <p className="text-lg md:text-xl mb-6 drop-shadow-md">Find the best destinations, experiences, and travel guides all in one place.</p>
           </div>
           </section>

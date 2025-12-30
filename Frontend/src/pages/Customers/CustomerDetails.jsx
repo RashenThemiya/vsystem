@@ -210,13 +210,13 @@ export default function CustomerDetails({ customer, onClose, onDelete, onUpdated
             <div className="grid grid-cols-2 gap-y-3 text-sm">
               <p><strong>Email:</strong> <br /> {customer.email || "-"}</p><br></br>
               <p><strong>Phone:</strong> <br /> {customer.phone_number || "-"}</p>
-              <p><strong>NIC:</strong> <br /> {customer.nic || "-"}</p>
+              <p><strong>NIC/ID:</strong> <br /> {customer.nic || "-"}</p>
             </div>
           </div>
 
           {/* NIC Images */}
           <div className="bg-gray-50 rounded-xl p-4 shadow-inner">
-            <h4 className="text-lg font-semibold text-gray-800 mb-3">NIC Images</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">Documents</h4>
 
             <div className="flex flex-col gap-3">
               {customer.nic_photo_front && (

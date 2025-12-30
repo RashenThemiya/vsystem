@@ -43,7 +43,7 @@ export default function VehicleTable({
                   >
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-center gap-3">
-                        <Avatar name={v.name} src={v.avatar_url} />
+                        <Avatar name={v.name} src={v.image} />
                         <div>
                           <div className="font-medium">{v.name}</div>
                           <div className="text-xs text-gray-400">{v.vehicle_id}</div>

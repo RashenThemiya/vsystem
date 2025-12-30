@@ -16,7 +16,7 @@ export default function CustomerSearchBar({ onSearch }) {
         <Search className="text-gray-400 mr-3 " />
         <input
           type="text"
-          placeholder="Search customer by name, NIC, phone..."
+          placeholder="Search customer by name, NIC/ID, phone..."
           value={query}
           onChange={handleInput}
           className="w-full outline-none text-sm "

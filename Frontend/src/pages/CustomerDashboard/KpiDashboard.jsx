@@ -57,31 +57,51 @@ const KpiDashboard = ({ customerID, customerName }) => {
     { name: "Cancelled", count: kpi.barChart?.Cancelled || 0 },
   ];
 
+  const topRightImage="../../images/logo.png"
+
 return (
   <div className="flex flex-col gap-6 p-3 sm:p-4 min-h-screen">
     {/* Welcome Message */}
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
-        Welcome,{" "}
-        <span className="text-violet-700">
-          {customerName || "Valued Customer"}
-        </span>
-        !
-      </h2>
-      <p className="text-sm sm:text-base text-gray-500 mt-2">
-        We are thrilled to have you at Ceylon Places. Here's a quick overview of
-        your activity and KPIs.
-      </p>
-      <p className="text-sm sm:text-base text-gray-500 mt-2 italic">
-        Planning a trip? Call us now! Our team is ready to make your journey
-        smooth and memorable.
-      </p>
+    <div className="bg-white p-4 sm:p-6 rounded-xl shadow flex flex-col md:flex-row items-center justify-between gap-6">
+  
+  {/* LEFT — Welcome Text */}
+  <div className="flex-1">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+      Welcome,{" "}
+      <span className="text-violet-700">
+        {customerName || "Valued Customer"}
+      </span>
+      !
+    </h2>
+
+    <p className="text-sm sm:text-base text-gray-500 mt-2">
+      We are thrilled to have you at Ceylon Places. Here's a quick overview of
+      your activity and KPIs.
+    </p>
+
+    <p className="text-sm sm:text-base text-gray-500 mt-2 italic">
+      Planning a trip? Call us now! Our team is ready to make your journey
+      smooth and memorable.
+    </p>
+  </div>
+
+  {/* RIGHT — Image */}
+  {topRightImage && (
+    <div className="shrink-0">
+      <img
+        src={topRightImage}
+        alt="Logo"
+        className="w-32 h-32 md:w-40 md:h-40 object-contain"
+      />
     </div>
+  )}
+</div>
+
 
     {/* KPI Charts */}
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Payment Status Pie Chart */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow w-full h-[320px] sm:h-[360px] lg:h-[300px]">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow w-full h-[350px] sm:h-[360px] lg:h-[350px]">
         <h3 className="text-sm sm:text-md font-semibold text-gray-700 mb-1">
           Your Payment Status
         </h3>
@@ -89,7 +109,7 @@ return (
           Overview of your paid, partially paid, and unpaid payments.
         </p>
 
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="85%">
           <PieChart>
             <Pie
               data={pieData}
@@ -110,13 +130,13 @@ return (
               ))}
             </Pie>
             <Tooltip />
-            <Legend verticalAlign="bottom" height={36} />
+            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
       {/* Trip Status Bar Chart */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow w-full h-[320px] sm:h-[360px] lg:h-[300px]">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow w-full h-[350px] sm:h-[360px] lg:h-[350px]">
         <h3 className="text-sm sm:text-md font-semibold text-gray-700 mb-1">
           Your Trip Summary
         </h3>
@@ -124,7 +144,7 @@ return (
           Track your trips by status.
         </p>
 
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="90%">
           <BarChart data={barData}>
             <XAxis
               dataKey="name"
@@ -133,7 +153,7 @@ return (
             />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Legend verticalAlign="bottom" height={36} />
+            <Legend />
             <Bar
               dataKey="count"
               radius={[6, 6, 0, 0]}
