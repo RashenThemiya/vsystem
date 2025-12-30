@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 
 /* ============================
-   DTOs (Correct Way)
+   DTOs (Updated with remarks)
 ============================ */
 
 export type VehicleCostCreateInput = {
@@ -15,8 +15,9 @@ export type VehicleCostCreateInput = {
   cost: number;
   cost_type: VehicleCostType;
   bill_id?: number | null;
+  remarks?: string | null; // 🔹 Added remarks
 
-  // 🔽 Extra fields for vehicle update
+  // Extra fields for vehicle update
   service_meter_number?: number;
   insurance_expiry_date?: Date;
   license_expiry_date?: Date;
@@ -52,6 +53,7 @@ export const createVehicleCostService = async (
         cost: data.cost,
         cost_type: data.cost_type,
         bill_id,
+        remarks: data.remarks, // 🔹 Include remarks
       },
     });
 
@@ -156,6 +158,7 @@ export const updateVehicleCostService = async (
         date: data.date,
         cost: data.cost,
         cost_type: data.cost_type,
+        remarks: data.remarks, // 🔹 Update remarks
         bill: billConnection,
       },
       include: {
