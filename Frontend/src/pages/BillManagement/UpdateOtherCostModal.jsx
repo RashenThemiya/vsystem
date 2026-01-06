@@ -227,7 +227,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               className="input w-full border border-gray-300 rounded px-2 py-1"
-              required
+              
             />
           </div>
 

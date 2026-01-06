@@ -106,6 +106,30 @@ export const OneColumnRowSub = ({ label, value }) => (
 export const CustomerDetails = ({ trip, isBase64 }) => {
   const customer = trip.customer;
 
+   
+   
+   const bytesObjectToBase64 = (img) => {
+  if (!img) return null;
+
+  // already base64 string
+  if (typeof img === "string") {
+    return img.startsWith("data:image")
+      ? img
+      : `data:image/png;base64,${img}`;
+  }
+
+  // object with numeric keys → Uint8Array
+  if (typeof img === "object") {
+    const bytes = Uint8Array.from(Object.values(img));
+    let binary = "";
+    bytes.forEach((b) => (binary += String.fromCharCode(b)));
+    return `data:image/png;base64,${btoa(binary)}`;
+  }
+
+  return null;
+};
+
+
   if (!customer)
     return (
       <div className="text-sm font-semibold text-white mt-2">
@@ -114,11 +138,8 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
     );
 
   // Avatar = NIC front image OR fallback circle with initials
-  const avatarImg = customer.nic_photo_frontt
-    ? (isBase64(customer.nic_photo_frontt)
-        ? `data:image/jpeg;base64,${customer.nic_photo_frontt}`
-        : customer.nic_photo_front)
-    : null;
+
+  const avatarImg = bytesObjectToBase64(customer.profile_photo);
 
   // NIC Images
   const nicFront = customer.nic_photo_front
@@ -149,7 +170,7 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
     <img
       src={avatarImg}
       alt="Customer Avatar"
-      className="w-32 h-32 object-cover rounded-full shadow border mb-4"
+      className="w-32 h-32 bg-white object-cover rounded-full shadow border mb-4"
     />
   ) : (
     <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-black shadow mb-4">
@@ -202,6 +223,7 @@ export const CustomerDetails = ({ trip, isBase64 }) => {
 
 /* ------------------ DriverDetails ------------------ */
 export const DriverDetails = ({ trip, isBase64 }) => {
+  
   if (!trip.driver)
     return (
       <div className="text-sm font-semibold text-gray-100 mt-2">
