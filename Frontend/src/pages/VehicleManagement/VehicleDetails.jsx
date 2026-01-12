@@ -63,6 +63,7 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
   };
 
   const handleDelete = async () => {
+    console.log("Deleting vehicle ID:", vehicle?.vehicle_id);
     setLoading(true);
     setError(null);
     try {
@@ -73,7 +74,7 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
       setSuccessMsg("Vehicle deleted successfully!");
       setTimeout(() => setSuccessMsg(""), 2000);
     } catch (err) {
-      console.error(err);
+      console.error("Delete error:", err.response?.data || err);
       setError(err.response?.data?.message || "Failed to delete vehicle.");
     } finally {
       setLoading(false);
@@ -114,6 +115,27 @@ export default function VehicleDetails({ vehicle, onClose, onDelete, onUpdated }
               >
                 <FaEdit size={16} />
               </button>
+            </div>
+            {/* Delete Button */}
+            <div className="absolute top-3 right-3 z-10">
+              <ConfirmWrapper
+                onConfirm={handleDelete}
+                message="Are you sure you want to delete this vehicle?"
+                confirmText="Yes, Delete"
+                cancelText="Cancel"
+                icon={<FaTrash />}
+                buttonBackgroundColor="bg-red-600"
+                buttonTextColor="text-white"
+              >
+                <button
+                  type="button"
+                  className="p-2 rounded-full bg-red-200 hover:bg-red-300 text-red-700 shadow"
+                  title="Delete Vehicle"
+                  disabled={loading}
+                >
+                  <FaTrash size={16} />
+                </button>
+              </ConfirmWrapper>
             </div>
 
             

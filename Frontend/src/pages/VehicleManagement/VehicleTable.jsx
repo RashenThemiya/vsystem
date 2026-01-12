@@ -19,7 +19,7 @@ export default function VehicleTable({
           {/* Scrollable area for rows while header stays fixed */}
           <div className="max-h-[500px] overflow-y-auto rounded">
             <table className="min-w-full table-fixed">
-              <thead className="bg-white sticky top-0 z-20 text-sm text-gray-600 border-b">
+              <thead className="bg-white  top-0 z-20 text-sm text-gray-600 border-b">
                 <tr>
                   <th className="py-3 px-4 text-left w-1/5">Vehicle</th>
                   <th className="py-3 px-4 text-left w-1/6">Number Plate</th>
