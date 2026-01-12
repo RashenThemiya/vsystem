@@ -45,15 +45,15 @@ export const createVehicleService = async (data: any) => {
         ? Number(data.last_service_meter_number)
         : null,
       owner_id: data.owner_id ? Number(data.owner_id) : null,
-      license_image: data.license_image ? Buffer.from(data.license_image, "base64") : null,
+      license_image: data.license_image ? toBufferIfBase64(data.license_image) : null,
       insurance_card_image: data.insurance_card_image
-        ? Buffer.from(data.insurance_card_image, "base64")
+        ? toBufferIfBase64(data.insurance_card_image)
         : null,
       eco_test_image: data.eco_test_image
-        ? Buffer.from(data.eco_test_image, "base64")
+        ? toBufferIfBase64(data.eco_test_image)
         : null,
-      book_image: data.book_image ? Buffer.from(data.book_image, "base64") : null,
-      image: data.image ? Buffer.from(data.image, "base64") : null,
+      book_image: data.book_image ? toBufferIfBase64(data.book_image) : null,
+      image: data.image ? toBufferIfBase64(data.image) : null,
       gps: data.gps_latitude && data.gps_longitude && data.tracker_id
         ? {
             create: {
