@@ -26,11 +26,14 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
     insurance_expiry_date: "",
     eco_test_expiry_date: "",
     vehicle_fuel_efficiency: "",
-    license_image: "",
-    insurance_card_image: "",
-    eco_test_image: "",
-    book_image: "",
-    image: "",
+  });
+
+  const [files, setFiles] = useState({
+    license_image: null,
+    insurance_card_image: null,
+    eco_test_image: null,
+    book_image: null,
+    image: null,
   });
 
   const [owners, setOwners] = useState([]);
@@ -38,7 +41,6 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const [preview, setPreview] = useState({});
 
   const vehicleTypes = ["Car", "Van", "Bus", "Bike"];
@@ -78,13 +80,14 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   };
 
   const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    const file = files[0];
+    const { name, files: fileList } = e.target;
+    const file = fileList[0];
     if (file) {
+      setFiles((prev) => ({ ...prev, [name]: file }));
+
+      // Preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64 = reader.result.split(",")[1];
-        setVehicle((prev) => ({ ...prev, [name]: base64 }));
         setPreview((prev) => ({ ...prev, [name]: reader.result }));
       };
       reader.readAsDataURL(file);
@@ -98,13 +101,25 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
 
     try {
       const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      // Append vehicle fields
+      Object.keys(vehicle).forEach((key) => {
+        if (vehicle[key] !== "") formData.append(key, vehicle[key]);
+      });
+
+      // Append files
+      Object.keys(files).forEach((key) => {
+        if (files[key]) formData.append(key, files[key]);
+      });
+
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/vehicles`,
-        vehicle,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -112,7 +127,6 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
       if (res.status === 200 || res.status === 201) {
         setShowSuccess(true);
         onSuccess(res.data.data);
-
         setTimeout(() => onClose(), 2000);
       }
     } catch (err) {
@@ -120,12 +134,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
       setError(err.response?.data?.message || "Failed to add vehicle");
     } finally {
       setLoading(false);
-      setIsConfirmed(false);
     }
-  };
-
-  const handleConfirm = () => {
-    setIsConfirmed(true);
   };
 
   return (
