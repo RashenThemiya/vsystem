@@ -2,10 +2,18 @@ import { prisma } from "../config/prismaClient.js";
 type AnyObj = Record<string, any>;
 
 const toBufferIfBase64 = (val: any) => {
-  if (val === null) return null;
-  if (!val) return undefined;
+  if (!val) return null;
+
+  // Remove prefix if it's a data URL
+  if (typeof val === "string" && val.startsWith("data:")) {
+    const base64Data = val.split(",")[1];
+    return Buffer.from(base64Data, "base64");
+  }
+
+  // Otherwise assume pure base64
   return Buffer.from(val, "base64");
 };
+
 
 /**
  * Create a new vehicle

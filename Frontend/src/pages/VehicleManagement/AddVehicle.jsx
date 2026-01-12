@@ -116,6 +116,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
         setTimeout(() => onClose(), 2000);
       }
     } catch (err) {
+      console.error("Add vehicle error:", err.response?.data || err);
       setError(err.response?.data?.message || "Failed to add vehicle");
     } finally {
       setLoading(false);
