@@ -176,6 +176,15 @@ const AddCustomer = ({ onCancel, onSuccess }) => {
     return contact.test(contact_number);
   };
 
+    if (loading) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Adding customer...
+      </p>
+    </div>
+  </div>;
+
 
   
   return (

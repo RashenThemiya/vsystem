@@ -135,6 +135,15 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
       Loading vehicle data...
     </div>
   );
+  if (saving) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Updating vehicle...
+      </p>
+    </div>
+  </div>;
+
   return (
     <div className="fixed inset-0 bg-white/40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl mt-12 relative p-8">
