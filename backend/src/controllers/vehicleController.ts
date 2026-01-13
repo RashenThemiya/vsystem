@@ -8,13 +8,27 @@ import {
   getActiveVehiclesService, // 🆕 NEW
 
 } from "../services/vehicleService.js";
+import { Multer } from "multer";
 
 /**
  * ✅ Create a new vehicle
  */
+
 export const createVehicleController = async (req: Request, res: Response) => {
   try {
-    const data = req.body;
+    const files = req.files as
+      | Record<string, Express.Multer.File[]>
+      | undefined;
+
+    const data = {
+      ...req.body,
+
+      image: files?.image?.[0]?.buffer,
+      license_image: files?.license_image?.[0]?.buffer,
+      insurance_card_image: files?.insurance_card_image?.[0]?.buffer,
+      eco_test_image: files?.eco_test_image?.[0]?.buffer,
+      book_image: files?.book_image?.[0]?.buffer,
+    };
 
     if (
       !data.vehicle_number ||
@@ -24,7 +38,9 @@ export const createVehicleController = async (req: Request, res: Response) => {
       !data.owner_id ||
       !data.fuel_id
     ) {
-      return res.status(400).json({ message: "Missing required vehicle fields" });
+      return res.status(400).json({
+        message: "Missing required vehicle fields",
+      });
     }
 
     const newVehicle = await createVehicleService(data);
@@ -100,7 +116,25 @@ export const getVehicleByIdController = async (req: Request, res: Response) => {
 export const updateVehicleController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updatedVehicle = await updateVehicleService(Number(id), req.body);
+    const vehicleId = Number(id);
+
+    if (isNaN(vehicleId)) {
+      return res.status(400).json({ message: "Invalid vehicle ID" });
+    }
+
+    // Handle uploaded files (Multer)
+    const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+
+    const data = {
+      ...req.body,
+      image: files?.image?.[0]?.buffer,
+      license_image: files?.license_image?.[0]?.buffer,
+      insurance_card_image: files?.insurance_card_image?.[0]?.buffer,
+      eco_test_image: files?.eco_test_image?.[0]?.buffer,
+      book_image: files?.book_image?.[0]?.buffer,
+    };
+
+    const updatedVehicle = await updateVehicleService(vehicleId, data);
 
     return res.status(200).json({
       message: "✅ Vehicle updated successfully",
@@ -114,7 +148,6 @@ export const updateVehicleController = async (req: Request, res: Response) => {
     });
   }
 };
-
 /**
  * ✅ Delete vehicle and all related records (GPS, mileage, etc.)
  */
