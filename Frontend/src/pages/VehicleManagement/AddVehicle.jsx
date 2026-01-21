@@ -80,19 +80,31 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   };
 
   const handleFileChange = (e) => {
-    const { name, files: fileList } = e.target;
-    const file = fileList[0];
-    if (file) {
-      setFiles((prev) => ({ ...prev, [name]: file }));
+  const { name, files: fileList } = e.target;
+  const file = fileList[0];
 
-      // Preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview((prev) => ({ ...prev, [name]: reader.result }));
-      };
-      reader.readAsDataURL(file);
+  if (file) {
+    // Validate file size (1MB)
+    const maxSize = 1 * 1024 * 1024; // 1MB
+
+    if (file.size > maxSize) {
+      setError("Image size must be less than 1MB.");
+      setFiles((prev) => ({ ...prev, [name]: null }));
+      setPreview((prev) => ({ ...prev, [name]: null }));
+      return;
     }
-  };
+
+    setFiles((prev) => ({ ...prev, [name]: file }));
+
+    // Preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview((prev) => ({ ...prev, [name]: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,7 +149,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
     }
   };
 
-   if (loading) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+   if (loading) return <div className="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
     <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
       <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       <p className="text-sm font-semibold text-gray-700">
