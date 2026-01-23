@@ -8,12 +8,12 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
   const [owners, setOwners] = useState([]);
   const [fuels, setFuels] = useState([]);
   const [preview, setPreview] = useState({});
-  const [changedImages, setChangedImages] = useState({}); // track changed images
+  const [changedImages, setChangedImages] = useState({}); // track changed File objects
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const availabilityOptions = ["Yes", "No"];
 
+  const availabilityOptions = ["Yes", "No"];
   const vehicleTypes = ["Car", "Van", "Bus", "Bike"];
   const acTypes = ["AC", "Non_AC"];
   const imageFields = [
@@ -42,49 +42,33 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
     fetchMeta();
 
- if (initialVehicle) {
-  setVehicle({
-    ...initialVehicle,
+    if (initialVehicle) {
+      setVehicle({
+        ...initialVehicle,
+        fuel_id: initialVehicle.fuel?.fuel_id || "",
+        owner_id: initialVehicle.owner?.owner_id?.toString() || "",
+        mileage_cost: initialVehicle.mileage_costs?.[0]?.mileage_cost || "",
+        mileage_cost_additional: initialVehicle.mileage_costs?.[0]?.mileage_cost_additional || "",
+        license_expiry_date: initialVehicle.license_expiry_date?.split("T")[0] || "",
+        insurance_expiry_date: initialVehicle.insurance_expiry_date?.split("T")[0] || "",
+        eco_test_expiry_date: initialVehicle.eco_test_expiry_date?.split("T")[0] || "",
+      });
 
-    // ✅ fuel
-    fuel_id: initialVehicle.fuel?.fuel_id || "",
-      owner_id: initialVehicle.owner?.owner_id?.toString() || "", // ✅ important
-
-    // ✅ mileage costs (take latest)
-    mileage_cost: initialVehicle.mileage_costs?.[0]?.mileage_cost || "",
-    mileage_cost_additional:
-      initialVehicle.mileage_costs?.[0]?.mileage_cost_additional || "",
-
-    // ✅ format dates for input[type="date"]
-    license_expiry_date: initialVehicle.license_expiry_date
-      ? initialVehicle.license_expiry_date.split("T")[0]
-      : "",
-
-    insurance_expiry_date: initialVehicle.insurance_expiry_date
-      ? initialVehicle.insurance_expiry_date.split("T")[0]
-      : "",
-
-    eco_test_expiry_date: initialVehicle.eco_test_expiry_date
-      ? initialVehicle.eco_test_expiry_date.split("T")[0]
-      : "",
-  });
-
-  setPreview({
-    license_image: initialVehicle.license_image,
-    insurance_card_image: initialVehicle.insurance_card_image,
-    eco_test_image: initialVehicle.eco_test_image,
-    book_image: initialVehicle.book_image,
-    image: initialVehicle.image,
-  });
-}
-
+      setPreview({
+        license_image: initialVehicle.license_image,
+        insurance_card_image: initialVehicle.insurance_card_image,
+        eco_test_image: initialVehicle.eco_test_image,
+        book_image: initialVehicle.book_image,
+        image: initialVehicle.image,
+      });
+    }
 
     setLoading(false);
   }, [initialVehicle]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setVehicle((prev) => ({ ...prev, [name]: value }));
+    setVehicle(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
@@ -92,17 +76,14 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     const file = files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result.split(",")[1];
+    // Optional: limit file size to 50MB
+    if (file.size > 50 * 1024 * 1024) {
+      alert("File too large! Max 50MB.");
+      return;
+    }
 
-      // Mark this image as changed
-      setChangedImages((prev) => ({ ...prev, [name]: true }));
-
-      setVehicle((prev) => ({ ...prev, [name]: base64 }));
-      setPreview((prev) => ({ ...prev, [name]: reader.result }));
-    };
-    reader.readAsDataURL(file);
+    setChangedImages(prev => ({ ...prev, [name]: file }));
+    setPreview(prev => ({ ...prev, [name]: URL.createObjectURL(file) }));
   };
 
   const updateVehicle = async () => {
@@ -111,19 +92,32 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
 
     try {
       const token = localStorage.getItem("token");
+      const formData = new FormData();
 
-      // Prepare payload
-      const payload = { ...vehicle };
+      // Append non-image fields
+      Object.keys(vehicle).forEach(key => {
+        if (!imageFields.includes(key)) {
+          const value = vehicle[key];
+          if (value !== undefined && value !== null) formData.append(key, value);
+        }
+      });
 
-      // Set unchanged images to null
-      imageFields.forEach((field) => {
-        if (!changedImages[field]) payload[field] = null;
+      // Append only changed images
+      imageFields.forEach(field => {
+        if (changedImages[field]) {
+          formData.append(field, changedImages[field]);
+        }
       });
 
       const res = await api.put(
         `/api/vehicles/${vehicle.vehicle_id}`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       const updatedVehicle = res.data?.data || res.data;
@@ -136,7 +130,19 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center min-h-[300px] text-gray-500">Loading vehicle data...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-[300px] text-gray-500">
+      Loading vehicle data...
+    </div>
+  );
+  if (saving) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Updating vehicle...
+      </p>
+    </div>
+  </div>;
 
   return (
     <div className="fixed inset-0 bg-white/40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">

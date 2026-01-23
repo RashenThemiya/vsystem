@@ -1,33 +1,37 @@
 import { prisma } from "../config/prismaClient.js";
 type AnyObj = Record<string, any>;
 
-const toBufferIfBase64 = (val: any) => {
+const toBufferIfBase64 = (val?: string | null) => {
   if (!val) return null;
 
-  // Remove prefix if it's a data URL
-  if (typeof val === "string" && val.startsWith("data:")) {
-    const base64Data = val.split(",")[1];
-    return Buffer.from(base64Data, "base64");
+  if (typeof val === "string") {
+    // Remove data URL prefix if present
+    const base64Match = val.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (base64Match) {
+      return Buffer.from(base64Match[2], "base64");
+    }
+    // Otherwise assume pure base64
+    return Buffer.from(val, "base64");
   }
 
-  // Otherwise assume pure base64
-  return Buffer.from(val, "base64");
+  return null;
 };
+
 
 
 /**
  * Create a new vehicle
- */
-export const createVehicleService = async (data: any) => {
+ */export const createVehicleService = async (data: any) => {
   return prisma.vehicle.create({
     data: {
       vehicle_number: data.vehicle_number,
       name: data.name,
       type: data.type,
-      rent_cost_daily: data.rent_cost_daily ? Number(data.rent_cost_daily) : 0,
+      rent_cost_daily: Number(data.rent_cost_daily || 0),
       fuel_id: Number(data.fuel_id),
       ac_type: data.ac_type,
-      owner_cost_monthly: data.owner_cost_monthly ? Number(data.owner_cost_monthly) : 0,
+      owner_cost_monthly: Number(data.owner_cost_monthly || 0),
+
       license_expiry_date: data.license_expiry_date
         ? new Date(data.license_expiry_date)
         : null,
@@ -37,33 +41,37 @@ export const createVehicleService = async (data: any) => {
       eco_test_expiry_date: data.eco_test_expiry_date
         ? new Date(data.eco_test_expiry_date)
         : null,
+
       vehicle_fuel_efficiency: data.vehicle_fuel_efficiency
         ? Number(data.vehicle_fuel_efficiency)
         : null,
+
       meter_number: data.meter_number ? Number(data.meter_number) : null,
       last_service_meter_number: data.last_service_meter_number
         ? Number(data.last_service_meter_number)
         : null,
+
       owner_id: data.owner_id ? Number(data.owner_id) : null,
-      license_image: data.license_image ? toBufferIfBase64(data.license_image) : null,
-      insurance_card_image: data.insurance_card_image
-        ? toBufferIfBase64(data.insurance_card_image)
-        : null,
-      eco_test_image: data.eco_test_image
-        ? toBufferIfBase64(data.eco_test_image)
-        : null,
-      book_image: data.book_image ? toBufferIfBase64(data.book_image) : null,
-      image: data.image ? toBufferIfBase64(data.image) : null,
-      gps: data.gps_latitude && data.gps_longitude && data.tracker_id
-        ? {
-            create: {
-              tracker_id: data.tracker_id,
-              latitude: data.gps_latitude,
-              longitude: data.gps_longitude,
-              recorded_at: new Date(),
-            },
-          }
-        : undefined,
+
+      // ✅ DIRECT BUFFERS FROM MULTER
+      image: data.image ?? null,
+      license_image: data.license_image ?? null,
+      insurance_card_image: data.insurance_card_image ?? null,
+      eco_test_image: data.eco_test_image ?? null,
+      book_image: data.book_image ?? null,
+
+      gps:
+        data.tracker_id && data.gps_latitude && data.gps_longitude
+          ? {
+              create: {
+                tracker_id: data.tracker_id,
+                latitude: Number(data.gps_latitude),
+                longitude: Number(data.gps_longitude),
+                recorded_at: new Date(),
+              },
+            }
+          : undefined,
+
       mileage_costs:
         data.mileage_cost && data.mileage_cost_additional
           ? {
@@ -75,12 +83,13 @@ export const createVehicleService = async (data: any) => {
           : undefined,
     },
     include: {
-    mileage_costs: true, // <-- include mileage costs in the returned object
-    owner: true,
-    fuel: true,
-  },
+      mileage_costs: true,
+      owner: true,
+      fuel: true,
+    },
   });
 };
+
 
 /**
  * Get all vehicles (no image data)
@@ -280,12 +289,11 @@ export const getVehicleByIdService = async (id: number) => {
 /**
  * Update a vehicle and related data (GPS, Mileage, Owner)
 
-*/
-export const updateVehicleService = async (id: number, data: AnyObj) => {
+*/export const updateVehicleService = async (id: number, data: AnyObj) => {
   const scalarUpdate: AnyObj = {};
 
-  const maybeSetNumber = (k: string, cast = true) => {
-    if (data[k] !== undefined) scalarUpdate[k] = cast ? Number(data[k]) : data[k];
+  const maybeSetNumber = (k: string) => {
+    if (data[k] !== undefined) scalarUpdate[k] = Number(data[k]);
   };
 
   // =========================
@@ -349,27 +357,18 @@ export const updateVehicleService = async (id: number, data: AnyObj) => {
       data.owner_id === null ? null : Number(data.owner_id);
 
   // =========================
-  // 2️⃣ IMAGE HANDLING (SAFE)
+  // 2️⃣ IMAGE HANDLING (CORRECT)
   // =========================
-  // ✅ Update ONLY if base64 string is provided
-  // ❌ null / undefined → keep old image
+  // ✅ Multer provides Buffer
+  // ❌ No base64 conversion
+  // ❌ No overwrite if undefined
 
-  const imageFields = [
-    "image",
-    "license_image",
-    "insurance_card_image",
-    "eco_test_image",
-    "book_image",
-  ];
-
-  for (const field of imageFields) {
-    if (
-      typeof data[field] === "string" &&
-      data[field].trim() !== ""
-    ) {
-      scalarUpdate[field] = Buffer.from(data[field], "base64");
-    }
-  }
+  if (data.image) scalarUpdate.image = data.image;
+  if (data.license_image) scalarUpdate.license_image = data.license_image;
+  if (data.insurance_card_image)
+    scalarUpdate.insurance_card_image = data.insurance_card_image;
+  if (data.eco_test_image) scalarUpdate.eco_test_image = data.eco_test_image;
+  if (data.book_image) scalarUpdate.book_image = data.book_image;
 
   // =========================
   // 3️⃣ Update main vehicle
@@ -391,9 +390,7 @@ export const updateVehicleService = async (id: number, data: AnyObj) => {
       where: { vehicle_id: id },
     });
 
-    const gpsPayload: AnyObj = {
-      recorded_at: new Date(),
-    };
+    const gpsPayload: AnyObj = { recorded_at: new Date() };
 
     if (data.tracker_id !== undefined)
       gpsPayload.tracker_id = String(data.tracker_id);
@@ -496,10 +493,7 @@ export const updateVehicleService = async (id: number, data: AnyObj) => {
       mileage_costs: true,
       vehicle_other_costs: true,
       bill_uploads: true,
-      trips: {
-        include: {
-        },
-      },
+      trips: true,
     },
   });
 };

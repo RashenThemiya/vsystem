@@ -26,11 +26,14 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
     insurance_expiry_date: "",
     eco_test_expiry_date: "",
     vehicle_fuel_efficiency: "",
-    license_image: "",
-    insurance_card_image: "",
-    eco_test_image: "",
-    book_image: "",
-    image: "",
+  });
+
+  const [files, setFiles] = useState({
+    license_image: null,
+    insurance_card_image: null,
+    eco_test_image: null,
+    book_image: null,
+    image: null,
   });
 
   const [owners, setOwners] = useState([]);
@@ -38,7 +41,6 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const [preview, setPreview] = useState({});
 
   const vehicleTypes = ["Car", "Van", "Bus", "Bike"];
@@ -78,18 +80,31 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   };
 
   const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    const file = files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result.split(",")[1];
-        setVehicle((prev) => ({ ...prev, [name]: base64 }));
-        setPreview((prev) => ({ ...prev, [name]: reader.result }));
-      };
-      reader.readAsDataURL(file);
+  const { name, files: fileList } = e.target;
+  const file = fileList[0];
+
+  if (file) {
+    // Validate file size (1MB)
+    const maxSize = 1 * 1024 * 1024; // 1MB
+
+    if (file.size > maxSize) {
+      setError("Image size must be less than 1MB.");
+      setFiles((prev) => ({ ...prev, [name]: null }));
+      setPreview((prev) => ({ ...prev, [name]: null }));
+      return;
     }
-  };
+
+    setFiles((prev) => ({ ...prev, [name]: file }));
+
+    // Preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview((prev) => ({ ...prev, [name]: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,13 +113,25 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
 
     try {
       const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      // Append vehicle fields
+      Object.keys(vehicle).forEach((key) => {
+        if (vehicle[key] !== "") formData.append(key, vehicle[key]);
+      });
+
+      // Append files
+      Object.keys(files).forEach((key) => {
+        if (files[key]) formData.append(key, files[key]);
+      });
+
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/vehicles`,
-        vehicle,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -112,7 +139,6 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
       if (res.status === 200 || res.status === 201) {
         setShowSuccess(true);
         onSuccess(res.data.data);
-
         setTimeout(() => onClose(), 2000);
       }
     } catch (err) {
@@ -120,13 +146,17 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
       setError(err.response?.data?.message || "Failed to add vehicle");
     } finally {
       setLoading(false);
-      setIsConfirmed(false);
     }
   };
 
-  const handleConfirm = () => {
-    setIsConfirmed(true);
-  };
+   if (loading) return <div className="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+      <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <p className="text-sm font-semibold text-gray-700">
+        Adding vehicle...
+      </p>
+    </div>
+  </div>;
 
   return (
     <div className="fixed inset-0 bg-white/40 bg-opacity-40 backdrop-blur-md flex justify-center items-start overflow-auto z-50 p-6">
