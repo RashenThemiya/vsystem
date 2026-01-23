@@ -7,6 +7,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
   const [vehicle, setVehicle] = useState(initialVehicle || {});
   const [owners, setOwners] = useState([]);
   const [fuels, setFuels] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const [preview, setPreview] = useState({});
   const [changedImages, setChangedImages] = useState({}); // track changed File objects
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,7 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
   useEffect(() => {
     const fetchMeta = async () => {
       try {
+        setDataLoading(true);
         const token = localStorage.getItem("token");
         const [ownersRes, fuelsRes] = await Promise.all([
           api.get("/api/owners", { headers: { Authorization: `Bearer ${token}` } }),
@@ -37,7 +39,9 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
         setFuels(fuelsRes.data?.data || fuelsRes.data || []);
       } catch {
         setError("Failed to fetch owners or fuels data.");
-      }
+      } finally {
+      setDataLoading(false);
+    }
     };
 
     fetchMeta();
@@ -76,9 +80,12 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     const file = files?.[0];
     if (!file) return;
 
-    // Optional: limit file size to 50MB
-    if (file.size > 50 * 1024 * 1024) {
-      alert("File too large! Max 50MB.");
+    const maxSize = 1 * 1024 * 1024; // 1MB
+
+    if (file.size > maxSize) {
+      setError("Image size must be less than 1MB.");
+      setFiles((prev) => ({ ...prev, [name]: null }));
+      setPreview((prev) => ({ ...prev, [name]: null }));
       return;
     }
 
@@ -130,11 +137,19 @@ export default function EditVehicleForm({ vehicle: initialVehicle, onCancel, onS
     }
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center min-h-[300px] text-gray-500">
-      Loading vehicle data...
-    </div>
-  );
+  if (loading || dataLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+          <div className="animate-spin h-10 w-10 rounded-full border-4 border-green-600 border-t-transparent"></div>
+          <p className="text-sm font-semibold text-gray-700">
+            Loading vehicle data...
+          </p>
+        </div>
+      </div>
+    );
+  }
+ 
   if (saving) return <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
     <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
       <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
