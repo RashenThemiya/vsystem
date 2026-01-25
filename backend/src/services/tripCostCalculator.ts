@@ -53,9 +53,9 @@ export const calculateActualTripCost = (
   const fuelCostPerLitre = Number(trip.fuel_cost) || 0;
   const fuelEfficiency = Number(trip.fuel_efficiency) || 0;
   const driverDailyCost =
-    trip.driver_required === "Yes"
-      ? Number(trip.driver?.driver_charges || 0)
-      : 0;
+  trip.driver_required === "Yes"
+    ? Number(trip.driver_cost ?? trip.driver?.driver_charges ?? 0)
+    : 0;
   const damageCost = Number(trip.damage_cost || 0);
 
   const otherCosts = (trip.other_trip_costs || []).reduce(

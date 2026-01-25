@@ -9,7 +9,7 @@ export const calculateTotalEstimatedCost = ({ trip = {}, selectedVehicle = {}, s
   const additionalMileageCost = Number(selectedVehicle?.additional_mileage_cost) || 0;
   const fuelCostPerLitre = Number(selectedVehicle?.fuel_cost) || 0;
   const fuelEfficiency = Number(selectedVehicle?.fuel_efficiency) || 0;
-  const driverDailyCost = Number(selectedDriver?.driver_cost) || 0;
+  const driverDailyCost = Number(trip.driver_cost) || 0;
   const damageCost = Number(trip.damage_cost) || 0;
 
   const otherCosts = (trip.other_trip_costs || []).reduce((sum, c) => sum + (Number(c.cost) || 0), 0);

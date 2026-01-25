@@ -49,6 +49,7 @@ const AddTripForm = ({
   }, [
     trip.estimated_days,
     trip.estimated_distance,
+    trip.driver_cost,
     trip.discount,
     trip.damage_cost,
     trip.other_trip_costs,
@@ -156,10 +157,24 @@ const AddTripForm = ({
 
       {/* Driver Details */}
       {selectedDriver && (
-        <div className="bg-pink-50 p-4 rounded-xl border border-pink-300 mt-4 space-y-2">
-          <h3 className="text-lg font-semibold text-pink-700">Driver Details</h3>
-          <div>Driver Name: <span className="font-medium">{selectedDriver.name}</span></div>
-          <div>Driver Cost per Day (Rs): <span className="font-medium">{selectedDriver.driver_cost}</span></div>
+        <div className="bg-pink-50 p-4 rounded-xl border border-pink-300 space-y-2">
+          <h3 className="text-lg font-semibold text-pink-700">
+            Driver Details
+          </h3>
+
+          <div>Driver Name: {selectedDriver.name}</div>
+
+          <div>
+            <label className="label">Driver Cost per Day (Rs)</label>
+            <input
+              type="number"
+              name="driver_cost"
+              value={trip.driver_cost || 0}
+              onChange={handleChange}
+              className="input"
+              min="0"
+            />
+          </div>
         </div>
       )}
 

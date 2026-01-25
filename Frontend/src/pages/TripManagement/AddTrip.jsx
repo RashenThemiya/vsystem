@@ -21,6 +21,7 @@ const AddTrip = () => {
     customer_id: "",
     vehicle_id: "",
     driver_id: "",
+    driver_cost: 0, // ✅ ADD THIS
     from_location: "",
     to_location: "",
     waypoints: [],
@@ -95,6 +96,8 @@ const AddTrip = () => {
       from_location,
       to_location,
       waypoints,
+      driver_cost: Number(copyTrip.driver_cost || 0), // ✅ KEEP CUSTOM COST
+
       up_down: copyTrip.up_down || "Both",
       num_passengers: copyTrip.num_passengers || 0,
       other_trip_costs: copyTrip.other_trip_costs || [],
@@ -178,7 +181,12 @@ const AddTrip = () => {
         updatedTrip.estimated_days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
       }
     }
-
+   if (name === "driver_id") {
+      const driver = drivers.find(
+        d => Number(d.driver_id) === Number(value) || Number(d.id) === Number(value)
+      );
+      updatedTrip.driver_cost = driver ? Number(driver.driver_cost) : 0;
+    }
     // Recalculate total cost & profit
     const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({
       trip: updatedTrip,
@@ -243,6 +251,7 @@ const AddTrip = () => {
         customer_id: Number(trip.customer_id),
         vehicle_id: Number(trip.vehicle_id),
         driver_id: trip.driver_id ? Number(trip.driver_id) : null,
+        driver_cost: Number(trip.driver_cost || 0), // ✅ SEND TO BACKEND
         from_location: trip.from_location,
         to_location: trip.to_location,
         up_down: trip.up_down,

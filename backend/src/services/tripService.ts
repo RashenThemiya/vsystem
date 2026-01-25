@@ -19,6 +19,7 @@ export interface CreateTripDTO {
   customer_id: number;
   vehicle_id: number;
   from_location: string;
+  driver_cost?: number;
   to_location: string;
   up_down: "Up" | "Down" | "Both";
   estimated_distance?: number;
@@ -75,8 +76,7 @@ export const createTripService = async (data: CreateTripDTO) => {
     mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost ?? null,
     additional_mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost_additional ?? null,
     fuel_cost: vehicle.fuel?.cost ?? null,
-    driver_cost: driver?.driver_charges ?? null,
-  };
+   driver_cost:data.driver_cost !== undefined? data.driver_cost: driver?.driver_charges ?? null,  };
 
   // 4️⃣ Create the trip
   const trip = await prisma.trip.create({
@@ -165,6 +165,7 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "customer_id",
     "vehicle_id",
     "from_location",
+    "damage_cost",
     "to_location",
     "up_down",
     "driver_required",
@@ -176,6 +177,7 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "actual_distance",
     "estimated_days",
     "actual_days",
+    "driver_cost", // ✅ ADD THIS
     "estimated_cost",
     "actual_cost",
     "mileage_cost",
@@ -187,14 +189,25 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "total_estimated_cost",
     "total_actual_cost",
   ];
+const decimalFields = [
+  "driver_cost",
+  "discount",
+  "damage_cost",
+  "payment_amount",
+  "advance_payment",
+  "total_estimated_cost",
+  "total_actual_cost",
+];
 
-  for (const key of fields) {
-    if (data[key as keyof UpdateTripDTO] !== undefined) {
-      updateData[key] = Number.isNaN(Number(data[key as keyof UpdateTripDTO]))
-        ? data[key as keyof UpdateTripDTO]
-        : Number(data[key as keyof UpdateTripDTO]);
-    }
+for (const key of fields) {
+  const value = data[key as keyof UpdateTripDTO];
+  if (value !== undefined) {
+    updateData[key] = decimalFields.includes(key)
+      ? new Prisma.Decimal(value as number)
+      : value;
   }
+}
+
 
   // Dates
   if (data.leaving_datetime) updateData.leaving_datetime = new Date(data.leaving_datetime);
