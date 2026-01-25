@@ -38,6 +38,7 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
 
   const [owners, setOwners] = useState([]);
   const [fuels, setFuels] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -47,32 +48,39 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
   const acTypes = ["AC", "Non_AC"];
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Unauthorized! Please log in first.");
-        navigate("/login");
-        return;
-      }
+  const fetchData = async () => {
+    const token = localStorage.getItem("token");
 
-      try {
-        const [ownersRes, fuelsRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/owners`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/fuels`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+    if (!token) {
+      setError("Unauthorized! Please log in first.");
+      navigate("/login");
+      return;
+    }
 
-        setOwners(ownersRes.data?.data || ownersRes.data || []);
-        setFuels(fuelsRes.data?.data || fuelsRes.data || []);
-      } catch (err) {
-        setError("Failed to load dropdown data. Please try again.");
-      }
-    };
-    fetchData();
-  }, [navigate]);
+    try {
+      setDataLoading(true);
+
+      const [ownersRes, fuelsRes] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/owners`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/fuels`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      setOwners(ownersRes.data?.data || ownersRes.data || []);
+      setFuels(fuelsRes.data?.data || fuelsRes.data || []);
+    } catch (err) {
+      setError("Failed to load required data. Please try again.");
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  fetchData();
+}, [navigate]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -149,6 +157,18 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
     }
   };
 
+    if (dataLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
+          <div className="animate-spin h-10 w-10 rounded-full border-4 border-green-600 border-t-transparent"></div>
+          <p className="text-sm font-semibold text-gray-700">
+            Loading vehicle data...
+          </p>
+        </div>
+      </div>
+    );
+  }
    if (loading) return <div className="fixed inset-0 z-50 bg-white/50 flex items-center justify-center">
     <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center gap-3">
       <div className="animate-spin h-8 w-8 rounded-full border-4 border-indigo-600 border-t-transparent"></div>
