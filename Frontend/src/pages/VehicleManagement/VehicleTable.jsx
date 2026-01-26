@@ -21,7 +21,6 @@ export default function VehicleTable({
             <table className="min-w-full table-fixed">
               <thead className="bg-white  top-0 z-20 text-sm text-gray-600 border-b">
                 <tr>
-                  <th className="py-3 px-4 text-left w-16">No</th>
                   <th className="py-3 px-4 text-left w-1/5">Vehicle</th>
                   <th className="py-3 px-4 text-left w-1/6">Number Plate</th>
                   <th className="py-3 px-4 text-left w-1/6">Type</th>
@@ -36,15 +35,12 @@ export default function VehicleTable({
               </thead>
 
               <tbody>
-                {vehicles.filter(Boolean).map((v, index) => (
+                {vehicles.filter(Boolean).map((v) => (
                   <tr
                     key={v.vehicle_id}
                     className="hover:bg-gray-50 cursor-pointer transition"
                     onClick={() => onSelectVehicle && onSelectVehicle(v)}
                   >
-                    <td className="py-4 px-4 align-top">
-                      {index + 1}
-                    </td>
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-center gap-3">
                         <Avatar name={v.name} src={v.image} />

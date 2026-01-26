@@ -18,7 +18,6 @@ export default function DriverTable({ drivers = [], loading, error, onSelectDriv
               <thead className="bg-white border-b">
                 <tr>
                   {/* set widths so columns align predictably */}
-                  <th className="py-3 px-4 text-left text-sm text-gray-600 w-16 z-20 bg-white">No</th>
                   <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/4 z-20 bg-white">Driver</th>
                   <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 z-20 bg-white">Phone Number</th>
                   <th className="py-3 px-4 text-left text-sm text-gray-600 w-1/6 z-20 bg-white">Driver Charges</th>
@@ -30,15 +29,12 @@ export default function DriverTable({ drivers = [], loading, error, onSelectDriv
               </thead>
 
               <tbody>
-                {drivers.map((d, index) => (
+                {drivers.map((d) => (
                   <tr
                     key={d.driver_id}
                     className="hover:bg-gray-50 cursor-pointer transition"
                     onClick={() => onSelectDriver && onSelectDriver(d)}
                   >
-                    <td className="py-3 px-4 text-sm text-gray-600 align-top">
-                      {index+1}
-                    </td>
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-center gap-3">
                         <Avatar name={d.name} src={d.avatar_url || d.image} />
