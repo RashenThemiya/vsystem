@@ -21,7 +21,7 @@ export default function VehicleTable({
             <table className="min-w-full table-fixed">
               <thead className="bg-white  top-0 z-20 text-sm text-gray-600 border-b">
                 <tr>
-                  <th className="py-3 px-4 text-left w-1/5">No</th>
+                  <th className="py-3 px-4 text-left w-16">No</th>
                   <th className="py-3 px-4 text-left w-1/5">Vehicle</th>
                   <th className="py-3 px-4 text-left w-1/6">Number Plate</th>
                   <th className="py-3 px-4 text-left w-1/6">Type</th>
