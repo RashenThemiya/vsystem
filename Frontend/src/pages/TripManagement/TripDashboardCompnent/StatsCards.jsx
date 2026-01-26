@@ -15,7 +15,7 @@ export default function StatsCards({ stats, onStatusSelect }) {
         title="Total"
         value={stats.total}
         icon={<FaListOl />}
-        onClick={() => onStatusSelect("")}
+        onClick={() => onStatusSelect("ALL")}
       />
       
       <Card

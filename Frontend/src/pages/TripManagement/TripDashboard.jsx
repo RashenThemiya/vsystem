@@ -4,123 +4,114 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import api from "../../utils/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
+
 import ActionCards from "./TripDashboardCompnent/ActionCards";
 import StatsCards from "./TripDashboardCompnent/StatsCards";
-import TripSearchBar from "./TripDashboardCompnent//SearchBar";
+import TripSearchBar from "./TripDashboardCompnent/SearchBar";
 import TripTable from "./TripDashboardCompnent/TripTable";
 
 export default function TripDashboard() {
   const { name, role } = useAuth();
   const navigate = useNavigate();
 
-  const [trips, setTrips] = useState([]);
+  /* ---------------- STATE ---------------- */
+
+  const [allTrips, setAllTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Pending");
-  const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
-  const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
-  const [allTrips, setAllTrips] = useState([]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const [monthFilter, setMonthFilter] = useState("ALL");
+  const [yearFilter, setYearFilter] = useState("ALL");
 
   const [showStartModal, setShowStartModal] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
+
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [startMeter, setStartMeter] = useState(null);
   const [endMeter, setEndMeter] = useState(null);
- 
 
-
-
-  const tripStatuses = ["Pending", "Ongoing", "Ended", "Completed", "Cancelled"];
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  /* ---------------- FETCH TRIPS ---------------- */
 
   const fetchTrips = async () => {
     setLoading(true);
     try {
-      const isValidYear = Number.isInteger(yearFilter) && yearFilter >= 2000;
-const isValidMonth = Number.isInteger(monthFilter) && monthFilter >= 1 && monthFilter <= 12;
+      let query = "";
 
-if (!isValidYear || !isValidMonth) {
-  setLoading(false);
-  return;
-}
+      if (monthFilter !== "ALL" && yearFilter !== "ALL") {
+        const startDate = new Date(yearFilter, monthFilter - 1, 1);
+        const endDate = new Date(yearFilter, monthFilter, 0);
+        query = `?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`;
+      }
 
-const startDate = new Date(yearFilter, monthFilter - 1, 1);
-const endDate = new Date(yearFilter, monthFilter, 0); // last day of month
+      const res = await api.get(`/api/trips${query}`);
+      const data = Array.isArray(res.data.data) ? res.data.data : [];
 
-const query = `?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`;
-
-      //if (statusFilter) query += `&trip_status=${statusFilter}`;
-
-      const response = await api.get(`/api/trips${query}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-
-      const tripData = Array.isArray(response.data.data) ? response.data.data : [];
-      
-      setTrips(tripData);
-      setAllTrips(tripData);
-      applyFilters(tripData); 
-      setFilteredTrips(tripData);
+      setAllTrips(data);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Failed to fetch trips.");
+      setError("Failed to fetch trips");
     } finally {
       setLoading(false);
     }
   };
 
-  const applyFilters = (data) => {
-  let filtered = data;
+  /* ---------------- APPLY FILTERS ---------------- */
 
-  if (statusFilter) {
-    filtered = filtered.filter(t => t.trip_status === statusFilter);
-  }
+  const applyFilters = () => {
+    let filtered = [...allTrips];
 
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    filtered = filtered.filter(t =>
-      t.from_location.toLowerCase().includes(q) ||
-      t.to_location.toLowerCase().includes(q) ||
-      t.customer.name.toLowerCase().includes(q)||
-      t.driver.name.toLowerCase().includes(q)
-    );
-  }
+    if (statusFilter !== "ALL") {
+      filtered = filtered.filter(t => t.trip_status === statusFilter);
+    }
 
-  setTrips(filtered);
-  setFilteredTrips(filtered);
-};
-
-
-  useEffect(() => {
-    applyFilters(allTrips);
-    fetchTrips();
-  }, [statusFilter, monthFilter, yearFilter]);
-
-  useEffect(() => {
-    const filtered = trips.filter((trip) => {
-      const searchLower = searchQuery.toLowerCase();
-      return (
-        trip.from_location?.toLowerCase().includes(searchLower) ||
-        trip.to_location?.toLowerCase().includes(searchLower) ||
-        trip.customer?.name?.toLowerCase().includes(searchLower)||
-        trip.driver?.name?.toLowerCase().includes(searchLower)
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(t =>
+        t.from_location?.toLowerCase().includes(q) ||
+        t.to_location?.toLowerCase().includes(q) ||
+        t.customer?.name?.toLowerCase().includes(q) ||
+        t.driver?.name?.toLowerCase().includes(q)
       );
-    });
+    }
+
     setFilteredTrips(filtered);
-  }, [searchQuery, trips]);
+  };
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  /* ---------------- EFFECTS ---------------- */
+
+  // Fetch when month/year changes
+  useEffect(() => {
+    fetchTrips();
+  }, [monthFilter, yearFilter]);
+
+  // Filter when data or filters change
+  useEffect(() => {
+    applyFilters();
+  }, [statusFilter, searchQuery, allTrips]);
+
+  /* ---------------- STATS ---------------- */
 
   const stats = {
     total: allTrips.length,
-    pending: allTrips.filter((t) => t.trip_status === "Pending").length,
-    ongoing: allTrips.filter((t) => t.trip_status === "Ongoing").length,
-    ended: allTrips.filter((t) => t.trip_status === "Ended").length,
-    completed: allTrips.filter((t) => t.trip_status === "Completed").length,
-    cancelled: allTrips.filter((t) => t.trip_status === "Cancelled").length,
+    pending: allTrips.filter(t => t.trip_status === "Pending").length,
+    ongoing: allTrips.filter(t => t.trip_status === "Ongoing").length,
+    ended: allTrips.filter(t => t.trip_status === "Ended").length,
+    completed: allTrips.filter(t => t.trip_status === "Completed").length,
+    cancelled: allTrips.filter(t => t.trip_status === "Cancelled").length,
   };
+
+  /* ---------------- TRIP ACTIONS ---------------- */
 
   const openStartTripModal = (tripId) => {
     setSelectedTripId(tripId);
@@ -129,175 +120,116 @@ const query = `?start_date=${startDate.toISOString()}&end_date=${endDate.toISOSt
   };
 
   const handleStartTrip = async () => {
-    if (!selectedTripId || startMeter === null || isNaN(startMeter)) {
-      alert("Enter valid start meter");
-      return;
-    }
-    await api.patch(`/api/trips/${selectedTripId}/start`, { start_meter: startMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+    if (!startMeter || isNaN(startMeter)) return alert("Invalid meter");
+
+    await api.patch(`/api/trips/${selectedTripId}/start`, { start_meter: startMeter });
     setShowStartModal(false);
     fetchTrips();
-    setSuccessMessage("Trip started!");
+    setSuccessMessage("Trip started");
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
-  const openEndTripModal = (tripId, currentMeter) => {
+  const openEndTripModal = (tripId, meter) => {
     setSelectedTripId(tripId);
-    setEndMeter(currentMeter || null);
+    setEndMeter(meter || null);
     setShowEndModal(true);
   };
 
   const handleEndTrip = async () => {
-    if (!selectedTripId || endMeter === null || isNaN(endMeter)) {
-      alert("Enter valid end meter");
-      return;
-    }
-    await api.patch(`/api/trips/${selectedTripId}/end`, { end_meter: endMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+    if (!endMeter || isNaN(endMeter)) return alert("Invalid meter");
+
+    await api.patch(`/api/trips/${selectedTripId}/end`, { end_meter: endMeter });
     setShowEndModal(false);
     fetchTrips();
-    setSuccessMessage("Trip Ended!");
+    setSuccessMessage("Trip ended");
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
+
       <main className="flex-1 overflow-auto p-8">
         <div className="max-w-7xl mx-auto">
+
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex justify-between mb-6">
             <div>
               <h1 className="text-2xl font-semibold">Trip Management</h1>
-              <p className="text-sm text-gray-500">Manage Trips and all Trip-related data</p>
+              <p className="text-gray-500 text-sm">Manage all trips</p>
             </div>
             <div className="text-sm text-gray-600">
-              Signed in as <span className="font-medium">{name}</span> — {role}
-              {errorMessage && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
-                ❌ {errorMessage}
-              </div>
-            )}
-
-            {successMessage && (
-              <div className="bg-green-200 border border-green-400 font-semibold text-green-700 px-4 py-3 rounded mb-4 text-center">
-                ✅ {successMessage}
-              </div>
-            )}
+              {name} — {role}
             </div>
           </div>
 
-          {/* Stats + Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-6 items-stretch">
-            <div className="lg:col-span-3"><StatsCards stats={stats} onStatusSelect={(status) => setStatusFilter(status)} /></div>
-            <div className="lg:col-span-1"><ActionCards onAddTripClick={() => navigate("/create-trip")} /></div>
+          {/* Alerts */}
+          {successMessage && (
+            <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
+              ✅ {successMessage}
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="lg:col-span-3">
+              <StatsCards onStatusSelect={setStatusFilter} stats={stats} />
+            </div>
+            <div className="lg:col-span-1">
+              <ActionCards onAddTripClick={() => navigate("/create-trip")} />
+            </div>
           </div>
 
-          {/* Search + Month/Year Filter */}
-          <div className="flex flex-wrap gap-4 mt-6 items-center">
+          {/* Filters */}
+          <div className="flex gap-4 mt-6 items-center">
             <TripSearchBar onSearch={setSearchQuery} />
-            <label>Month:</label>
-            <select value={monthFilter} onChange={(e) => setMonthFilter(Number(e.target.value))} className="w-30 border rounded-xl px-3 py-2 items-center border-gray-300">
-              {[...Array(12)].map((_, i) => <option key={i+1} value={i+1} className="rounded-xl bg-gray-100 text-gray-800">{new Date(0,i).toLocaleString("default",{month:"long"})}</option>)}
+          </div>
+
+          <div className="flex gap-4 mt-2 items-center">
+            <select
+              value={monthFilter}
+              onChange={e => setMonthFilter(e.target.value)}
+              className="border rounded px-3 py-2"
+            >
+              <option value="ALL">All Months</option>
+              {[...Array(12)].map((_, i) => (
+                <option key={i} value={i + 1}>
+                  {new Date(0, i).toLocaleString("default", { month: "long" })}
+                </option>
+              ))}
             </select>
-            <label>Year:</label>
-            <input
-              type="number"
-              min="2000"
-              max="2100"
+
+            <select
               value={yearFilter}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === "") return;
-                setYearFilter(Number(val));
-              }}
-              className="w-24 border rounded-xl px-3 py-2 border-gray-300"
-            />
+              onChange={e => setYearFilter(e.target.value)}
+              className="border rounded px-3 py-2"
+            >
+              <option value="ALL">All Years</option>
+              {years.map(y => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
 
           </div>
 
           {/* Table */}
-          <div className="mt-8">
+          <div className="mt-4">
             <TripTable
               trips={filteredTrips}
               loading={loading}
               error={error}
-              onSelectTrip={(trip) => navigate(`/trip/${trip.trip_id}`)}
-              onSelectDriver={(trip) => {
-                if (trip.driver?.driver_id) {
-                  navigate(`/driver-profile/${trip.driver?.driver_id}`);
-                }
-              }}
-              onSelectVehicle={(trip) => navigate(`/vehicles/${trip.vehicle?.vehicle_id}`)}
-              onSelectCustomer={(trip) => navigate(`/customer-profile/${trip.customer?.customer_id}`)}
+              onSelectTrip={(t) => navigate(`/trip/${t.trip_id}`)}
               onStartTrip={openStartTripModal}
               onEndTrip={openEndTripModal}
-                onCreateAnotherTrip={(trip) =>
-                        navigate("/create-trip", {
-                          state: { copyTrip: trip },
-                        })
-}
-
             />
           </div>
+
         </div>
       </main>
-      {/* Start Trip Modal */}
-        {showStartModal && (
-          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-xl shadow-xl w-80">
-              <h3 className="text-xl font-bold mb-4">Start Trip</h3>
-              <input
-                type="number"
-                placeholder="Enter start meter"
-                className="border rounded px-3 py-2 w-full mb-4 border-gray-300"
-                value={startMeter ?? ""}
-                onChange={(e) => setStartMeter(Number(e.target.value))}
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowStartModal(false)}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleStartTrip}
-                  className="px-4 py-2 bg-green-600 text-white hover:bg-green-700"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* End Trip Modal */}
-        {showEndModal && (
-          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded shadow-xl w-80">
-              <h3 className="text-xl font-bold mb-4">End Trip</h3>
-              <input
-                type="number"
-                placeholder="Enter end meter"
-                className="border rounded px-3 py-2 w-full mb-4 border-gray-300"
-                value={endMeter ?? ""}
-                onChange={(e) => setEndMeter(Number(e.target.value))}
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowEndModal(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEndTrip}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
     </div>
   );
 }
