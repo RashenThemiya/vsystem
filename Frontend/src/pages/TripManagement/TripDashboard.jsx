@@ -41,49 +41,62 @@ export default function TripDashboard() {
   /* ---------------- FETCH TRIPS ---------------- */
 
   const fetchTrips = async () => {
-    setLoading(true);
-    try {
-      let query = "";
+  setLoading(true);
+  try {
+    const res = await api.get(`/api/trips`);
+    const data = Array.isArray(res.data.data) ? res.data.data : [];
+    setAllTrips(data);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to fetch trips");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (monthFilter !== "ALL" && yearFilter !== "ALL") {
-        const startDate = new Date(yearFilter, monthFilter - 1, 1);
-        const endDate = new Date(yearFilter, monthFilter, 0);
-        query = `?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`;
-      }
 
-      const res = await api.get(`/api/trips${query}`);
-      const data = Array.isArray(res.data.data) ? res.data.data : [];
-
-      setAllTrips(data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch trips");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   /* ---------------- APPLY FILTERS ---------------- */
 
   const applyFilters = () => {
-    let filtered = [...allTrips];
+  let filtered = [...allTrips];
 
-    if (statusFilter !== "ALL") {
-      filtered = filtered.filter(t => t.trip_status === statusFilter);
-    }
+  // STATUS
+  if (statusFilter !== "ALL") {
+    filtered = filtered.filter(t => t.trip_status === statusFilter);
+  }
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(t =>
-        t.from_location?.toLowerCase().includes(q) ||
-        t.to_location?.toLowerCase().includes(q) ||
-        t.customer?.name?.toLowerCase().includes(q) ||
-        t.driver?.name?.toLowerCase().includes(q)
-      );
-    }
+  // SEARCH
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(t =>
+      t.from_location?.toLowerCase().includes(q) ||
+      t.to_location?.toLowerCase().includes(q) ||
+      t.customer?.name?.toLowerCase().includes(q) ||
+      t.driver?.name?.toLowerCase().includes(q)
+    );
+  }
 
-    setFilteredTrips(filtered);
-  };
+  // YEAR (created_at)
+  if (yearFilter !== "ALL") {
+    filtered = filtered.filter(t => {
+      const year = new Date(t.created_at).getFullYear();
+      return year === Number(yearFilter);
+    });
+  }
+
+  // MONTH (created_at)
+  if (monthFilter !== "ALL") {
+    filtered = filtered.filter(t => {
+      const month = new Date(t.created_at).getMonth() + 1;
+      return month === Number(monthFilter);
+    });
+  }
+
+  setFilteredTrips(filtered);
+};
+
+
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -92,24 +105,27 @@ export default function TripDashboard() {
 
   // Fetch when month/year changes
   useEffect(() => {
-    fetchTrips();
-  }, [monthFilter, yearFilter]);
+  fetchTrips();
+}, []);
+
 
   // Filter when data or filters change
   useEffect(() => {
-    applyFilters();
-  }, [statusFilter, searchQuery, allTrips]);
+  applyFilters();
+}, [statusFilter, searchQuery, monthFilter, yearFilter, allTrips]);
+
 
   /* ---------------- STATS ---------------- */
 
   const stats = {
-    total: allTrips.length,
-    pending: allTrips.filter(t => t.trip_status === "Pending").length,
-    ongoing: allTrips.filter(t => t.trip_status === "Ongoing").length,
-    ended: allTrips.filter(t => t.trip_status === "Ended").length,
-    completed: allTrips.filter(t => t.trip_status === "Completed").length,
-    cancelled: allTrips.filter(t => t.trip_status === "Cancelled").length,
-  };
+  total: filteredTrips.length,
+  pending: filteredTrips.filter(t => t.trip_status === "Pending").length,
+  ongoing: filteredTrips.filter(t => t.trip_status === "Ongoing").length,
+  ended: filteredTrips.filter(t => t.trip_status === "Ended").length,
+  completed: filteredTrips.filter(t => t.trip_status === "Completed").length,
+  cancelled: filteredTrips.filter(t => t.trip_status === "Cancelled").length,
+};
+
 
   /* ---------------- TRIP ACTIONS ---------------- */
 

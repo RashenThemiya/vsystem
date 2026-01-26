@@ -31,9 +31,9 @@ const TripActionButtons = ({
   const showEnd = tripStatus === "Ongoing";
   const showComplete = tripStatus === "Ended";
   const showPrint = tripStatus === "Ended" || tripStatus === "Completed" || tripStatus === "Pending" || tripStatus === "Ongoing" || tripStatus === "Cancelled";
-  const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing";
-  const showAlterDate = tripStatus !== "Completed" && tripStatus =="Pending"
-  const showAlterMeter = tripStatus !== "Completed" && tripStatus !=="Pending"
+  const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing" && tripStatus =="Ended"
+  const showAlterDate = tripStatus !== "Completed" && tripStatus !=="Pending" 
+  const showAlterMeter = tripStatus !== "Completed" && tripStatus !=="Pending" 
   const showAddPayment = tripStatus !== "Completed" && tripStatus !== "Cancelled";
   const showAddDamage = tripStatus !== "Completed" && tripStatus !== "Cancelled";
 
