@@ -80,7 +80,7 @@ export default function TripDashboard() {
   // YEAR (created_at)
   if (yearFilter !== "ALL") {
     filtered = filtered.filter(t => {
-      const year = new Date(t.created_at).getFullYear();
+      const year = new Date(t.leaving_datetime).getFullYear();
       return year === Number(yearFilter);
     });
   }
@@ -88,7 +88,7 @@ export default function TripDashboard() {
   // MONTH (created_at)
   if (monthFilter !== "ALL") {
     filtered = filtered.filter(t => {
-      const month = new Date(t.created_at).getMonth() + 1;
+      const month = new Date(t.leaving_datetime).getMonth() + 1;
       return month === Number(monthFilter);
     });
   }
