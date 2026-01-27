@@ -17,11 +17,15 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
     try {
       setLoading(true);
 
+      // Get browser timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       await api.patch(
         `/api/trips/${tripId}/update-dates`,
         {
           leaving_datetime: leavingDate,
           actual_return_datetime: returnDate,
+          timezone, // send timezone to backend
         },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -31,11 +35,11 @@ const AlterDatesModal = ({ open, onClose, tripId, onSuccess }) => {
       onSuccess(); // refresh trip
       onClose();   // close modal
       Swal.fire({
-              icon: "success",
-              title: "Dates updated",
-              timer: 2000,
-              showConfirmButton: true,
-            });
+        icon: "success",
+        title: "Dates updated",
+        timer: 2000,
+        showConfirmButton: true,
+      });
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.message || "Failed to update dates");

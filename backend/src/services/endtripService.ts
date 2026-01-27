@@ -4,6 +4,7 @@ import { prisma } from "../config/prismaClient.js";
 import { Prisma } from "@prisma/client";
 import { calculateActualTripCost, TripWithRelations } from "./tripCostCalculator.js";
 import { TripStatus, PaymentStatus } from "@prisma/client";
+import * as dfnsTz from "date-fns-tz";
 
 export interface EndTripDTO {
   end_meter: number;
@@ -132,8 +133,8 @@ export const addDamageCostService = async (
 export interface UpdateTripDatesDTO {
   leaving_datetime?: string | Date;
   actual_return_datetime?: string | Date;
+  timezone?: string; // New: user timezone, e.g., "Asia/Colombo"
 }
-
 export const updateTripDatesService = async (
   trip_id: number,
   data: UpdateTripDatesDTO
@@ -150,21 +151,25 @@ export const updateTripDatesService = async (
 
   if (!trip) throw new Error("Trip not found");
 
-  // 2️⃣ Update leaving and actual return dates
-  const leavingDate = data.leaving_datetime
-    ? new Date(data.leaving_datetime)
-    : trip.leaving_datetime;
+  // 2️⃣ Use provided timezone or default to UTC
+  const timezone = data.timezone ?? "UTC";
 
-  const actualReturnDate = data.actual_return_datetime
-    ? new Date(data.actual_return_datetime)
-    : trip.actual_return_datetime ?? new Date();
+  // 3️⃣ Convert leaving and return datetimes to UTC
+const leavingDate = data.leaving_datetime
+  ? dfnsTz.zonedTimeToUtc(data.leaving_datetime, timezone)
+  : trip.leaving_datetime;
 
+const actualReturnDate = data.actual_return_datetime
+  ? dfnsTz.zonedTimeToUtc(data.actual_return_datetime, timezone)
+  : trip.actual_return_datetime ?? new Date();
+
+
+  // 4️⃣ Update trip dates in DB
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
       leaving_datetime: leavingDate,
       actual_return_datetime: actualReturnDate,
-
     },
     include: {
       vehicle: true,
@@ -173,11 +178,11 @@ export const updateTripDatesService = async (
     },
   });
 
-  // 3️⃣ Recalculate actual days
+  // 5️⃣ Recalculate actual days
   const diffTime = Math.max(actualReturnDate.getTime() - leavingDate.getTime(), 0);
   const actualDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
 
-  // 4️⃣ Prepare trip object for calculation
+  // 6️⃣ Prepare trip object for cost calculation
   const tripForCalc: TripWithRelations = {
     ...updatedTrip,
     actual_days: actualDays,
@@ -197,7 +202,7 @@ export const updateTripDatesService = async (
       : null, // ensure null instead of undefined
   };
 
-  // 5️⃣ Recalculate total actual cost
+  // 7️⃣ Recalculate total actual cost
   const costData = calculateActualTripCost(
     tripForCalc,
     updatedTrip.end_meter ?? updatedTrip.start_meter ?? 0
@@ -205,14 +210,13 @@ export const updateTripDatesService = async (
 
   const newTotalCost = costData.totalActualCost;
 
-  // 6️⃣ Recalculate payment status
+  // 8️⃣ Recalculate payment status
   const paid = Number(updatedTrip.payment_amount || 0);
-
   let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
   if (paid >= newTotalCost) paymentStatus = PaymentStatus.Paid;
   else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
 
-  // 7️⃣ Update trip with recalculated cost and payment status
+  // 9️⃣ Update trip with recalculated cost and payment status
   const finalTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
@@ -220,8 +224,6 @@ export const updateTripDatesService = async (
       actual_days: actualDays,
       payment_status: paymentStatus,
       profit: new Prisma.Decimal(costData.profit),
-      
-      
     },
   });
 
