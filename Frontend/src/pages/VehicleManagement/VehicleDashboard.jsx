@@ -36,7 +36,13 @@ export default function VehicleDashboard() {
         });
         console.log("API Response:", res.data);
         const data = Array.isArray(res.data) ? res.data : [];
-        setVehicles(data);
+
+          const sortedData = [...data].sort(
+            (a, b) => Number(a.vehicle_id) - Number(b.vehicle_id)
+          );
+
+          setVehicles(sortedData);
+
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || "Failed to fetch vehicles");
@@ -44,7 +50,6 @@ export default function VehicleDashboard() {
         setLoading(false);
       }
     };
-
     fetchVehicles();
   }, []);
 
@@ -62,14 +67,17 @@ export default function VehicleDashboard() {
   };
 
   // Search
-  const filteredVehicles = vehicles.filter((v) => {
-  const q = searchQuery.toLowerCase();
-  return (
-    (v.vehicle_number || "").toLowerCase().includes(q) ||
-    (v.name || "").toLowerCase().includes(q) ||
-    (v.type || "").toLowerCase().includes(q)
-  );
-});
+  const filteredVehicles = [...vehicles]
+  .filter((v) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      (v.vehicle_number || "").toLowerCase().includes(q) ||
+      (v.name || "").toLowerCase().includes(q) ||
+      (v.type || "").toLowerCase().includes(q)
+    );
+  })
+  .sort((a, b) => Number(a.vehicle_id) - Number(b.vehicle_id));
+
 
 
   // Select vehicle
