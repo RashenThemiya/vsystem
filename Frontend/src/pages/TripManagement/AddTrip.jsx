@@ -41,6 +41,7 @@ const AddTrip = () => {
     total_actual_cost: 0,
     payment_status: "Unpaid",
     trip_status: "Pending",
+    trip_type: "Daily",
     leaving_datetime: "",
     estimated_return_datetime: "",
     map_locations: [],
@@ -99,6 +100,7 @@ const AddTrip = () => {
       driver_cost: Number(copyTrip.driver_cost || 0), // ✅ KEEP CUSTOM COST
 
       up_down: copyTrip.up_down || "Both",
+      trip_type: copyTrip.trip_type || "Special",
       num_passengers: copyTrip.num_passengers || 0,
       other_trip_costs: copyTrip.other_trip_costs || [],
       // Reset new fields
@@ -272,6 +274,7 @@ const AddTrip = () => {
         trip_status: trip.trip_status,
         leaving_datetime: trip.leaving_datetime,
         profit: Number(trip.profit || 0),
+        trip_type: trip.trip_type,
         estimated_return_datetime: trip.estimated_return_datetime,
         map_locations: (trip.map_locations || []).map((loc) => ({
           location_name: loc.location_name,
