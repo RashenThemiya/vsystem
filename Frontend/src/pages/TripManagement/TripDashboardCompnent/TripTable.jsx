@@ -8,9 +8,26 @@ export default function TripTable({
   onSelectCustomer,
   onStartTrip,
   onEndTrip,
-  onCreateAnotherTrip, // ✅ NEW
-
+  onCreateAnotherTrip,
 }) {
+
+  const statusStyles = (status) => {
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "Ongoing":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Ended":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "Completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow p-4">
       {loading ? (
@@ -44,26 +61,45 @@ export default function TripTable({
                   <tr
                     key={t.trip_id}
                     className="hover:bg-gray-50 transition cursor-pointer"
-                    
                   >
-                    <td className="px-4 py-4 text-blue-600 hover:underline" onClick={() => onSelectTrip(t)}>
+                    <td
+                      className="px-4 py-4 text-blue-600 hover:underline"
+                      onClick={() => onSelectTrip(t)}
+                    >
                       {t.trip_id}
                     </td>
                     <td className="px-4 py-4">{t.from_location}</td>
                     <td className="px-4 py-4">{t.to_location}</td>
-                    <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" 
-                        onClick={() => onSelectCustomer(t)}>{t.customer?.name}
-                        </td>
-                    <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" 
-                        onClick={() => onSelectVehicle(t)}>{t.vehicle?.name}
+                    <td
+                      className="px-4 py-4 text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => onSelectCustomer(t)}
+                    >
+                      {t.customer?.name}
                     </td>
                     <td
-                        className="px-4 py-4 text-blue-600 hover:underline cursor-pointer"
-                        onClick={() => onSelectDriver(t)}
-                      >
-                        {t.driver?.name || "N/A"}
+                      className="px-4 py-4 text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => onSelectVehicle(t)}
+                    >
+                      {t.vehicle?.name}
                     </td>
-                    <td className="px-4 py-4">{t.trip_status}</td>
+                    <td
+                      className="px-4 py-4 text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => onSelectDriver(t)}
+                    >
+                      {t.driver?.name || "N/A"}
+                    </td>
+
+                    {/* ✨ STATUS BADGE */}
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${statusStyles(
+                          t.trip_status
+                        )}`}
+                      >
+                        {t.trip_status}
+                      </span>
+                    </td>
+
                     <td className="px-4 py-4">{t.payment_status}</td>
                     <td className="px-4 py-4">
                       {new Date(t.leaving_datetime).toLocaleString()}
@@ -93,22 +129,23 @@ export default function TripTable({
                           >
                             End
                           </button>
-                          
                         )}
+
                         <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onCreateAnotherTrip(t);
-                            }}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded"
-                          >
-                            Rebook
-                          </button>
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onCreateAnotherTrip(t);
+                          }}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded"
+                        >
+                          Rebook
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
         </div>

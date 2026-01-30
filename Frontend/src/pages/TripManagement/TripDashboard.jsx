@@ -4,18 +4,19 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import api from "../../utils/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
-
 import ActionCards from "./TripDashboardCompnent/ActionCards";
 import StatsCards from "./TripDashboardCompnent/StatsCards";
-import TripSearchBar from "./TripDashboardCompnent/SearchBar";
+import TripSearchBar from "./TripDashboardCompnent//SearchBar";
 import TripTable from "./TripDashboardCompnent/TripTable";
+import StartTripModal from "./TripAction/StartTripModal";
+import EndTripModal from "./TripAction/EndTripModal";
+
 
 export default function TripDashboard() {
   const { name, role } = useAuth();
   const navigate = useNavigate();
 
-  /* ---------------- STATE ---------------- */
-
+  const [trips, setTrips] = useState([]);
   const [allTrips, setAllTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
 
@@ -25,8 +26,8 @@ export default function TripDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const [monthFilter, setMonthFilter] = useState("ALL");
-  const [yearFilter, setYearFilter] = useState("ALL");
+  const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
+  const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
 
   const [showStartModal, setShowStartModal] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
@@ -34,11 +35,10 @@ export default function TripDashboard() {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [startMeter, setStartMeter] = useState(null);
   const [endMeter, setEndMeter] = useState(null);
-
+ 
+  const tripStatuses = ["Pending", "Ongoing", "Ended", "Completed", "Cancelled"];
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
-  /* ---------------- FETCH TRIPS ---------------- */
 
   const fetchTrips = async () => {
   setLoading(true);
@@ -55,9 +55,7 @@ export default function TripDashboard() {
 };
 
 
-
-  /* ---------------- APPLY FILTERS ---------------- */
-
+  
   const applyFilters = () => {
   let filtered = [...allTrips];
 
@@ -96,8 +94,6 @@ export default function TripDashboard() {
   setFilteredTrips(filtered);
 };
 
-
-
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
@@ -114,9 +110,6 @@ export default function TripDashboard() {
   applyFilters();
 }, [statusFilter, searchQuery, monthFilter, yearFilter, allTrips]);
 
-
-  /* ---------------- STATS ---------------- */
-
   const stats = {
   total: filteredTrips.length,
   pending: filteredTrips.filter(t => t.trip_status === "Pending").length,
@@ -127,8 +120,6 @@ export default function TripDashboard() {
 };
 
 
-  /* ---------------- TRIP ACTIONS ---------------- */
-
   const openStartTripModal = (tripId) => {
     setSelectedTripId(tripId);
     setStartMeter(null);
@@ -136,69 +127,70 @@ export default function TripDashboard() {
   };
 
   const handleStartTrip = async () => {
-    if (!startMeter || isNaN(startMeter)) return alert("Invalid meter");
-
-    await api.patch(`/api/trips/${selectedTripId}/start`, { start_meter: startMeter });
+    if (!selectedTripId || startMeter === null || isNaN(startMeter)) {
+      alert("Enter valid start meter");
+      return;
+    }
+    await api.patch(`/api/trips/${selectedTripId}/start`, { start_meter: startMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
     setShowStartModal(false);
     fetchTrips();
-    setSuccessMessage("Trip started");
+    setSuccessMessage("Trip started!");
     setTimeout(() => setSuccessMessage(""), 3000);
+    
   };
 
-  const openEndTripModal = (tripId, meter) => {
+  const openEndTripModal = (tripId, currentMeter) => {
     setSelectedTripId(tripId);
-    setEndMeter(meter || null);
+    setEndMeter(currentMeter || null);
     setShowEndModal(true);
   };
 
   const handleEndTrip = async () => {
-    if (!endMeter || isNaN(endMeter)) return alert("Invalid meter");
-
-    await api.patch(`/api/trips/${selectedTripId}/end`, { end_meter: endMeter });
+    if (!selectedTripId || endMeter === null || isNaN(endMeter)) {
+      alert("Enter valid end meter");
+      return;
+    }
+    await api.patch(`/api/trips/${selectedTripId}/end`, { end_meter: endMeter }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
     setShowEndModal(false);
     fetchTrips();
-    setSuccessMessage("Trip ended");
+    setSuccessMessage("Trip Ended!");
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
-  /* ---------------- UI ---------------- */
-
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
       <Sidebar />
-
       <main className="flex-1 overflow-auto p-8">
         <div className="max-w-7xl mx-auto">
-
           {/* Header */}
-          <div className="flex justify-between mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-semibold">Trip Management</h1>
-              <p className="text-gray-500 text-sm">Manage all trips</p>
+              <p className="text-sm text-gray-500">Manage Trips and all Trip-related data</p>
             </div>
             <div className="text-sm text-gray-600">
-              {name} — {role}
+              Signed in as <span className="font-medium">{name}</span> — {role}
+              {errorMessage && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
+                ❌ {errorMessage}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="bg-green-200 border border-green-400 font-semibold text-green-700 px-4 py-3 rounded mb-4 text-center">
+                ✅ {successMessage}
+              </div>
+            )}
             </div>
           </div>
 
-          {/* Alerts */}
-          {successMessage && (
-            <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
-              ✅ {successMessage}
-            </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            <div className="lg:col-span-3">
-              <StatsCards onStatusSelect={setStatusFilter} stats={stats} />
-            </div>
-            <div className="lg:col-span-1">
-              <ActionCards onAddTripClick={() => navigate("/create-trip")} />
-            </div>
+          {/* Stats + Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mt-6 items-stretch">
+            <div className="lg:col-span-3"><StatsCards stats={stats} onStatusSelect={(status) => setStatusFilter(status)} /></div>
+            <div className="lg:col-span-1"><ActionCards onAddTripClick={() => navigate("/create-trip")} /></div>
           </div>
 
-          {/* Filters */}
+          {/* Search + Month/Year Filter */}
           <div className="flex gap-4 mt-6 items-center">
             <TripSearchBar onSearch={setSearchQuery} />
           </div>
@@ -232,20 +224,50 @@ export default function TripDashboard() {
 
           </div>
 
+
           {/* Table */}
-          <div className="mt-4">
+          <div className="mt-8">
             <TripTable
               trips={filteredTrips}
               loading={loading}
               error={error}
-              onSelectTrip={(t) => navigate(`/trip/${t.trip_id}`)}
+              onSelectTrip={(trip) => navigate(`/trip/${trip.trip_id}`)}
+              onSelectDriver={(trip) => {
+                if (trip.driver?.driver_id) {
+                  navigate(`/driver-profile/${trip.driver?.driver_id}`);
+                }
+              }}
+              onSelectVehicle={(trip) => navigate(`/vehicles/${trip.vehicle?.vehicle_id}`)}
+              onSelectCustomer={(trip) => navigate(`/customer-profile/${trip.customer?.customer_id}`)}
               onStartTrip={openStartTripModal}
               onEndTrip={openEndTripModal}
+                onCreateAnotherTrip={(trip) =>
+                        navigate("/create-trip", {
+                          state: { copyTrip: trip },
+                        })
+              }
             />
           </div>
-
         </div>
       </main>
+      <StartTripModal
+          open={showStartModal}
+          tripId={selectedTripId}
+          onClose={() => setShowStartModal(false)}
+          onSuccess={() => {
+            fetchTrips();   // refresh dashboard
+          }}
+        />
+        <EndTripModal
+          open={showEndModal}
+          tripId={selectedTripId}
+          currentMeter={endMeter}
+          onClose={() => setShowEndModal(false)}
+          onSuccess={() => {
+            fetchTrips(); // refresh list
+          }}
+        />
+
     </div>
   );
 }
