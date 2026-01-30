@@ -34,6 +34,7 @@ export default function TripTable({
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Leaving</th>
+                  <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
@@ -67,7 +68,7 @@ export default function TripTable({
                     <td className="px-4 py-4">
                       {new Date(t.leaving_datetime).toLocaleString()}
                     </td>
-
+                    <td className="px-4 py-4">{t.trip_type}</td>
                     <td className="px-4 py-4">
                       <div className="flex gap-2">
                         {t.trip_status === "Pending" && (

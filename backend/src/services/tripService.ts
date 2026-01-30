@@ -26,6 +26,7 @@ export interface CreateTripDTO {
   actual_distance?: number;
   estimated_days?: number;
   actual_days?: number;
+  trip_type?: "Daily" | "Special"; // ✅ ADD
   driver_required?: "Yes" | "No";
   driver_id?: number;
   estimated_cost?: number;
@@ -86,6 +87,7 @@ export const createTripService = async (data: CreateTripDTO) => {
       from_location: data.from_location,
       to_location: data.to_location,
       up_down: data.up_down,
+      trip_type: data.trip_type ?? "Special",
 
       // Auto-filled fields
       vehicle_rent_daily: auto.vehicle_rent_daily,
@@ -168,6 +170,7 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "damage_cost",
     "to_location",
     "up_down",
+    "trip_type",
     "driver_required",
     "driver_id",
     "fuel_required",
@@ -300,6 +303,7 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
       num_passengers: true,
       discount: true,
       damage_cost: true,
+      trip_type: true,
       payment_amount: true,
       advance_payment: true,
       start_meter: true,
@@ -435,6 +439,8 @@ export const getTripByIdService = async (trip_id: number) => {
       vehicle_id: true,
       from_location: true,
       to_location: true,
+      trip_type: true,
+
       up_down: true,
       estimated_distance: true,
       actual_distance: true,
