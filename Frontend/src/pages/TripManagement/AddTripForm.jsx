@@ -53,6 +53,7 @@ const AddTripForm = ({
     trip.discount,
     trip.damage_cost,
     trip.other_trip_costs,
+    trip.trip_type,
     selectedVehicle,
     selectedDriver,
   ]);
@@ -306,6 +307,19 @@ const AddTripForm = ({
             onChange={handleChange}
             className="input"
           />
+        </div>
+        <div>
+          <label className="label">Trip Type</label>
+          <select
+            name="trip_type"
+            value={trip.trip_type || ""}
+            onChange={handleChange}
+            className="input"
+            required
+          >
+            <option value="Daily">Daily</option>
+            <option value="Special">Special</option>
+          </select>
         </div>
       </div>
 

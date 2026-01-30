@@ -19,6 +19,7 @@ export default function TripDashboard() {
   const [trips, setTrips] = useState([]);
   const [allTrips, setAllTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
+  const [baseTrips, setBaseTrips] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,15 +55,8 @@ export default function TripDashboard() {
   }
 };
 
-
-  
-  const applyFilters = () => {
+const applyBaseFilters = () => {
   let filtered = [...allTrips];
-
-  // STATUS
-  if (statusFilter !== "ALL") {
-    filtered = filtered.filter(t => t.trip_status === statusFilter);
-  }
 
   // SEARCH
   if (searchQuery) {
@@ -75,7 +69,7 @@ export default function TripDashboard() {
     );
   }
 
-  // YEAR (created_at)
+  // YEAR
   if (yearFilter !== "ALL") {
     filtered = filtered.filter(t => {
       const year = new Date(t.leaving_datetime).getFullYear();
@@ -83,7 +77,7 @@ export default function TripDashboard() {
     });
   }
 
-  // MONTH (created_at)
+  // MONTH
   if (monthFilter !== "ALL") {
     filtered = filtered.filter(t => {
       const month = new Date(t.leaving_datetime).getMonth() + 1;
@@ -91,8 +85,23 @@ export default function TripDashboard() {
     });
   }
 
-  setFilteredTrips(filtered);
+  return filtered;
 };
+
+  
+  const applyFilters = () => {
+  const baseFiltered = applyBaseFilters();
+
+  // Status filter for table only
+  let filtered = [...baseFiltered];
+  if (statusFilter !== "ALL") {
+    filtered = filtered.filter(t => t.trip_status === statusFilter);
+  }
+
+  setFilteredTrips(filtered);
+  setBaseTrips(baseFiltered);   // IMPORTANT: used for stats
+};
+
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -111,12 +120,12 @@ export default function TripDashboard() {
 }, [statusFilter, searchQuery, monthFilter, yearFilter, allTrips]);
 
   const stats = {
-  total: filteredTrips.length,
-  pending: filteredTrips.filter(t => t.trip_status === "Pending").length,
-  ongoing: filteredTrips.filter(t => t.trip_status === "Ongoing").length,
-  ended: filteredTrips.filter(t => t.trip_status === "Ended").length,
-  completed: filteredTrips.filter(t => t.trip_status === "Completed").length,
-  cancelled: filteredTrips.filter(t => t.trip_status === "Cancelled").length,
+   total: baseTrips.length,
+    pending: baseTrips.filter(t => t.trip_status === "Pending").length,
+    ongoing: baseTrips.filter(t => t.trip_status === "Ongoing").length,
+    ended: baseTrips.filter(t => t.trip_status === "Ended").length,
+    completed: baseTrips.filter(t => t.trip_status === "Completed").length,
+    cancelled: baseTrips.filter(t => t.trip_status === "Cancelled").length,
 };
 
 
