@@ -30,6 +30,9 @@ export default function TripDashboard() {
   const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
   const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
 
+  const [tripTypeFilter, setTripTypeFilter] = useState("ALL"); // "Daily", "Special", etc.
+  const [companyFilter, setCompanyFilter] = useState("ALL");   // company_id or "ALL"
+
   const [showStartModal, setShowStartModal] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
 
@@ -85,6 +88,15 @@ const applyBaseFilters = () => {
     });
   }
 
+  if (tripTypeFilter !== "ALL") {
+    filtered = filtered.filter(t => t.trip_type === tripTypeFilter);
+  }
+
+  // COMPANY
+  if (companyFilter !== "ALL") {
+    filtered = filtered.filter(t => t.customer?.name === companyFilter);
+  }
+
   return filtered;
 };
 
@@ -117,7 +129,7 @@ const applyBaseFilters = () => {
   // Filter when data or filters change
   useEffect(() => {
   applyFilters();
-}, [statusFilter, searchQuery, monthFilter, yearFilter, allTrips]);
+}, [statusFilter, searchQuery, monthFilter, yearFilter, tripTypeFilter, companyFilter, allTrips]);
 
   const stats = {
    total: baseTrips.length,
@@ -230,6 +242,33 @@ const applyBaseFilters = () => {
                 </option>
               ))}
             </select>
+
+            <select
+                value={tripTypeFilter}
+                onChange={e => setTripTypeFilter(e.target.value)}
+                className="border rounded px-3 py-2"
+              >
+                <option value="ALL">All Trip Types</option>
+                <option value="Daily">Daily</option>
+                <option value="Special">Special</option>
+              </select>
+
+              {/* Company Filter */}
+              <select
+                  value={companyFilter}
+                  onChange={e => setCompanyFilter(e.target.value)}
+                  className="border rounded px-3 py-2"
+                >
+                  <option value="ALL">All Customers</option>
+                  {allTrips
+                    .map(t => t.customer?.name)           // use customer name
+                    .filter((v, i, a) => v && a.indexOf(v) === i) // unique customer names
+                    .map((customerName) => (
+                      <option key={customerName} value={customerName}>
+                        {customerName}
+                      </option>
+                    ))}
+                </select>
 
           </div>
 
