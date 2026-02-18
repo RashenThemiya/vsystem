@@ -10,10 +10,10 @@ export interface EndTripDTO {
   end_meter: number;
 }
 
+// ========================= END TRIP =========================
 export const endTripService = async (trip_id: number, data: EndTripDTO) => {
   const { end_meter } = data;
 
-  // Fetch trip with relations
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     include: {
@@ -24,54 +24,46 @@ export const endTripService = async (trip_id: number, data: EndTripDTO) => {
   });
 
   if (!trip) throw new Error("Trip not found");
-  if (trip.trip_status !== "Ongoing")
+  if (trip.trip_status !== TripStatus.Ongoing)
     throw new Error("Only ongoing trips can be ended");
 
   if (end_meter < (trip.start_meter || 0))
     throw new Error("End meter cannot be less than start meter");
 
-  // Calculate actual cost using helper
+  // ✅ stable return date for end trip (now)
+  const stableReturnDate = new Date();
+
   const costData = calculateActualTripCost(
     trip as TripWithRelations,
-    end_meter
+    end_meter,
+    stableReturnDate
   );
 
-  // Update trip
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
       end_meter,
       actual_distance: new Prisma.Decimal(costData.actualDistance),
-      actual_return_datetime: new Date(),
+      actual_return_datetime: stableReturnDate,
       actual_days: costData.actualDays,
       total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
-      trip_status: "Ended",
+      trip_status: TripStatus.Ended,
       profit: new Prisma.Decimal(costData.profit),
     },
   });
 
-  // Update vehicle meter
   await prisma.vehicle.update({
     where: { vehicle_id: trip.vehicle_id },
-    data: {
-      meter_number: end_meter,
-    },
+    data: { meter_number: end_meter },
   });
 
-  return {
-    ...updatedTrip,
-    cost_breakdown: costData,
-  };
+  return { ...updatedTrip, cost_breakdown: costData };
 };
 
-export const addDamageCostService = async (
-  trip_id: number,
-  damage_amount: number
-) => {
-  if (damage_amount <= 0)
-    throw new Error("Damage cost must be greater than zero");
+// ========================= ADD DAMAGE COST =========================
+export const addDamageCostService = async (trip_id: number, damage_amount: number) => {
+  if (damage_amount <= 0) throw new Error("Damage cost must be greater than zero");
 
-  // 1️⃣ Fetch trip
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     include: {
@@ -83,63 +75,53 @@ export const addDamageCostService = async (
 
   if (!trip) throw new Error("Trip not found");
 
-  // 2️⃣ Convert all numeric fields to number safely
-  const currentDamage = Number(trip.damage_cost || 0);
-  const newDamageCostNumber = damage_amount;
-
-  // 3️⃣ Build trip object for calculation (correct Decimal type)
   const tripForCalc: TripWithRelations = {
-    ...trip,
-    damage_cost: new Prisma.Decimal(newDamageCostNumber),
+    ...(trip as TripWithRelations),
+    damage_cost: new Prisma.Decimal(damage_amount),
   };
 
-  // Need actual distance & days for calculation
-  const actualDistance = Number(trip.actual_distance || 0);
-  const actualDays = Number(trip.actual_days || 1);
+  const endMeter = trip.end_meter ?? trip.start_meter ?? 0;
 
-  // 4️⃣ Recalculate cost
-  const costData = calculateActualTripCost(
-    tripForCalc,
-    trip.end_meter ?? trip.start_meter ?? 0
-  );
+  // ✅ For ended/completed trips, must have actual_return_datetime
+  const stableReturnDate =
+    trip.actual_return_datetime ?? trip.estimated_return_datetime ?? trip.leaving_datetime;
+
+  // ✅ IMPORTANT: Use stored actual_days as fixed days (prevents 2 -> 3 jump)
+  const fixedDays = trip.actual_days ?? 1;
+
+  const costData = calculateActualTripCost(tripForCalc, endMeter, stableReturnDate, fixedDays);
 
   const newTotalCost = costData.totalActualCost;
 
-  // 5️⃣ Recalculate payment status
   const paid = Number(trip.payment_amount || 0);
 
   let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
   if (paid >= newTotalCost) paymentStatus = PaymentStatus.Paid;
   else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
 
-  // 6️⃣ Update DB
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
-      damage_cost: new Prisma.Decimal(newDamageCostNumber),
+      damage_cost: new Prisma.Decimal(damage_amount),
       total_actual_cost: new Prisma.Decimal(newTotalCost),
+      // keep DB days consistent
+      actual_days: fixedDays,
       profit: new Prisma.Decimal(costData.profit),
       payment_status: paymentStatus,
-
     },
   });
 
-  return {
-    ...updatedTrip,
-    cost_breakdown: costData,
-  };
+  return { ...updatedTrip, cost_breakdown: costData };
 };
 
+// ========================= UPDATE TRIP DATES =========================
 export interface UpdateTripDatesDTO {
   leaving_datetime?: string | Date;
   actual_return_datetime?: string | Date;
-  timezone?: string; // New: user timezone, e.g., "Asia/Colombo"
+  timezone?: string; // e.g., "Asia/Colombo"
 }
-export const updateTripDatesService = async (
-  trip_id: number,
-  data: UpdateTripDatesDTO
-) => {
-  // 1️⃣ Fetch trip with relations
+
+export const updateTripDatesService = async (trip_id: number, data: UpdateTripDatesDTO) => {
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     include: {
@@ -151,20 +133,17 @@ export const updateTripDatesService = async (
 
   if (!trip) throw new Error("Trip not found");
 
-  // 2️⃣ Use provided timezone or default to UTC
   const timezone = data.timezone ?? "UTC";
 
-  // 3️⃣ Convert leaving and return datetimes to UTC
-const leavingDate = data.leaving_datetime
-  ? dfnsTz.zonedTimeToUtc(data.leaving_datetime, timezone)
-  : trip.leaving_datetime;
+  // ⚠️ Keep your existing conversion (works if input is local time without tz)
+  const leavingDate = data.leaving_datetime
+    ? dfnsTz.zonedTimeToUtc(data.leaving_datetime, timezone)
+    : trip.leaving_datetime;
 
-const actualReturnDate = data.actual_return_datetime
-  ? dfnsTz.zonedTimeToUtc(data.actual_return_datetime, timezone)
-  : trip.actual_return_datetime ?? new Date();
+  const actualReturnDate = data.actual_return_datetime
+    ? dfnsTz.zonedTimeToUtc(data.actual_return_datetime, timezone)
+    : trip.actual_return_datetime ?? trip.estimated_return_datetime ?? new Date();
 
-
-  // 4️⃣ Update trip dates in DB
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
@@ -178,45 +157,26 @@ const actualReturnDate = data.actual_return_datetime
     },
   });
 
-  // 5️⃣ Recalculate actual days
+  // ✅ recompute days from edited dates (this is correct for Alter Dates)
   const diffTime = Math.max(actualReturnDate.getTime() - leavingDate.getTime(), 0);
   const actualDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
 
-  // 6️⃣ Prepare trip object for cost calculation
-  const tripForCalc: TripWithRelations = {
-    ...updatedTrip,
-    actual_days: actualDays,
-    damage_cost: new Prisma.Decimal(Number(updatedTrip.damage_cost || 0)),
-    actual_distance: updatedTrip.actual_distance
-      ? new Prisma.Decimal(Number(updatedTrip.actual_distance))
-      : new Prisma.Decimal(0),
-    vehicle: {
-      ...updatedTrip.vehicle,
-      rent_cost_daily: new Prisma.Decimal(Number(updatedTrip.vehicle.rent_cost_daily)),
-    },
-    driver: updatedTrip.driver
-      ? {
-          ...updatedTrip.driver,
-          driver_charges: new Prisma.Decimal(Number(updatedTrip.driver.driver_charges)),
-        }
-      : null, // ensure null instead of undefined
-  };
+  const endMeter = updatedTrip.end_meter ?? updatedTrip.start_meter ?? 0;
 
-  // 7️⃣ Recalculate total actual cost
   const costData = calculateActualTripCost(
-    tripForCalc,
-    updatedTrip.end_meter ?? updatedTrip.start_meter ?? 0
+    updatedTrip as TripWithRelations,
+    endMeter,
+    actualReturnDate,
+    actualDays // ✅ force same days used in calculation
   );
 
   const newTotalCost = costData.totalActualCost;
 
-  // 8️⃣ Recalculate payment status
   const paid = Number(updatedTrip.payment_amount || 0);
   let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
   if (paid >= newTotalCost) paymentStatus = PaymentStatus.Paid;
   else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
 
-  // 9️⃣ Update trip with recalculated cost and payment status
   const finalTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
@@ -227,21 +187,16 @@ const actualReturnDate = data.actual_return_datetime
     },
   });
 
-  return {
-    ...finalTrip,
-    cost_breakdown: costData,
-  };
+  return { ...finalTrip, cost_breakdown: costData };
 };
 
+// ========================= UPDATE TRIP METER =========================
 export interface UpdateTripMeterDTO {
   start_meter?: number;
   end_meter?: number;
 }
 
-export const updateTripMeterService = async (
-  trip_id: number,
-  data: UpdateTripMeterDTO
-) => {
+export const updateTripMeterService = async (trip_id: number, data: UpdateTripMeterDTO) => {
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     include: {
@@ -253,18 +208,24 @@ export const updateTripMeterService = async (
 
   if (!trip) throw new Error("Trip not found");
 
+  // ✅ Allow alter meters only after Ended/Completed
+  if (trip.trip_status !== TripStatus.Ended && trip.trip_status !== TripStatus.Completed) {
+    throw new Error("You can alter meters only after trip is ended or completed");
+  }
+
   const newStartMeter = data.start_meter ?? trip.start_meter ?? 0;
   const newEndMeter = data.end_meter ?? trip.end_meter ?? trip.start_meter ?? 0;
 
-  if (newEndMeter < newStartMeter)
+  if (newEndMeter < newStartMeter) {
     throw new Error("End meter cannot be less than start meter");
+  }
 
-  // 1️⃣ Update trip meters in DB first
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
       start_meter: newStartMeter,
       end_meter: newEndMeter,
+      actual_distance: new Prisma.Decimal(newEndMeter - newStartMeter),
     },
     include: {
       vehicle: true,
@@ -273,45 +234,38 @@ export const updateTripMeterService = async (
     },
   });
 
-  // 2️⃣ Prepare trip object for cost calculation
-  const tripForCalc: TripWithRelations = {
-    ...updatedTrip,
-    actual_distance: new Prisma.Decimal(newEndMeter - newStartMeter),
-    actual_days: updatedTrip.actual_days ?? 1,
-    damage_cost: new Prisma.Decimal(Number(updatedTrip.damage_cost || 0)),
-    vehicle: {
-      ...updatedTrip.vehicle,
-      rent_cost_daily: new Prisma.Decimal(Number(updatedTrip.vehicle.rent_cost_daily)),
-    },
-    driver: updatedTrip.driver
-      ? {
-          ...updatedTrip.driver,
-          driver_charges: new Prisma.Decimal(Number(updatedTrip.driver.driver_charges)),
-        }
-      : null,
-  };
+  // ✅ For Ended/Completed trips, MUST use actual_return_datetime
+  if (!updatedTrip.actual_return_datetime) {
+    throw new Error("Cannot alter meter: trip has no actual_return_datetime");
+  }
+  const stableReturnDate = updatedTrip.actual_return_datetime;
 
-  // 3️⃣ Recalculate total cost
-  const costData = calculateActualTripCost(tripForCalc, newEndMeter);
+  // ✅ KEY FIX: Use stored actual_days so it NEVER jumps (2 -> 3)
+  const fixedDays = updatedTrip.actual_days ?? 1;
 
-  // 4️⃣ Recalculate payment status
+  const costData = calculateActualTripCost(
+    updatedTrip as TripWithRelations,
+    newEndMeter,
+    stableReturnDate,
+    fixedDays
+  );
+
   const paid = Number(updatedTrip.payment_amount || 0);
   let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
   if (paid >= costData.totalActualCost) paymentStatus = PaymentStatus.Paid;
   else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
 
-  // 5️⃣ Update DB with recalculated cost and payment status
   const finalTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
       total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
       actual_distance: new Prisma.Decimal(costData.actualDistance),
+      actual_days: fixedDays, // ✅ keep consistent
       payment_status: paymentStatus,
       profit: new Prisma.Decimal(costData.profit),
     },
   });
 
-  // 6️⃣ Update vehicle meter if end_meter changed
   if (data.end_meter !== undefined) {
     await prisma.vehicle.update({
       where: { vehicle_id: trip.vehicle_id },
@@ -319,8 +273,5 @@ export const updateTripMeterService = async (
     });
   }
 
-  return {
-    ...finalTrip,
-    cost_breakdown: costData,
-  };
+  return { ...finalTrip, cost_breakdown: costData };
 };

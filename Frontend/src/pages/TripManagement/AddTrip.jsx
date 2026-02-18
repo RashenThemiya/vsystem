@@ -230,6 +230,11 @@ const AddTrip = () => {
     setTrip((prev) => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: totalEstimatedCost, profit, discount }));
   };
 
+  const toUtcIso = (localDatetime) => {
+  if (!localDatetime) return null;
+  return new Date(localDatetime).toISOString(); // laptop local time -> UTC ISO
+};
+
   // ========================
   // Confirm & Submit
   // ========================
@@ -272,10 +277,10 @@ const AddTrip = () => {
         total_actual_cost: Number(trip.total_actual_cost || 0),
         payment_status: trip.payment_status,
         trip_status: trip.trip_status,
-        leaving_datetime: trip.leaving_datetime,
+       leaving_datetime: toUtcIso(trip.leaving_datetime),
         profit: Number(trip.profit || 0),
         trip_type: trip.trip_type,
-        estimated_return_datetime: trip.estimated_return_datetime,
+        estimated_return_datetime: toUtcIso(trip.estimated_return_datetime),
         map_locations: (trip.map_locations || []).map((loc) => ({
           location_name: loc.location_name,
           latitude: Number(loc.latitude),
