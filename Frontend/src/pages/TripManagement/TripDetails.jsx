@@ -23,6 +23,7 @@ import TripPrintModal from "./TripAction/TripPrintModule";
 import StartTripModal from "./TripAction/StartTripModal";
 import EndTripModal from "./TripAction/EndTripModal";
 import CancelTripModal from "./TripAction/CancelTripModal";
+import AlterDriverCostModal from "./TripAction/AlterDriverCostModal";
  
 const TripDetails = () => {
   const { id } = useParams();
@@ -45,6 +46,7 @@ const [activeTab, setActiveTab] = useState("customer");
 const [showStartTripModal, setShowStartTripModal] = useState(false);
 const [showEndTripModal, setShowEndTripModal] = useState(false);
 const [showCancelModal, setShowCancelModal] = useState(false);
+const [showDriverCostModal, setShowDriverCostModal] = useState(false);
 
 const [duePayment, setDuePayment] = useState(0);
 
@@ -239,6 +241,7 @@ const handleDeletePayment = async (payment_id) => {
          
           </div>
  
+ 
 <DamageCostModal
   open={openDamageModal}
   onClose={() => setOpenDamageModal(false)}
@@ -275,13 +278,20 @@ const handleDeletePayment = async (payment_id) => {
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
- 
+ <AlterDriverCostModal
+  open={showDriverCostModal}
+  onClose={() => setShowDriverCostModal(false)}
+  tripId={trip.trip_id}
+  currentDriverCost={trip.driver_cost}
+  onSuccess={fetchTrip}
+/>
 <TripPrintModal
   open={showPrintModal}
   onClose={() => setShowPrintModal(false)}
   tripId={trip.trip_id}
   onSuccess={fetchTrip}
 />
+
 
  {/* Start Trip Modal */}
       <StartTripModal
@@ -325,6 +335,8 @@ const handleDeletePayment = async (payment_id) => {
                 onCompleteTrip={() => setShowCompleteModal(true)}
                 onGetPrint={() => setShowPrintModal(true)}
                 onCancelTrip={() => setShowCancelModal(true)}
+                onAlterDriverCost={() => setShowDriverCostModal(true)}
+
               />
 
             </div>
