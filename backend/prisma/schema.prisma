@@ -189,9 +189,11 @@ model Vehicle_Other_Cost {
   date                  DateTime
   cost                  Decimal   @db.Decimal(10,2)
   remarks               String?   @db.VarChar(255)
+  liters                Decimal?  @db.Decimal(10,2)
+
   cost_type             VehicleCostType
   vehicle               Vehicle   @relation(fields: [vehicle_id], references: [vehicle_id])
-
+  
   // One-to-one relation to Bill_Upload
   bill                  Bill_Upload? @relation(fields: [bill_id], references: [bill_id])
   bill_id               Int?         @unique
