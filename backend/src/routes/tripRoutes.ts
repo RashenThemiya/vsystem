@@ -14,6 +14,7 @@ import {
   updateTripMeterController,
   cancelTripController,
   completeTripController,
+  updateTripDriverCostController,
 } from "../controllers/tripController.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
@@ -61,27 +62,66 @@ router.delete("/:id", authorizeRoles("Admin", "SuperAdmin"), deleteTripControlle
 
 // ----------------- Trip Lifecycle -----------------
 // Start trip (Pending -> Ongoing)
-router.patch("/:id/start", authorizeRoles("Admin", "SuperAdmin", "Driver"), startTripController);
+router.patch(
+  "/:id/start",
+  authorizeRoles("Admin", "SuperAdmin", "Driver"),
+  startTripController
+);
 
 // End trip (Ongoing -> Ended)
-router.patch("/:id/end", authorizeRoles("Admin", "SuperAdmin", "Driver"), endTripController);
+router.patch(
+  "/:id/end",
+  authorizeRoles("Admin", "SuperAdmin", "Driver"),
+  endTripController
+);
 
 // Add damage cost
-router.patch("/:id/damage", authorizeRoles("Admin", "SuperAdmin"), addDamageCostController);
+router.patch(
+  "/:id/damage",
+  authorizeRoles("Admin", "SuperAdmin"),
+  addDamageCostController
+);
 
 // Add trip payment
-router.post("/:id/payment", authorizeRoles("Admin", "SuperAdmin"), addTripPaymentController);
+router.post(
+  "/:id/payment",
+  authorizeRoles("Admin", "SuperAdmin"),
+  addTripPaymentController
+);
 
 // Update trip dates
-router.patch("/:id/update-dates", authorizeRoles("Admin", "SuperAdmin"), updateTripDatesController);
+router.patch(
+  "/:id/update-dates",
+  authorizeRoles("Admin", "SuperAdmin"),
+  updateTripDatesController
+);
 
 // Update trip meter
-router.patch("/:id/update-meter", authorizeRoles("Admin", "SuperAdmin"), updateTripMeterController);
+router.patch(
+  "/:id/update-meter",
+  authorizeRoles("Admin", "SuperAdmin"),
+  updateTripMeterController
+);
+
+// ✅ Update trip driver cost (Alter Driver Cost)
+router.patch(
+  "/:id/driver-cost",
+  authorizeRoles("Admin", "SuperAdmin"),
+  updateTripDriverCostController
+);
 
 // Complete trip (Only if Ended + Paid)
-router.patch("/:id/complete", authorizeRoles("Admin", "SuperAdmin"), completeTripController);
+router.patch(
+  "/:id/complete",
+  authorizeRoles("Admin", "SuperAdmin"),
+  completeTripController
+);
 
 // Cancel trip
-router.patch("/:id/cancel", authorizeRoles("Admin", "SuperAdmin"), cancelTripController);
+router.patch(
+  "/:id/cancel",
+  authorizeRoles("Admin", "SuperAdmin"),
+  cancelTripController
+);
 
 export default router;

@@ -275,3 +275,93 @@ export const updateTripMeterService = async (trip_id: number, data: UpdateTripMe
 
   return { ...finalTrip, cost_breakdown: costData };
 };
+
+
+// ========================= UPDATE TRIP DRIVER COST =========================
+export interface UpdateTripDriverCostDTO {
+  driver_cost: number; // daily driver cost for this trip
+}
+
+export const updateTripDriverCostService = async (
+  trip_id: number,
+  data: UpdateTripDriverCostDTO
+) => {
+  const { driver_cost } = data;
+
+  if (driver_cost < 0) throw new Error("Driver cost cannot be negative");
+
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+    include: {
+      vehicle: true,
+      driver: true,
+      other_trip_costs: true,
+    },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+
+  // ✅ Allow altering driver cost only after Ended/Completed
+  if (trip.trip_status !== TripStatus.Ended && trip.trip_status !== TripStatus.Completed) {
+    throw new Error("You can alter driver cost only after trip is ended or completed");
+  }
+
+  // ✅ Must have actual_return_datetime for ended/completed recalculation
+  if (!trip.actual_return_datetime) {
+    throw new Error("Cannot alter driver cost: trip has no actual_return_datetime");
+  }
+
+  // ✅ Update driver_cost first
+  const updatedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      driver_cost: new Prisma.Decimal(driver_cost),
+    },
+    include: {
+      vehicle: true,
+      driver: true,
+      other_trip_costs: true,
+    },
+  });
+
+  // ✅ stable calculation inputs
+  const endMeter = updatedTrip.end_meter ?? updatedTrip.start_meter ?? 0;
+
+  // ✅ FIX: Prisma returns Date | null, but function expects Date | undefined
+  const stableReturnDate: Date | undefined =
+    updatedTrip.actual_return_datetime ?? undefined;
+
+  // (extra safety - should never happen because we checked earlier)
+  if (!stableReturnDate) {
+    throw new Error("Cannot alter driver cost: actual_return_datetime missing");
+  }
+
+  // ✅ lock days (prevents 2 -> 3 jump)
+  const fixedDays = updatedTrip.actual_days ?? 1;
+
+  const costData = calculateActualTripCost(
+    updatedTrip as TripWithRelations,
+    endMeter,
+    stableReturnDate,
+    fixedDays
+  );
+
+  // ✅ payment status recalculation
+  const paid = Number(updatedTrip.payment_amount || 0);
+
+  let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
+  if (paid >= costData.totalActualCost) paymentStatus = PaymentStatus.Paid;
+  else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
+
+  const finalTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
+      actual_days: fixedDays,
+      payment_status: paymentStatus,
+      profit: new Prisma.Decimal(costData.profit),
+    },
+  });
+
+  return { ...finalTrip, cost_breakdown: costData };
+};
