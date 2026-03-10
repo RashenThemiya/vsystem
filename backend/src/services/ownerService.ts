@@ -27,7 +27,7 @@ export const createOwnerService = async (
 // ✅ Get all owners (with vehicles)
 export const getAllOwnersService = async () => {
   return await prisma.owner.findMany({
-    include: { vehicles: true }, // ✅ show linked vehicles
+    include: { vehicles: false }, // ✅ show linked vehicles
   });
 };
 

@@ -7,7 +7,8 @@ import {
   FaPrint,
   FaPlay,
   FaStop,
-  FaTimesCircle
+  FaTimesCircle,
+  FaUserTie, // ✅ NEW
 } from "react-icons/fa";
 
 const TripActionButtons = ({
@@ -17,6 +18,7 @@ const TripActionButtons = ({
   onCompleteTrip,
   onAlterReturnDate,
   onAlterMeter,
+  onAlterDriverCost, // ✅ NEW
   onGetPrint,
   onStartTrip,
   onEndTrip,
@@ -30,10 +32,23 @@ const TripActionButtons = ({
   const showStart = tripStatus === "Pending";
   const showEnd = tripStatus === "Ongoing";
   const showComplete = tripStatus === "Ended";
-  const showPrint = tripStatus === "Ended" || tripStatus === "Completed" || tripStatus === "Pending" || tripStatus === "Ongoing" || tripStatus === "Cancelled";
-  const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing" && tripStatus =="Ended"
-  const showAlterDate = tripStatus !== "Completed" && tripStatus !=="Pending" 
-  const showAlterMeter = tripStatus !== "Completed" && tripStatus !=="Pending" 
+
+  const showPrint =
+    tripStatus === "Ended" ||
+    tripStatus === "Completed" ||
+    tripStatus === "Pending" ||
+    tripStatus === "Ongoing" ||
+    tripStatus === "Cancelled";
+
+  // ✅ FIXED (your old condition was impossible)
+  const showCancel = tripStatus === "Pending" || tripStatus === "Ongoing";
+
+  const showAlterDate = tripStatus !== "Completed" && tripStatus !== "Pending";
+  const showAlterMeter = tripStatus !== "Completed" && tripStatus !== "Pending";
+
+  // ✅ NEW: show only when backend allows altering driver cost
+  const showAlterDriverCost = tripStatus === "Ended" || tripStatus === "Completed";
+
   const showAddPayment = tripStatus !== "Completed" && tripStatus !== "Cancelled";
   const showAddDamage = tripStatus !== "Completed" && tripStatus !== "Cancelled";
 
@@ -85,25 +100,31 @@ const TripActionButtons = ({
       )}
 
       {showAlterDate && (
-        <>
-          <div className={cardStyle} onClick={onAlterReturnDate}>
-            <div className={`${iconBox} bg-purple-50`}>
-              <FaCalendar className="text-purple-600 text-base" />
-            </div>
-            <div>Alter Dates</div>
+        <div className={cardStyle} onClick={onAlterReturnDate}>
+          <div className={`${iconBox} bg-purple-50`}>
+            <FaCalendar className="text-purple-600 text-base" />
           </div>
-        </>
+          <div>Alter Dates</div>
+        </div>
       )}
 
       {showAlterMeter && (
-        <>
-          <div className={cardStyle} onClick={onAlterMeter}>
-            <div className={`${iconBox} bg-yellow-50`}>
-              <FaCar className="text-yellow-600 text-base" />
-            </div>
-            <div>Alter Meter</div>
+        <div className={cardStyle} onClick={onAlterMeter}>
+          <div className={`${iconBox} bg-yellow-50`}>
+            <FaCar className="text-yellow-600 text-base" />
           </div>
-        </>
+          <div>Alter Meter</div>
+        </div>
+      )}
+
+      {/* ✅ NEW: Alter Driver Cost */}
+      {showAlterDriverCost && (
+        <div className={cardStyle} onClick={onAlterDriverCost}>
+          <div className={`${iconBox} bg-teal-50`}>
+            <FaUserTie className="text-teal-600 text-base" />
+          </div>
+          <div>Alter Driver Cost</div>
+        </div>
       )}
 
       {showPrint && (

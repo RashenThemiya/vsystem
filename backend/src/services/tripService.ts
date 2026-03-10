@@ -19,12 +19,14 @@ export interface CreateTripDTO {
   customer_id: number;
   vehicle_id: number;
   from_location: string;
+  driver_cost?: number;
   to_location: string;
   up_down: "Up" | "Down" | "Both";
   estimated_distance?: number;
   actual_distance?: number;
   estimated_days?: number;
   actual_days?: number;
+  trip_type?: "Daily" | "Special"; // ✅ ADD
   driver_required?: "Yes" | "No";
   driver_id?: number;
   estimated_cost?: number;
@@ -75,8 +77,7 @@ export const createTripService = async (data: CreateTripDTO) => {
     mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost ?? null,
     additional_mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost_additional ?? null,
     fuel_cost: vehicle.fuel?.cost ?? null,
-    driver_cost: driver?.driver_charges ?? null,
-  };
+   driver_cost:data.driver_cost !== undefined? data.driver_cost: driver?.driver_charges ?? null,  };
 
   // 4️⃣ Create the trip
   const trip = await prisma.trip.create({
@@ -86,6 +87,7 @@ export const createTripService = async (data: CreateTripDTO) => {
       from_location: data.from_location,
       to_location: data.to_location,
       up_down: data.up_down,
+      trip_type: data.trip_type ?? "Special",
 
       // Auto-filled fields
       vehicle_rent_daily: auto.vehicle_rent_daily,
@@ -165,8 +167,10 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "customer_id",
     "vehicle_id",
     "from_location",
+    "damage_cost",
     "to_location",
     "up_down",
+    "trip_type",
     "driver_required",
     "driver_id",
     "fuel_required",
@@ -176,6 +180,7 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "actual_distance",
     "estimated_days",
     "actual_days",
+    "driver_cost", // ✅ ADD THIS
     "estimated_cost",
     "actual_cost",
     "mileage_cost",
@@ -187,14 +192,25 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "total_estimated_cost",
     "total_actual_cost",
   ];
+const decimalFields = [
+  "driver_cost",
+  "discount",
+  "damage_cost",
+  "payment_amount",
+  "advance_payment",
+  "total_estimated_cost",
+  "total_actual_cost",
+];
 
-  for (const key of fields) {
-    if (data[key as keyof UpdateTripDTO] !== undefined) {
-      updateData[key] = Number.isNaN(Number(data[key as keyof UpdateTripDTO]))
-        ? data[key as keyof UpdateTripDTO]
-        : Number(data[key as keyof UpdateTripDTO]);
-    }
+for (const key of fields) {
+  const value = data[key as keyof UpdateTripDTO];
+  if (value !== undefined) {
+    updateData[key] = decimalFields.includes(key)
+      ? new Prisma.Decimal(value as number)
+      : value;
   }
+}
+
 
   // Dates
   if (data.leaving_datetime) updateData.leaving_datetime = new Date(data.leaving_datetime);
@@ -287,6 +303,7 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
       num_passengers: true,
       discount: true,
       damage_cost: true,
+      trip_type: true,
       payment_amount: true,
       advance_payment: true,
       start_meter: true,
@@ -422,6 +439,8 @@ export const getTripByIdService = async (trip_id: number) => {
       vehicle_id: true,
       from_location: true,
       to_location: true,
+      trip_type: true,
+
       up_down: true,
       estimated_distance: true,
       actual_distance: true,

@@ -21,6 +21,7 @@ const AddTrip = () => {
     customer_id: "",
     vehicle_id: "",
     driver_id: "",
+    driver_cost: 0, // ✅ ADD THIS
     from_location: "",
     to_location: "",
     waypoints: [],
@@ -96,6 +97,8 @@ const AddTrip = () => {
       from_location,
       to_location,
       waypoints,
+      driver_cost: Number(copyTrip.driver_cost || 0), // ✅ KEEP CUSTOM COST
+
       up_down: copyTrip.up_down || "Both",
       trip_type: copyTrip.trip_type || "Special",
       num_passengers: copyTrip.num_passengers || 0,
@@ -180,7 +183,12 @@ const AddTrip = () => {
         updatedTrip.estimated_days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
       }
     }
-
+   if (name === "driver_id") {
+      const driver = drivers.find(
+        d => Number(d.driver_id) === Number(value) || Number(d.id) === Number(value)
+      );
+      updatedTrip.driver_cost = driver ? Number(driver.driver_cost) : 0;
+    }
     // Recalculate total cost & profit
     const { totalEstimatedCost, profit, discount } = calculateTotalEstimatedCost({
       trip: updatedTrip,
@@ -222,6 +230,11 @@ const AddTrip = () => {
     setTrip((prev) => ({ ...prev, other_trip_costs: updatedCosts, total_estimated_cost: totalEstimatedCost, profit, discount }));
   };
 
+  const toUtcIso = (localDatetime) => {
+  if (!localDatetime) return null;
+  return new Date(localDatetime).toISOString(); // laptop local time -> UTC ISO
+};
+
   // ========================
   // Confirm & Submit
   // ========================
@@ -245,6 +258,7 @@ const AddTrip = () => {
         customer_id: Number(trip.customer_id),
         vehicle_id: Number(trip.vehicle_id),
         driver_id: trip.driver_id ? Number(trip.driver_id) : null,
+        driver_cost: Number(trip.driver_cost || 0), // ✅ SEND TO BACKEND
         from_location: trip.from_location,
         to_location: trip.to_location,
         up_down: trip.up_down,
@@ -263,10 +277,10 @@ const AddTrip = () => {
         total_actual_cost: Number(trip.total_actual_cost || 0),
         payment_status: trip.payment_status,
         trip_status: trip.trip_status,
-        leaving_datetime: trip.leaving_datetime,
+       leaving_datetime: toUtcIso(trip.leaving_datetime),
         profit: Number(trip.profit || 0),
         trip_type: trip.trip_type,
-        estimated_return_datetime: trip.estimated_return_datetime,
+        estimated_return_datetime: toUtcIso(trip.estimated_return_datetime),
         map_locations: (trip.map_locations || []).map((loc) => ({
           location_name: loc.location_name,
           latitude: Number(loc.latitude),
