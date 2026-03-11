@@ -18,6 +18,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
 
   // extra fields
   const [serviceMeter, setServiceMeter] = useState("");
+  const [liters, setLiters] = useState("");
   const [insuranceExpiry, setInsuranceExpiry] = useState("");
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [ecoExpiry, setEcoExpiry] = useState("");
@@ -73,6 +74,10 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
       // 🔹 cost-type specific data
       if (costType === "Service_Cost") {
         payload.service_meter_number = Number(serviceMeter);
+      }
+
+      if (costType === "Fuel_Cost") {
+        payload.liters = Number(liters);
       }
 
       if (costType === "Insurance_Amount") {
@@ -189,6 +194,16 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
               placeholder="Service Meter Number"
               value={serviceMeter}
               onChange={(e) => setServiceMeter(e.target.value)}
+              className="input w-full border border-gray-300 rounded px-2 py-1"
+            />
+          )}
+
+          {costType === "Fuel_Cost" && (
+            <input
+              type="number"
+              placeholder="Fuel Liters"
+              value={liters}
+              onChange={(e) => setLiters(e.target.value)}
               className="input w-full border border-gray-300 rounded px-2 py-1"
             />
           )}

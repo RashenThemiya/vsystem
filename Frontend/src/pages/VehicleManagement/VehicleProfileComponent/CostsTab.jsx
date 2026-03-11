@@ -37,6 +37,9 @@ const costTitle =
     ? "Total Costs"
     : `${selectedCostType} Total`;
 
+const showFuelLitersColumn = filteredCosts.some(
+  (c) => c.cost_type === "Fuel_Cost"
+);
 
   return (
     <>
@@ -160,6 +163,9 @@ const costTitle =
             <th className="p-2 text-left">Cost ID</th>
             <th className="p-2 text-left">Date</th>
             <th className="p-2 text-left">Cost Type</th>
+            {showFuelLitersColumn && (
+              <th className="p-2 text-left">Fuel Liters</th>
+            )}
             <th className="p-2 text-left">Amount</th>
             <th className="p-2 text-left">Remarks</th>
           </tr>
@@ -170,6 +176,11 @@ const costTitle =
               <td className="p-2">{c.vehicle_other_cost_id}</td>
               <td className="p-2">{c.date?.split("T")[0]}</td>
               <td className="p-2">{c.cost_type}</td>
+              {showFuelLitersColumn && (
+                <td className="p-2">
+                  {c.cost_type === "Fuel_Cost" ? c.liters : "-"}
+                </td>
+              )}
               <td className="p-2">Rs. {Number(c.cost).toLocaleString()}</td>
               <td className="p-2">{c.remarks}</td>
             </tr>
