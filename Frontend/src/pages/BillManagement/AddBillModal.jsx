@@ -11,11 +11,14 @@ const AddBillModal = ({ onClose, onSuccess }) => {
     vehicle_id: "",
     driver_id: "",
     bill_type: "",
+    cost: "",
+    liters: "",
     bill_date: "",
     bill_status: "pending",
     bill_image_base64: "",
     vehicle_other_cost_id: null,
   });
+
 
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
@@ -127,6 +130,8 @@ const AddBillModal = ({ onClose, onSuccess }) => {
         driver_id: bill.driver_id || null,
         bill_type: backendBillType,
         vehicle_other_cost_id: bill.vehicle_other_cost_id || null,
+        cost: bill.cost || null,
+        liters: bill.bill_type === "Fuel_Cost" ? bill.liters : null
       };
 
       const res = await axios.post(
@@ -246,6 +251,33 @@ const AddBillModal = ({ onClose, onSuccess }) => {
                   ))}
                 </select>
               </div>
+              {/* COST */}
+              <div>
+                <label className="label">Cost</label>
+                <input
+                  type="number"
+                  name="cost"
+                  value={bill.cost}
+                  onChange={handleChange}
+                  className="input"
+                  placeholder="Enter bill cost"
+                  required
+                />
+              </div>
+              {bill.bill_type === "Fuel_Cost" && (
+                <div>
+                  <label className="label">Fuel Amount (Litres)</label>
+                  <input
+                    type="number"
+                    name="liters"
+                    value={bill.liters}
+                    onChange={handleChange}
+                    className="input"
+                    placeholder="Enter fuel amount"
+                    required
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="label">Bill Date</label>

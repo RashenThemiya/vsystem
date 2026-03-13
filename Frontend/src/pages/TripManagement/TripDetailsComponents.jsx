@@ -379,7 +379,7 @@ if (setDuePayment) setDuePayment(duePayment);
           {[
             ["Vehicle Rent (Daily)", trip.vehicle_rent_daily],
             ["Driver Cost", trip.driver_cost],
-            ["Mileage Extra Cost", trip.additional_mileage_cost],
+            ["Mileage   Extra Cost", trip.additional_mileage_cost],
             ["Mileage Cost (Applied)", trip.mileage_cost],
             ["Discount", trip.discount],
             ["Damage Cost", trip.damage_cost],

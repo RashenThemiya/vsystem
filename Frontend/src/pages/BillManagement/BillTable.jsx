@@ -22,6 +22,10 @@ export default function BillTable({ bills, onSelect, onUpdateCost, searchQuery =
     return matchesSearch && matchesStatus;
   });
 
+  const showFuelLitersColumn = filteredBills.some(
+      (b) => b.bill_type === "Fuel_Cost"
+    );
+
   return (
     <div className="bg-white rounded-xl shadow-md p-4 overflow-x-auto">
       <table className="w-full text-sm">
@@ -31,6 +35,9 @@ export default function BillTable({ bills, onSelect, onUpdateCost, searchQuery =
             <th className="p-2 text-left" >Vehicle ID</th>
             <th className="p-2 text-left" >Driver ID</th>
             <th className="p-2 text-left">Type</th>
+            {showFuelLitersColumn && (
+              <th className="p-2 text-left">Fuel Liters</th>
+            )}
             <th className="p-2 text-left">Date</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Actions</th>
@@ -48,6 +55,11 @@ export default function BillTable({ bills, onSelect, onUpdateCost, searchQuery =
               <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" onClick={() => onSelectVehicle(bill)}>{bill.vehicle_id}</td>
               <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" onClick={() => onSelectDriver(bill)}>{bill.driver_id}</td>
               <td className="p-2 capitalize">{bill.bill_type}</td>
+              {showFuelLitersColumn && (
+                <td className="p-2">
+                  {bill.bill_type === "Fuel_Cost" ? bill.liters : "-"}
+                </td>
+              )}
               <td className="p-2">{new Date(bill.bill_date).toLocaleDateString()}</td>
               <td className="p-2">
                 <span
