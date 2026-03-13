@@ -143,6 +143,8 @@ model Trip {
   advance_payment            Decimal?   @db.Decimal(10,2)
   start_meter                Int?
   end_meter                  Int?
+  start_meter_photo          String?    @db.VarChar(500)
+  end_meter_photo            String?    @db.VarChar(500)
   total_estimated_cost       Decimal?   @db.Decimal(10,2)
   total_actual_cost          Decimal?   @db.Decimal(10,2)
   payment_status             PaymentStatus
@@ -207,7 +209,8 @@ model Bill_Upload {
   bill_type        BillType
   bill_date        DateTime
   bill_status      BillStatus @default(pending)
-
+  liters                Decimal?  @db.Decimal(10,2)
+  cost                Decimal?  @db.Decimal(10,2)
   vehicle          Vehicle? @relation(fields: [vehicle_id], references: [vehicle_id])
   driver           Driver?  @relation(fields: [driver_id], references: [driver_id])
   vehicle_other_cost Vehicle_Other_Cost?  // Optional inverse relation

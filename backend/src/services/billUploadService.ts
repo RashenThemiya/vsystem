@@ -1,5 +1,5 @@
 import { prisma } from "../config/prismaClient.js";
-import { Bill_Upload, BillStatus } from "@prisma/client";
+import { Bill_Upload, BillStatus, Prisma } from "@prisma/client";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 
@@ -60,6 +60,14 @@ export const createBillService = async (data: BillCreateInput) => {
       bill_type: data.bill_type,
       bill_date: new Date(data.bill_date).toISOString(),
       bill_status: data.bill_status || BillStatus.pending,
+      liters:
+        data.liters !== undefined && data.liters !== null
+          ? new Prisma.Decimal(data.liters)
+          : undefined,
+      cost:
+        data.cost !== undefined && data.cost !== null
+          ? new Prisma.Decimal(data.cost)
+          : undefined,
       bill_image: imageUrl,
 
       vehicle_other_cost: data.vehicle_other_cost_id
@@ -68,9 +76,8 @@ export const createBillService = async (data: BillCreateInput) => {
     }
   });
 
-  return bill; // ⬅️ Return only the bill object
+  return bill;
 };
-
 
 // ----------------- GET ALL BILLS -----------------
 export const getAllBillsService = async () => {
@@ -83,6 +90,8 @@ export const getAllBillsService = async () => {
     bill_type: bill.bill_type,
     bill_date: bill.bill_date,
     bill_status: bill.bill_status,
+    liters: bill.liters,
+    cost: bill.cost,
     bill_image: bill.bill_image || null,
     vehicle_id: bill.vehicle_id,
     vehicle_name: bill.vehicle?.name || null,
@@ -110,6 +119,8 @@ export const getBillByIdService = async (id: number) => {
     bill_type: bill.bill_type,
     bill_date: bill.bill_date,
     bill_status: bill.bill_status,
+    liters: bill.liters,
+    cost: bill.cost,
     bill_image: bill.bill_image || null,
     vehicle_id: bill.vehicle_id,
     vehicle_name: bill.vehicle?.name || null,
@@ -133,8 +144,20 @@ export const updateBillService = async (id: number, data: BillUpdateInput) => {
       vehicle_id: data.vehicle_id ?? undefined,
       driver_id: data.driver_id ?? undefined,
       bill_type: data.bill_type ?? undefined,
-      bill_date: data.bill_date ?? undefined,
+      bill_date: data.bill_date ? new Date(data.bill_date).toISOString() : undefined,
       bill_status: data.bill_status ?? undefined,
+      liters:
+        data.liters !== undefined
+          ? data.liters === null
+            ? null
+            : new Prisma.Decimal(data.liters)
+          : undefined,
+      cost:
+        data.cost !== undefined
+          ? data.cost === null
+            ? null
+            : new Prisma.Decimal(data.cost)
+          : undefined,
       bill_image: imageUrl ?? undefined,
 
       vehicle_other_cost:
