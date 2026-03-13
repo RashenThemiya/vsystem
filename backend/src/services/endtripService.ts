@@ -5,14 +5,50 @@ import { Prisma } from "@prisma/client";
 import { calculateActualTripCost, TripWithRelations } from "./tripCostCalculator.js";
 import { TripStatus, PaymentStatus } from "@prisma/client";
 import * as dfnsTz from "date-fns-tz";
+import AWS from "aws-sdk";
+import { v4 as uuidv4 } from "uuid";
+
+// ========================= R2 CONFIG =========================
+const s3 = new AWS.S3({
+  endpoint: process.env.R2_ENDPOINT,
+  accessKeyId: process.env.R2_ACCESS_KEY_ID,
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  signatureVersion: "v4",
+});
+
+const uploadToR2 = async (base64Image: string, fileNamePrefix = "trip-meter") => {
+  if (!base64Image) return null;
+
+  const cleanBase64 = base64Image.replace(/^data:image\/\w+;base64,/, "");
+  const buffer = Buffer.from(cleanBase64, "base64");
+  const key = `${fileNamePrefix}-${uuidv4()}.png`;
+
+  try {
+    await s3
+      .putObject({
+        Bucket: process.env.R2_BUCKET!,
+        Key: key,
+        Body: buffer,
+        ContentType: "image/png",
+        ACL: "public-read",
+      })
+      .promise();
+
+    return `${process.env.R2_PUBLIC_URL}/${key}`;
+  } catch (err) {
+    console.error("R2 Upload Error:", err);
+    return null;
+  }
+};
 
 export interface EndTripDTO {
   end_meter: number;
+  end_meter_photo_base64?: string;
 }
 
 // ========================= END TRIP =========================
 export const endTripService = async (trip_id: number, data: EndTripDTO) => {
-  const { end_meter } = data;
+  const { end_meter, end_meter_photo_base64 } = data;
 
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
@@ -24,13 +60,20 @@ export const endTripService = async (trip_id: number, data: EndTripDTO) => {
   });
 
   if (!trip) throw new Error("Trip not found");
-  if (trip.trip_status !== TripStatus.Ongoing)
+  if (trip.trip_status !== TripStatus.Ongoing) {
     throw new Error("Only ongoing trips can be ended");
+  }
 
-  if (end_meter < (trip.start_meter || 0))
+  if (end_meter < (trip.start_meter || 0)) {
     throw new Error("End meter cannot be less than start meter");
+  }
 
-  // ✅ stable return date for end trip (now)
+  let endMeterPhotoUrl: string | null = null;
+
+  if (end_meter_photo_base64) {
+    endMeterPhotoUrl = await uploadToR2(end_meter_photo_base64, "end-meter");
+  }
+
   const stableReturnDate = new Date();
 
   const costData = calculateActualTripCost(
@@ -43,6 +86,7 @@ export const endTripService = async (trip_id: number, data: EndTripDTO) => {
     where: { trip_id },
     data: {
       end_meter,
+      end_meter_photo: endMeterPhotoUrl ?? undefined,
       actual_distance: new Prisma.Decimal(costData.actualDistance),
       actual_return_datetime: stableReturnDate,
       actual_days: costData.actualDays,
@@ -57,8 +101,13 @@ export const endTripService = async (trip_id: number, data: EndTripDTO) => {
     data: { meter_number: end_meter },
   });
 
-  return { ...updatedTrip, cost_breakdown: costData };
+  return {
+    ...updatedTrip,
+    end_meter_photo: updatedTrip.end_meter_photo || null,
+    cost_breakdown: costData,
+  };
 };
+
 
 // ========================= ADD DAMAGE COST =========================
 export const addDamageCostService = async (trip_id: number, damage_amount: number) => {
@@ -272,6 +321,96 @@ export const updateTripMeterService = async (trip_id: number, data: UpdateTripMe
       data: { meter_number: newEndMeter },
     });
   }
+
+  return { ...finalTrip, cost_breakdown: costData };
+};
+
+
+// ========================= UPDATE TRIP DRIVER COST =========================
+export interface UpdateTripDriverCostDTO {
+  driver_cost: number; // daily driver cost for this trip
+}
+
+export const updateTripDriverCostService = async (
+  trip_id: number,
+  data: UpdateTripDriverCostDTO
+) => {
+  const { driver_cost } = data;
+
+  if (driver_cost < 0) throw new Error("Driver cost cannot be negative");
+
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+    include: {
+      vehicle: true,
+      driver: true,
+      other_trip_costs: true,
+    },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+
+  // ✅ Allow altering driver cost only after Ended/Completed
+  if (trip.trip_status !== TripStatus.Ended && trip.trip_status !== TripStatus.Completed) {
+    throw new Error("You can alter driver cost only after trip is ended or completed");
+  }
+
+  // ✅ Must have actual_return_datetime for ended/completed recalculation
+  if (!trip.actual_return_datetime) {
+    throw new Error("Cannot alter driver cost: trip has no actual_return_datetime");
+  }
+
+  // ✅ Update driver_cost first
+  const updatedTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      driver_cost: new Prisma.Decimal(driver_cost),
+    },
+    include: {
+      vehicle: true,
+      driver: true,
+      other_trip_costs: true,
+    },
+  });
+
+  // ✅ stable calculation inputs
+  const endMeter = updatedTrip.end_meter ?? updatedTrip.start_meter ?? 0;
+
+  // ✅ FIX: Prisma returns Date | null, but function expects Date | undefined
+  const stableReturnDate: Date | undefined =
+    updatedTrip.actual_return_datetime ?? undefined;
+
+  // (extra safety - should never happen because we checked earlier)
+  if (!stableReturnDate) {
+    throw new Error("Cannot alter driver cost: actual_return_datetime missing");
+  }
+
+  // ✅ lock days (prevents 2 -> 3 jump)
+  const fixedDays = updatedTrip.actual_days ?? 1;
+
+  const costData = calculateActualTripCost(
+    updatedTrip as TripWithRelations,
+    endMeter,
+    stableReturnDate,
+    fixedDays
+  );
+
+  // ✅ payment status recalculation
+  const paid = Number(updatedTrip.payment_amount || 0);
+
+  let paymentStatus: PaymentStatus = PaymentStatus.Unpaid;
+  if (paid >= costData.totalActualCost) paymentStatus = PaymentStatus.Paid;
+  else if (paid > 0) paymentStatus = PaymentStatus.Partially_Paid;
+
+  const finalTrip = await prisma.trip.update({
+    where: { trip_id },
+    data: {
+      total_actual_cost: new Prisma.Decimal(costData.totalActualCost),
+      actual_days: fixedDays,
+      payment_status: paymentStatus,
+      profit: new Prisma.Decimal(costData.profit),
+    },
+  });
 
   return { ...finalTrip, cost_breakdown: costData };
 };

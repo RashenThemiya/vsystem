@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 
 /* ============================
-   DTOs (Updated with remarks)
+   DTOs (Updated with remarks + liters)
 ============================ */
 
 export type VehicleCostCreateInput = {
@@ -15,7 +15,8 @@ export type VehicleCostCreateInput = {
   cost: number;
   cost_type: VehicleCostType;
   bill_id?: number | null;
-  remarks?: string | null; // 🔹 Added remarks
+  remarks?: string | null;
+  liters?: number | null; // only for fuel, otherwise null
 
   // Extra fields for vehicle update
   service_meter_number?: number;
@@ -36,7 +37,7 @@ export const createVehicleCostService = async (
   return await prisma.$transaction(async (tx) => {
     let bill_id: number | undefined;
 
-    // 1️⃣ Update Bill status
+    // 1. Update Bill status if bill_id provided
     if (data.bill_id) {
       const updatedBill = await tx.bill_Upload.update({
         where: { bill_id: data.bill_id },
@@ -45,7 +46,7 @@ export const createVehicleCostService = async (
       bill_id = updatedBill.bill_id;
     }
 
-    // 2️⃣ Create Vehicle Other Cost
+    // 2. Create Vehicle Other Cost
     const vehicleCost = await tx.vehicle_Other_Cost.create({
       data: {
         vehicle_id: data.vehicle_id,
@@ -53,16 +54,21 @@ export const createVehicleCostService = async (
         cost: data.cost,
         cost_type: data.cost_type,
         bill_id,
-        remarks: data.remarks, // 🔹 Include remarks
+        remarks: data.remarks ?? null,
+        liters: data.liters ?? null, // keep null if frontend does not send
+      },
+      include: {
+        vehicle: true,
+        bill: true,
       },
     });
 
-    // 3️⃣ Prepare vehicle updates
+    // 3. Prepare vehicle updates
     const vehicleUpdateData: Prisma.VehicleUpdateInput = {};
 
     switch (data.cost_type) {
       case "Service_Cost":
-        if (data.service_meter_number) {
+        if (data.service_meter_number !== undefined) {
           vehicleUpdateData.last_service_meter_number =
             data.service_meter_number;
         }
@@ -90,7 +96,7 @@ export const createVehicleCostService = async (
         break;
     }
 
-    // 4️⃣ Update vehicle if needed
+    // 4. Update vehicle if needed
     if (Object.keys(vehicleUpdateData).length > 0) {
       await tx.vehicle.update({
         where: { vehicle_id: data.vehicle_id },
@@ -111,6 +117,9 @@ export const getAllVehicleCostsService = async () => {
     include: {
       vehicle: true,
       bill: true,
+    },
+    orderBy: {
+      vehicle_other_cost_id: "desc",
     },
   });
 };
@@ -138,9 +147,9 @@ export const updateVehicleCostService = async (
   data: VehicleCostUpdateInput
 ) => {
   return await prisma.$transaction(async (tx) => {
-    let billConnection;
+    let billConnection: Prisma.Bill_UploadUpdateOneWithoutVehicle_other_costNestedInput | undefined;
 
-    if (data.bill_id) {
+    if (data.bill_id !== undefined && data.bill_id !== null) {
       const updatedBill = await tx.bill_Upload.update({
         where: { bill_id: data.bill_id },
         data: { bill_status: BillStatus.completed },
@@ -151,21 +160,86 @@ export const updateVehicleCostService = async (
       billConnection = { disconnect: true };
     }
 
+    const updateData: Prisma.Vehicle_Other_CostUpdateInput = {
+      remarks: data.remarks ?? undefined,
+    };
+
+    if (data.vehicle_id !== undefined) {
+      updateData.vehicle = {
+        connect: { vehicle_id: data.vehicle_id },
+      };
+    }
+
+    if (data.date !== undefined) {
+      updateData.date = data.date;
+    }
+
+    if (data.cost !== undefined) {
+      updateData.cost = data.cost;
+    }
+
+    if (data.cost_type !== undefined) {
+      updateData.cost_type = data.cost_type;
+    }
+
+    if (data.liters !== undefined) {
+      updateData.liters = data.liters; // if null sent, saves null
+    }
+
+    if (billConnection !== undefined) {
+      updateData.bill = billConnection;
+    }
+
     const updatedCost = await tx.vehicle_Other_Cost.update({
       where: { vehicle_other_cost_id: id },
-      data: {
-        vehicle_id: data.vehicle_id,
-        date: data.date,
-        cost: data.cost,
-        cost_type: data.cost_type,
-        remarks: data.remarks, // 🔹 Update remarks
-        bill: billConnection,
-      },
+      data: updateData,
       include: {
         vehicle: true,
         bill: true,
       },
     });
+
+    // Optional vehicle updates only if vehicle_id exists in payload
+    if (data.vehicle_id !== undefined) {
+      const vehicleUpdateData: Prisma.VehicleUpdateInput = {};
+
+      switch (data.cost_type) {
+        case "Service_Cost":
+          if (data.service_meter_number !== undefined) {
+            vehicleUpdateData.last_service_meter_number =
+              data.service_meter_number;
+          }
+          break;
+
+        case "Insurance_Amount":
+          if (data.insurance_expiry_date) {
+            vehicleUpdateData.insurance_expiry_date =
+              data.insurance_expiry_date;
+          }
+          break;
+
+        case "Revenue_License":
+          if (data.license_expiry_date) {
+            vehicleUpdateData.license_expiry_date =
+              data.license_expiry_date;
+          }
+          break;
+
+        case "Eco_Test_Cost":
+          if (data.eco_test_expiry_date) {
+            vehicleUpdateData.eco_test_expiry_date =
+              data.eco_test_expiry_date;
+          }
+          break;
+      }
+
+      if (Object.keys(vehicleUpdateData).length > 0) {
+        await tx.vehicle.update({
+          where: { vehicle_id: data.vehicle_id },
+          data: vehicleUpdateData,
+        });
+      }
+    }
 
     return updatedCost;
   });

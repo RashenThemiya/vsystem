@@ -15,7 +15,7 @@ import AsyncLock from "async-lock";
 import {endTripService } from "./../services/endtripService.js";
 import { updateTripDatesService, UpdateTripDatesDTO } from "../services/endtripService.js";
 
-import { addDamageCostService ,updateTripMeterService } from "../services/endtripService.js"; 
+import { addDamageCostService ,updateTripMeterService ,updateTripDriverCostService } from "../services/endtripService.js"; 
 import { completeTripService } from "../services/tripService.js"; 
 const lock = new AsyncLock();
 
@@ -261,5 +261,34 @@ export const cancelTripController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// ========================= ALTER DRIVER COST =========================
+export const updateTripDriverCostController = async (req: any, res: any) => {
+  try {
+  const trip_id = Number(req.params.id);
+    const { driver_cost } = req.body;
+
+    if (!trip_id || isNaN(trip_id)) {
+      return res.status(400).json({ message: "Invalid trip id" });
+    }
+
+    if (driver_cost === undefined) {
+      return res.status(400).json({ message: "driver_cost is required" });
+    }
+
+    const result = await updateTripDriverCostService(trip_id, {
+      driver_cost: Number(driver_cost),
+    });
+
+    return res.status(200).json({
+      message: "Driver cost updated successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      message: error.message || "Failed to update driver cost",
+    });
   }
 };

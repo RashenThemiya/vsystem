@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `vehicle_other_cost` ADD COLUMN `liters` DECIMAL(10, 2) NULL;

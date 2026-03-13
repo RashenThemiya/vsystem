@@ -1,6 +1,42 @@
 import { prisma } from "../config/prismaClient.js";
 import { Prisma, Driver } from "@prisma/client";
 import { TripStatus, PaymentStatus } from "@prisma/client";
+import AWS from "aws-sdk";
+import { v4 as uuidv4 } from "uuid";
+
+// ==================== R2 CONFIG ====================
+const s3 = new AWS.S3({
+  endpoint: process.env.R2_ENDPOINT,
+  accessKeyId: process.env.R2_ACCESS_KEY_ID,
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  signatureVersion: "v4",
+});
+
+// ==================== R2 UPLOAD HELPER ====================
+const uploadToR2 = async (base64Image: string, fileNamePrefix = "trip-meter") => {
+  if (!base64Image) return null;
+
+  const cleanBase64 = base64Image.replace(/^data:image\/\w+;base64,/, "");
+  const buffer = Buffer.from(cleanBase64, "base64");
+  const key = `${fileNamePrefix}-${uuidv4()}.png`;
+
+  try {
+    await s3
+      .putObject({
+        Bucket: process.env.R2_BUCKET!,
+        Key: key,
+        Body: buffer,
+        ContentType: "image/png",
+        ACL: "public-read",
+      })
+      .promise();
+
+    return `${process.env.R2_PUBLIC_URL}/${key}`;
+  } catch (err) {
+    console.error("R2 Upload Error:", err);
+    return null;
+  }
+};
 
 // ==================== DTOs ====================
 export interface MapLocationDTO {
@@ -26,7 +62,7 @@ export interface CreateTripDTO {
   actual_distance?: number;
   estimated_days?: number;
   actual_days?: number;
-  trip_type?: "Daily" | "Special"; // ✅ ADD
+  trip_type?: "Daily" | "Special";
   driver_required?: "Yes" | "No";
   driver_id?: number;
   estimated_cost?: number;
@@ -39,7 +75,11 @@ export interface CreateTripDTO {
   payment_amount?: number;
   advance_payment?: number;
   start_meter?: number;
+  start_meter_photo_base64?: string;
+  start_meter_photo?: string;
   end_meter?: number;
+  end_meter_photo_base64?: string;
+  end_meter_photo?: string;
   total_estimated_cost?: number;
   profit?: number;
   total_actual_cost?: number;
@@ -54,32 +94,48 @@ export interface CreateTripDTO {
 
 export interface UpdateTripDTO extends Partial<CreateTripDTO> {}
 
+export interface StartTripDTO {
+  start_meter: number;
+  start_meter_photo_base64?: string;
+}
+
 // ========================= CREATE TRIP =========================
 export const createTripService = async (data: CreateTripDTO) => {
-  // 1️⃣ Fetch vehicle info including fuel and mileage
   const vehicle = await prisma.vehicle.findUnique({
     where: { vehicle_id: data.vehicle_id },
     include: { mileage_costs: true, fuel: true },
   });
+
   if (!vehicle) throw new Error("Vehicle not found");
 
-  // 2️⃣ Fetch driver if provided
   let driver: Driver | null = null;
   if (data.driver_id) {
-    driver = await prisma.driver.findUnique({ where: { driver_id: data.driver_id } });
+    driver = await prisma.driver.findUnique({
+      where: { driver_id: data.driver_id },
+    });
     if (!driver) throw new Error("Driver not found");
   }
 
-  // 3️⃣ Auto-fill new fields
+  let startMeterPhotoUrl: string | null = null;
+  let endMeterPhotoUrl: string | null = null;
+
+  if (data.start_meter_photo_base64) {
+    startMeterPhotoUrl = await uploadToR2(data.start_meter_photo_base64, "start-meter");
+  }
+
+  if (data.end_meter_photo_base64) {
+    endMeterPhotoUrl = await uploadToR2(data.end_meter_photo_base64, "end-meter");
+  }
+
   const auto = {
     vehicle_rent_daily: vehicle.rent_cost_daily,
     fuel_efficiency: vehicle.vehicle_fuel_efficiency ?? null,
     mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost ?? null,
     additional_mileage_cost: vehicle.mileage_costs?.[0]?.mileage_cost_additional ?? null,
     fuel_cost: vehicle.fuel?.cost ?? null,
-   driver_cost:data.driver_cost !== undefined? data.driver_cost: driver?.driver_charges ?? null,  };
+    driver_cost: data.driver_cost !== undefined ? data.driver_cost : driver?.driver_charges ?? null,
+  };
 
-  // 4️⃣ Create the trip
   const trip = await prisma.trip.create({
     data: {
       customer_id: data.customer_id,
@@ -89,40 +145,80 @@ export const createTripService = async (data: CreateTripDTO) => {
       up_down: data.up_down,
       trip_type: data.trip_type ?? "Special",
 
-      // Auto-filled fields
       vehicle_rent_daily: auto.vehicle_rent_daily,
       fuel_efficiency: auto.fuel_efficiency,
       mileage_cost: auto.mileage_cost,
       additional_mileage_cost: auto.additional_mileage_cost,
       fuel_cost: auto.fuel_cost,
-      driver_cost: auto.driver_cost,
+      driver_cost:
+        auto.driver_cost !== null ? new Prisma.Decimal(auto.driver_cost) : null,
 
-      // Optional frontend data
-      estimated_distance: data.estimated_distance !== undefined ? new Prisma.Decimal(data.estimated_distance) : null,
-      actual_distance: data.actual_distance !== undefined ? new Prisma.Decimal(data.actual_distance) : null,
+      estimated_distance:
+        data.estimated_distance !== undefined
+          ? new Prisma.Decimal(data.estimated_distance)
+          : null,
+
+      actual_distance:
+        data.actual_distance !== undefined
+          ? new Prisma.Decimal(data.actual_distance)
+          : null,
+
       estimated_days: data.estimated_days ?? null,
       actual_days: data.actual_days ?? null,
       driver_required: data.driver_required ?? "No",
       driver_id: data.driver_id ?? null,
       fuel_required: data.fuel_required ?? "No",
       num_passengers: data.num_passengers ?? null,
-      discount: data.discount !== undefined ? new Prisma.Decimal(data.discount) : new Prisma.Decimal(0),
-      damage_cost: data.damage_cost !== undefined ? new Prisma.Decimal(data.damage_cost) : null,
-      payment_amount: data.payment_amount !== undefined ? new Prisma.Decimal(data.payment_amount) : null,
-      advance_payment: data.advance_payment !== undefined ? new Prisma.Decimal(data.advance_payment) : null,
+      discount:
+        data.discount !== undefined
+          ? new Prisma.Decimal(data.discount)
+          : new Prisma.Decimal(0),
+      damage_cost:
+        data.damage_cost !== undefined
+          ? new Prisma.Decimal(data.damage_cost)
+          : null,
+      payment_amount:
+        data.payment_amount !== undefined
+          ? new Prisma.Decimal(data.payment_amount)
+          : null,
+      advance_payment:
+        data.advance_payment !== undefined
+          ? new Prisma.Decimal(data.advance_payment)
+          : null,
+
       start_meter: data.start_meter ?? null,
+      start_meter_photo: startMeterPhotoUrl ?? data.start_meter_photo ?? null,
       end_meter: data.end_meter ?? null,
-      total_estimated_cost: data.total_estimated_cost !== undefined ? new Prisma.Decimal(data.total_estimated_cost) : null,
-      total_actual_cost: data.total_actual_cost !== undefined ? new Prisma.Decimal(data.total_actual_cost) : null,
+      end_meter_photo: endMeterPhotoUrl ?? data.end_meter_photo ?? null,
+
+      total_estimated_cost:
+        data.total_estimated_cost !== undefined
+          ? new Prisma.Decimal(data.total_estimated_cost)
+          : null,
+
+      total_actual_cost:
+        data.total_actual_cost !== undefined
+          ? new Prisma.Decimal(data.total_actual_cost)
+          : null,
+
       payment_status: data.payment_status ?? "Unpaid",
       trip_status: data.trip_status ?? "Pending",
-      leaving_datetime: data.leaving_datetime ? new Date(data.leaving_datetime) : new Date(),
-      estimated_return_datetime: data.estimated_return_datetime ? new Date(data.estimated_return_datetime) : null,
-      actual_return_datetime: data.actual_return_datetime ? new Date(data.actual_return_datetime) : null,
-      profit: data.profit !== undefined ? new Prisma.Decimal(data.profit) : null,
 
+      leaving_datetime: data.leaving_datetime
+        ? new Date(data.leaving_datetime)
+        : new Date(),
 
-      // Map locations
+      estimated_return_datetime: data.estimated_return_datetime
+        ? new Date(data.estimated_return_datetime)
+        : null,
+
+      actual_return_datetime: data.actual_return_datetime
+        ? new Date(data.actual_return_datetime)
+        : null,
+
+      profit:
+        data.profit !== undefined ? new Prisma.Decimal(data.profit) : null,
+
       map: data.map_locations
         ? {
             create: data.map_locations.map((loc: MapLocationDTO, index) => ({
@@ -134,7 +230,6 @@ export const createTripService = async (data: CreateTripDTO) => {
           }
         : undefined,
 
-      // Other trip costs
       other_trip_costs: data.other_trip_costs
         ? {
             create: data.other_trip_costs.map((cost: OtherTripCostDTO) => ({
@@ -144,17 +239,21 @@ export const createTripService = async (data: CreateTripDTO) => {
           }
         : undefined,
     },
-    include: { map: true, other_trip_costs: true },
-  });
-if (data.advance_payment) {
-  await prisma.payment.create({
-    data: {
-      trip_id: trip.trip_id,
-      amount: new Prisma.Decimal(data.advance_payment),
-      payment_date: new Date(), // always a valid date
+    include: {
+      map: true,
+      other_trip_costs: true,
     },
   });
-}
+
+  if (data.advance_payment) {
+    await prisma.payment.create({
+      data: {
+        trip_id: trip.trip_id,
+        amount: new Prisma.Decimal(data.advance_payment),
+        payment_date: new Date(),
+      },
+    });
+  }
 
   return trip;
 };
@@ -163,11 +262,21 @@ if (data.advance_payment) {
 export const updateTripService = async (id: number, data: UpdateTripDTO) => {
   const updateData: any = {};
 
+  let startMeterPhotoUrl: string | null = null;
+  let endMeterPhotoUrl: string | null = null;
+
+  if (data.start_meter_photo_base64) {
+    startMeterPhotoUrl = await uploadToR2(data.start_meter_photo_base64, "start-meter");
+  }
+
+  if (data.end_meter_photo_base64) {
+    endMeterPhotoUrl = await uploadToR2(data.end_meter_photo_base64, "end-meter");
+  }
+
   const fields = [
     "customer_id",
     "vehicle_id",
     "from_location",
-    "damage_cost",
     "to_location",
     "up_down",
     "trip_type",
@@ -175,84 +284,108 @@ export const updateTripService = async (id: number, data: UpdateTripDTO) => {
     "driver_id",
     "fuel_required",
     "num_passengers",
-    "discount",
-    "estimated_distance",
-    "actual_distance",
     "estimated_days",
     "actual_days",
-    "driver_cost", // ✅ ADD THIS
+    "start_meter",
+    "end_meter",
+  ];
+
+  const decimalFields = [
+    "driver_cost",
+    "estimated_distance",
+    "actual_distance",
     "estimated_cost",
     "actual_cost",
     "mileage_cost",
+    "discount",
     "damage_cost",
     "payment_amount",
     "advance_payment",
-    "start_meter",
-    "end_meter",
     "total_estimated_cost",
     "total_actual_cost",
+    "profit",
   ];
-const decimalFields = [
-  "driver_cost",
-  "discount",
-  "damage_cost",
-  "payment_amount",
-  "advance_payment",
-  "total_estimated_cost",
-  "total_actual_cost",
-];
 
-for (const key of fields) {
-  const value = data[key as keyof UpdateTripDTO];
-  if (value !== undefined) {
-    updateData[key] = decimalFields.includes(key)
-      ? new Prisma.Decimal(value as number)
-      : value;
+  for (const key of fields) {
+    const value = data[key as keyof UpdateTripDTO];
+    if (value !== undefined) {
+      updateData[key] = value;
+    }
   }
-}
 
+  for (const key of decimalFields) {
+    const value = data[key as keyof UpdateTripDTO];
+    if (value !== undefined) {
+      updateData[key] = value === null ? null : new Prisma.Decimal(value as number);
+    }
+  }
 
-  // Dates
-  if (data.leaving_datetime) updateData.leaving_datetime = new Date(data.leaving_datetime);
-  if (data.estimated_return_datetime)
-    updateData.estimated_return_datetime = new Date(data.estimated_return_datetime);
-  if (data.actual_return_datetime)
-    updateData.actual_return_datetime = new Date(data.actual_return_datetime);
+  if (startMeterPhotoUrl) {
+    updateData.start_meter_photo = startMeterPhotoUrl;
+  } else if (data.start_meter_photo !== undefined) {
+    updateData.start_meter_photo = data.start_meter_photo;
+  }
 
-  // Status
+  if (endMeterPhotoUrl) {
+    updateData.end_meter_photo = endMeterPhotoUrl;
+  } else if (data.end_meter_photo !== undefined) {
+    updateData.end_meter_photo = data.end_meter_photo;
+  }
+
+  if (data.leaving_datetime !== undefined) {
+    updateData.leaving_datetime = data.leaving_datetime
+      ? new Date(data.leaving_datetime)
+      : null;
+  }
+
+  if (data.estimated_return_datetime !== undefined) {
+    updateData.estimated_return_datetime = data.estimated_return_datetime
+      ? new Date(data.estimated_return_datetime)
+      : null;
+  }
+
+  if (data.actual_return_datetime !== undefined) {
+    updateData.actual_return_datetime = data.actual_return_datetime
+      ? new Date(data.actual_return_datetime)
+      : null;
+  }
+
   if (data.trip_status) updateData.trip_status = data.trip_status;
   if (data.payment_status) updateData.payment_status = data.payment_status;
 
-  // Update main trip
   const trip = await prisma.trip.update({
     where: { trip_id: Number(id) },
     data: updateData,
   });
 
-  // Update map locations
   if (Array.isArray(data.map_locations)) {
     await prisma.map.deleteMany({ where: { trip_id: trip.trip_id } });
-    await prisma.map.createMany({
-      data: data.map_locations.map((loc, index) => ({
-        trip_id: trip.trip_id,
-        location_name: loc.location_name,
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        sequence: loc.sequence ?? index + 1,
-      })),
-    });
+
+    if (data.map_locations.length > 0) {
+      await prisma.map.createMany({
+        data: data.map_locations.map((loc, index) => ({
+          trip_id: trip.trip_id,
+          location_name: loc.location_name,
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+          sequence: loc.sequence ?? index + 1,
+        })),
+      });
+    }
   }
 
-  // Update other trip costs
   if (Array.isArray(data.other_trip_costs)) {
     await prisma.other_Trip_Cost.deleteMany({ where: { trip_id: trip.trip_id } });
-    await prisma.other_Trip_Cost.createMany({
-      data: data.other_trip_costs.map((cost) => ({
-        trip_id: trip.trip_id,
-        cost_type: cost.cost_type,
-        cost_amount: cost.cost,
-      })),
-    });
+
+    if (data.other_trip_costs.length > 0) {
+      await prisma.other_Trip_Cost.createMany({
+        data: data.other_trip_costs.map((cost) => ({
+          trip_id: trip.trip_id,
+          cost_type: cost.cost_type,
+          cost_amount: cost.cost,
+        })),
+      });
+    }
   }
 
   return trip;
@@ -260,20 +393,18 @@ for (const key of fields) {
 
 // ========================= GET ALL TRIPS =========================
 interface GetTripsFilter {
-  trip_status?: string; // optional filter by status
-  start_date?: string;  // ISO string, optional
-  end_date?: string;    // ISO string, optional
+  trip_status?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 export const getAllTripsService = async (filters?: GetTripsFilter) => {
   const where: any = {};
 
-  // Filter by status
   if (filters?.trip_status) {
     where.trip_status = filters.trip_status;
   }
 
-  // Filter by leaving date range
   if (filters?.start_date && filters?.end_date) {
     where.leaving_datetime = {
       gte: new Date(filters.start_date),
@@ -307,7 +438,9 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
       payment_amount: true,
       advance_payment: true,
       start_meter: true,
+      start_meter_photo: true,
       end_meter: true,
+      end_meter_photo: true,
       total_estimated_cost: true,
       total_actual_cost: true,
       payment_status: true,
@@ -318,8 +451,8 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
       driver_cost: true,
       additional_mileage_cost: true,
       created_at: true,
+      profit: true,
 
-      // Map locations
       map: {
         select: {
           map_id: true,
@@ -331,7 +464,6 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
         orderBy: { sequence: "asc" },
       },
 
-      // Customer without images
       customer: {
         select: {
           customer_id: true,
@@ -342,7 +474,6 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
         },
       },
 
-      // Vehicle without images
       vehicle: {
         select: {
           vehicle_id: true,
@@ -370,7 +501,6 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
         },
       },
 
-      // Driver without images
       driver: {
         select: {
           driver_id: true,
@@ -384,7 +514,6 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
         },
       },
 
-      // Payments
       payments: {
         select: {
           payment_id: true,
@@ -393,7 +522,6 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
         },
       },
 
-      // Other trip costs
       other_trip_costs: {
         select: {
           trip_other_cost_id: true,
@@ -406,17 +534,30 @@ export const getAllTripsService = async (filters?: GetTripsFilter) => {
 };
 
 // ========================= START TRIP =========================
-export const startTripService = async (trip_id: number, start_meter: number) => {
-  const trip = await prisma.trip.findUnique({ where: { trip_id } });
-  if (!trip) throw new Error("Trip not found");
-  if (trip.trip_status !== "Pending") throw new Error("Only pending trips can be started");
+export const startTripService = async (trip_id: number, data: StartTripDTO) => {
+  const { start_meter, start_meter_photo_base64 } = data;
 
-  // Update trip and vehicle meter
+  const trip = await prisma.trip.findUnique({
+    where: { trip_id },
+  });
+
+  if (!trip) throw new Error("Trip not found");
+  if (trip.trip_status !== TripStatus.Pending) {
+    throw new Error("Only pending trips can be started");
+  }
+
+  let startMeterPhotoUrl: string | null = null;
+
+  if (start_meter_photo_base64) {
+    startMeterPhotoUrl = await uploadToR2(start_meter_photo_base64, "start-meter");
+  }
+
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
-      trip_status: "Ongoing",
+      trip_status: TripStatus.Ongoing,
       start_meter,
+      start_meter_photo: startMeterPhotoUrl ?? undefined,
     },
   });
 
@@ -425,14 +566,17 @@ export const startTripService = async (trip_id: number, start_meter: number) => 
     data: { meter_number: start_meter },
   });
 
-  return updatedTrip;
+  return {
+    ...updatedTrip,
+    start_meter_photo: updatedTrip.start_meter_photo || null,
+  };
 };
+
 // ========================= GET SINGLE TRIP =========================
 export const getTripByIdService = async (trip_id: number) => {
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     select: {
-      // === Trip base fields (all needed fields) ===
       trip_id: true,
       map_id: true,
       customer_id: true,
@@ -440,7 +584,6 @@ export const getTripByIdService = async (trip_id: number) => {
       from_location: true,
       to_location: true,
       trip_type: true,
-
       up_down: true,
       estimated_distance: true,
       actual_distance: true,
@@ -461,7 +604,9 @@ export const getTripByIdService = async (trip_id: number) => {
       payment_amount: true,
       advance_payment: true,
       start_meter: true,
+      start_meter_photo: true,
       end_meter: true,
+      end_meter_photo: true,
       total_estimated_cost: true,
       total_actual_cost: true,
       payment_status: true,
@@ -474,12 +619,10 @@ export const getTripByIdService = async (trip_id: number) => {
       created_at: true,
       profit: true,
 
-      // === Map ===
       map: {
         orderBy: { sequence: "asc" },
       },
 
-      // === Customer ===
       customer: {
         select: {
           customer_id: true,
@@ -493,7 +636,6 @@ export const getTripByIdService = async (trip_id: number) => {
         },
       },
 
-      // === Driver ===
       driver: {
         select: {
           driver_id: true,
@@ -504,11 +646,10 @@ export const getTripByIdService = async (trip_id: number) => {
           age: true,
           license_number: true,
           license_expiry_date: true,
-          image: true,        // KEEP ONLY THIS IMAGE
+          image: true,
         },
       },
 
-      // === Vehicle (ONLY needed fields) ===
       vehicle: {
         select: {
           vehicle_id: true,
@@ -527,22 +668,11 @@ export const getTripByIdService = async (trip_id: number) => {
           meter_number: true,
           last_service_meter_number: true,
           owner_id: true,
-
-          // ONLY THIS IMAGE SHOULD BE FETCHED
           image: true,
-
-          // ❌ DO NOT FETCH THESE:
-          // license_image: false
-          // insurance_card_image: false
-          // eco_test_image: false
-          // book_image: false
         },
       },
 
-      // === Payments ===
       payments: true,
-
-      // === Other trip costs ===
       other_trip_costs: true,
     },
   });
@@ -578,7 +708,6 @@ export const getTripByIdService = async (trip_id: number) => {
   };
 };
 
-
 // ========================= DELETE TRIP =========================
 export const deleteTripService = async (trip_id: number) => {
   await prisma.map.deleteMany({ where: { trip_id } });
@@ -587,7 +716,7 @@ export const deleteTripService = async (trip_id: number) => {
   return true;
 };
 
-
+// ========================= COMPLETE TRIP =========================
 export const completeTripService = async (trip_id: number) => {
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
@@ -595,46 +724,43 @@ export const completeTripService = async (trip_id: number) => {
 
   if (!trip) throw new Error("Trip not found");
 
-  if (trip.trip_status !== TripStatus.Ended)
+  if (trip.trip_status !== TripStatus.Ended) {
     throw new Error("Only trips with status 'Ended' can be completed");
+  }
 
-  // ✅ Check full payment before completing
-  if (trip.payment_status !== PaymentStatus.Paid)
+  if (trip.payment_status !== PaymentStatus.Paid) {
     throw new Error("Cannot complete trip: full payment is not done");
+  }
 
-  // Update trip to Completed
   const completedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
       trip_status: TripStatus.Completed,
-      actual_return_datetime: new Date(), // mark completion time
+      actual_return_datetime: new Date(),
     },
   });
 
   return completedTrip;
 };
 
-
-/**
- * Add a payment to a trip and update payment status automatically
- * @param trip_id - Trip ID
- * @param amount - Payment amount
- * @param payment_date - Optional payment date
- */
+// ========================= ADD TRIP PAYMENT =========================
 export const addTripPaymentService = async (
   trip_id: number,
   amount: number,
   payment_date?: Date | string
 ) => {
-  // 1️⃣ Find the trip
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
-    select: { trip_id: true, total_actual_cost: true, payment_amount: true, payment_status: true },
+    select: {
+      trip_id: true,
+      total_actual_cost: true,
+      payment_amount: true,
+      payment_status: true,
+    },
   });
 
   if (!trip) throw new Error("Trip not found");
 
-  // 2️⃣ Create new payment row
   const payment = await prisma.payment.create({
     data: {
       trip_id,
@@ -643,11 +769,10 @@ export const addTripPaymentService = async (
     },
   });
 
-  // 3️⃣ Calculate new total payment
   const newTotalPayment = (trip.payment_amount ?? new Prisma.Decimal(0)).plus(amount);
 
-  // 4️⃣ Update payment status automatically
   let newPaymentStatus: PaymentStatus = PaymentStatus.Unpaid;
+
   if (trip.total_actual_cost !== null) {
     if (newTotalPayment.gte(trip.total_actual_cost)) {
       newPaymentStatus = PaymentStatus.Paid;
@@ -656,7 +781,6 @@ export const addTripPaymentService = async (
     }
   }
 
-  // 5️⃣ Update trip with new payment info
   const updatedTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
@@ -668,8 +792,8 @@ export const addTripPaymentService = async (
   return { payment, updatedTrip };
 };
 
+// ========================= CANCEL TRIP =========================
 export const cancelTripService = async (trip_id: number) => {
-  // 1️⃣ Fetch the trip
   const trip = await prisma.trip.findUnique({
     where: { trip_id },
     select: { trip_id: true, trip_status: true, payment_status: true },
@@ -677,12 +801,13 @@ export const cancelTripService = async (trip_id: number) => {
 
   if (!trip) throw new Error("Trip not found");
 
-  // 2️⃣ Check if trip can be cancelled
-  if (trip.trip_status === TripStatus.Completed || trip.trip_status === TripStatus.Cancelled) {
+  if (
+    trip.trip_status === TripStatus.Completed ||
+    trip.trip_status === TripStatus.Cancelled
+  ) {
     throw new Error("Cannot cancel a completed or already cancelled trip");
   }
 
-  // 3️⃣ Update trip status to Cancelled
   const cancelledTrip = await prisma.trip.update({
     where: { trip_id },
     data: {
