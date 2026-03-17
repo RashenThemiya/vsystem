@@ -19,6 +19,7 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
   const [insuranceExpiry, setInsuranceExpiry] = useState("");
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [ecoExpiry, setEcoExpiry] = useState("");
+  const [liters, setLiters] = useState("");
   const [remarks, setRemarks] = useState("");
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
 
       // Conditional fields
       if (costType === "Service_Cost") payload.service_meter_number = Number(serviceMeter);
+      if (costType === "Fuel_Cost") payload.liters = Number(liters);
       if (costType === "Insurance_Amount") payload.insurance_expiry_date = insuranceExpiry ? dayjs(insuranceExpiry).toISOString() : null;
       if (costType === "Revenue_License") payload.license_expiry_date = licenseExpiry ? dayjs(licenseExpiry).toISOString() : null;
       if (costType === "Eco_Test_Cost") payload.eco_test_expiry_date = ecoExpiry ? dayjs(ecoExpiry).toISOString() : null;
@@ -158,6 +160,20 @@ const AddVehicleCostModal = ({ vehicleId, isOpen, onClose, onSuccess }) => {
               />
             </div>
           )}
+
+          {costType === "Fuel_Cost" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Fuel Liters</label>
+              <input
+                type="number"
+                value={liters}
+                onChange={(e) => setLiters(e.target.value)}
+                className="border px-2 py-2 rounded w-full"
+                required
+              />
+            </div>
+          )}
+
 
           {/* Date */}
           <div>

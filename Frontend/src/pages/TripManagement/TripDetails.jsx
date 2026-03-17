@@ -47,6 +47,8 @@ const [showStartTripModal, setShowStartTripModal] = useState(false);
 const [showEndTripModal, setShowEndTripModal] = useState(false);
 const [showCancelModal, setShowCancelModal] = useState(false);
 const [showDriverCostModal, setShowDriverCostModal] = useState(false);
+const [meterImage, setMeterImage] = useState(null);
+
 
 const [duePayment, setDuePayment] = useState(0);
 
@@ -357,8 +359,45 @@ const handleDeletePayment = async (payment_id) => {
             <div className="bg-gray-100 p-1 rounded-lg">
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
               <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
-              <OneColumnRow label="Start Meter" value={trip.start_meter} />
-              <OneColumnRow label="End Meter" value={trip.end_meter} />
+              <OneColumnRow
+                  label="Start Meter"
+                  value={
+                    <>
+                      {trip.start_meter}
+
+                      {trip.start_meter_photo && (
+                        <button
+                          onClick={() =>
+                            setMeterImage(`data:image/jpeg;base64,${trip.start_meter_photo}`)
+                          }
+                          className="ml-2 text-blue-600 underline text-sm"
+                        >
+                          View Meter Image
+                        </button>
+                      )}
+                    </>
+                  }
+                />
+                <OneColumnRow
+                  label="End Meter"
+                  value={
+                    <>
+                      {trip.end_meter}
+
+                      {trip.end_meter_photo && (
+                        <button
+                          onClick={() =>
+                            setMeterImage(`data:image/jpeg;base64,${trip.end_meter_photo}`)
+                          }
+                          className="ml-2 text-blue-600 underline text-sm"
+                        >
+                          View Meter Image
+                        </button>
+                      )}
+                    </>
+                  }
+                />
+
             </div>
 
             <h4 className="mt-3 font-semibold">Route / Map</h4>
@@ -448,6 +487,26 @@ const handleDeletePayment = async (payment_id) => {
           </div>
         </div>
       </div>
+            {/* Meter Image Viewer */}
+      {meterImage && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="relative">
+            <button
+              onClick={() => setMeterImage(null)}
+              className="absolute -top-10 right-0 text-white text-lg bg-red-500 px-3 py-1 rounded"
+            >
+              Close
+            </button>
+
+            <img
+              src={meterImage}
+              alt="Meter"
+              className="max-h-[80vh] max-w-[90vw] rounded shadow-lg"
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -32,6 +32,8 @@ const VehicleProfile = () => {
   const [costSelectedMonth, setCostSelectedMonth] = useState("");
   const [costSelectedYear, setCostSelectedYear] = useState("");
 
+  const [totalDistance, setTotalDistance] = useState(0);
+  const [totalFuelLiters, setTotalFuelLiters] = useState(0);
   
   useEffect(() => {
     fetchVehicle();
@@ -41,6 +43,7 @@ const VehicleProfile = () => {
     if (vehicle) {
       applyTripFilter();
       applyCostFilter();
+      calculateFuelLiters();
     }
   }, [
     vehicle,
@@ -76,6 +79,26 @@ const VehicleProfile = () => {
     setTotalEarning(total);
   };
 
+  const calculateTotalDistance = (trips) => {
+  // Only include completed trips
+  const total = trips
+    .filter((t) => t.trip_status === "Completed" || 'Ended')
+    .reduce((sum, t) => sum + Number(t.actual_distance || 0), 0);
+
+  setTotalDistance(total);
+};
+
+const calculateFuelLiters = () => {
+  if (!vehicle?.vehicle_other_costs) return;
+
+  const total = vehicle.vehicle_other_costs
+    .filter((c) => c.cost_type === "Fuel_Cost")
+    .reduce((sum, c) => sum + Number(c.liters || 0), 0);
+
+  setTotalFuelLiters(total);
+};
+
+
   // Filter trips
   const applyTripFilter = () => {
     if (!vehicle?.trips) return;
@@ -100,6 +123,7 @@ const VehicleProfile = () => {
 
     setFilteredTrips(trips);
     calculateEarnings(trips);
+    calculateTotalDistance(trips); 
   };
 
   // Filter costs
@@ -177,6 +201,8 @@ const VehicleProfile = () => {
           <TripsTab
             trips={filteredTrips}
             totalEarning={totalEarning}
+            totalLiters={totalFuelLiters}
+            totalDistance={totalDistance}
             filterStatus={filterStatus}
             setFilterStatus={setFilterStatus}
             tripDateFilterType={tripDateFilterType}

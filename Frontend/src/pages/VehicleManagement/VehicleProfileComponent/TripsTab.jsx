@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 const TripsTab = ({
   trips,
   totalEarning,
+  totalDistance,
+  totalLiters,
   filterStatus,
   setFilterStatus,
   tripDateFilterType,
@@ -30,11 +32,22 @@ const TripsTab = ({
         <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
           <div className="text-md font-semibold opacity-100">Total Trips</div>
           <div className="text-2xl font-bold mt-2">{filteredTripsCount}</div>
+          <div className="text-sm opacity-90 mt-1">Total Trips Count</div>
         </div>
         <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
           <div className="text-md font-semibold opacity-100">Total Earnings</div>
           <div className="text-xl font-bold mt-2">Rs. {totalEarning.toLocaleString()}</div>
           <div className="text-sm opacity-90 mt-1">Completed Trips Only</div>
+        </div>
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Actual Distance</div>
+          <div className="text-xl font-bold mt-2">{totalDistance.toLocaleString()} Km</div>
+          <div className="text-sm opacity-90 mt-1">Completed & Ended Trips</div>
+        </div>
+        <div className={`p-4 rounded-xl shadow-md text-white bg-gradient-to-r from-indigo-500 to-violet-600`}>
+          <div className="text-md font-semibold opacity-100">Total Fuel Consumption</div>
+          <div className="text-xl font-bold mt-2">{totalLiters.toLocaleString()} Liters</div>
+          <div className="text-sm opacity-90 mt-1">Based On Fuel Cost</div>
         </div>
       </div>
 
