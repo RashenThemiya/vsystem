@@ -145,11 +145,13 @@ const AddVehicleModal = ({ onClose, onSuccess }) => {
       );
 
       if (res.status === 200 || res.status === 201) {
+        setLoading(false);
         setShowSuccess(true);
         onSuccess(res.data.data);
         setTimeout(() => onClose(), 2000);
       }
     } catch (err) {
+      setLoading(false);
       console.error("Add vehicle error:", err.response?.data || err);
       setError(err.response?.data?.message || "Failed to add vehicle");
     } finally {

@@ -144,6 +144,8 @@ export default function OwnerDashboard() {
           onSuccess={(newOwner) => {
             setOwners([...owners, newOwner]);
             setShowAddForm(false);
+            setSuccessMessage("Owner added successfully!");
+            setTimeout(() => setSuccessMessage(""), 3000);
           }}
         />
       )}
