@@ -175,6 +175,8 @@
           onSuccess={(newDriver) => {
             setDrivers([...drivers, newDriver]);
             setShowAddForm(false);
+            setSuccessMessage("Driver added successfully!");
+            setTimeout(() => setSuccessMessage(""), 3000);
           }}
         />
       )}

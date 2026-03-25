@@ -53,28 +53,43 @@ const [meterImage, setMeterImage] = useState(null);
 const [duePayment, setDuePayment] = useState(0);
 
 const handleDeletePayment = async (payment_id) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This payment will be permanently deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete!",
+  });
+
+  if (!result.isConfirmed) return;
 
   try {
-    console.log("/api/payments/" + payment_id);
     await api.delete(`/api/payments/${payment_id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-   Swal.fire({
-                  icon: "success",
-                  title: "Payment Deleted",
-                  timer: 2000,
-                  showConfirmButton: true,
-                });
-    fetchTrip(); // refresh trip data to update UI
+
+    Swal.fire({
+      icon: "success",
+      title: "Payment Deleted",
+      text: "The payment has been removed successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    fetchTrip();
   } catch (err) {
     console.error(err);
-    alert("Failed to delete payment");
+
+    Swal.fire({
+      icon: "error",
+      title: "Delete Failed",
+      text: err?.response?.data?.message || "Failed to delete payment",
+    });
   }
 };
 
- 
- 
- 
   useEffect(() => {
     fetchTrip();
   }, [id]);

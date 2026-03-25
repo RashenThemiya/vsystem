@@ -185,6 +185,8 @@ export default function VehicleDashboard() {
           onSuccess={(newVehicle) => {
             setVehicles([...vehicles, newVehicle]);
             setShowAddForm(false);
+            setSuccessMessage("Vehicle added successfully!")
+            setTimeout(() => setSuccessMessage(""), 3000);
           }}
         />
       </ModalWrapper>

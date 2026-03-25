@@ -38,6 +38,7 @@ export default function BillTable({ bills, onSelect, onUpdateCost, searchQuery =
             {showFuelLitersColumn && (
               <th className="p-2 text-left">Fuel Liters</th>
             )}
+            <th className="p-2 text-left">Cost</th>
             <th className="p-2 text-left">Date</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Actions</th>
@@ -54,12 +55,13 @@ export default function BillTable({ bills, onSelect, onUpdateCost, searchQuery =
               <td className="p-2">{bill.bill_id}</td>
               <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" onClick={() => onSelectVehicle(bill)}>{bill.vehicle_id}</td>
               <td className="px-4 py-4 text-blue-600 hover:underline cursor-pointer" onClick={() => onSelectDriver(bill)}>{bill.driver_id}</td>
-              <td className="p-2 capitalize">{bill.bill_type}</td>
+              <td className="p-2 capitalize">{bill.bill_type.replace("_", " ")}</td>
               {showFuelLitersColumn && (
                 <td className="p-2">
                   {bill.bill_type === "Fuel_Cost" ? bill.liters : "-"}
                 </td>
               )}
+              <td className="p-2">Rs. {bill.cost}</td>
               <td className="p-2">{new Date(bill.bill_date).toLocaleDateString()}</td>
               <td className="p-2">
                 <span

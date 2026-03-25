@@ -14,7 +14,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
   ];
 
   const [cost, setCost] = useState("");
-  const [costType, setCostType] = useState("Lease_Cost");
+  const [costType, setCostType] = useState("");
 
   // extra fields
   const [serviceMeter, setServiceMeter] = useState("");
@@ -23,6 +23,7 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [ecoExpiry, setEcoExpiry] = useState("");
   const [remarks, setRemarks] = useState("");
+  
 
 
   const [loading, setLoading] = useState(false);
@@ -31,25 +32,32 @@ const UpdateOtherCostModal = ({ bill, otherCost, onClose, onSuccess }) => {
 
   // 🔹 Prefill existing cost
   useEffect(() => {
-    if (otherCost) {
-      setCost(otherCost.cost || "");
-      setCostType(otherCost.cost_type || bill.bill_type);
-      setServiceMeter(otherCost.service_meter_number || "");
-      setRemarks(otherCost.remarks || ""); 
+    //console.log("othercost "+otherCost)
+    console.log("bill "+bill.bill_type)
+    if (bill) {
+      setCost(bill.cost || "");
+      setCostType(bill.bill_type );
+      setServiceMeter(bill.service_meter_number || "");
+      setRemarks(bill.remarks || ""); 
       setInsuranceExpiry(
-        otherCost.insurance_expiry_date
-          ? otherCost.insurance_expiry_date.split("T")[0]
+        bill.insurance_expiry_date
+          ? bill.insurance_expiry_date.split("T")[0]
           : ""
       );
       setLicenseExpiry(
-        otherCost.license_expiry_date
-          ? otherCost.license_expiry_date.split("T")[0]
+        bill.license_expiry_date
+          ? bill.license_expiry_date.split("T")[0]
           : ""
       );
       setEcoExpiry(
-        otherCost.eco_test_expiry_date
-          ? otherCost.eco_test_expiry_date.split("T")[0]
+        bill.eco_test_expiry_date
+          ? bill.eco_test_expiry_date.split("T")[0]
           : ""
+      );
+      setLiters(
+        bill.liters
+          ||
+          ""
       );
     }
   }, [otherCost, bill]);

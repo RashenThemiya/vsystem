@@ -168,6 +168,8 @@
           onSuccess={(newCustomer) => {
             setCustomers([...customers, newCustomer]); // add new customer to list
             setShowAddForm(false); // close modal
+            setSuccessMessage("Customer added successfully!");
+            setTimeout(() => setSuccessMessage(""), 3000);
           }}
         />
         )}
