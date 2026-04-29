@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosInstance";
 import { useAuth } from "../context/AuthContext";
-import { FaArrowLeft } from "react-icons/fa"; // ← icon for back button
+import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa"; // ← icon for back button
 
 export default function PixelPerfectLogin() {
   const [email, setEmail] = useState("");
@@ -27,6 +27,9 @@ export default function PixelPerfectLogin() {
       else setError("Unknown role, cannot redirect.");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+      setTimeout(() => {
+        setError("");
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -113,9 +116,9 @@ export default function PixelPerfectLogin() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="ml-3 opacity-80"
+                    className="ml-3 pt-3.5 pb-3.5 text-white/50 hover:text-white  transition-colors flex-shrink-0"
                   >
-
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
