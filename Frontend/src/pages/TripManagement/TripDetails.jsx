@@ -12,7 +12,7 @@ import {
   VehicleDetails,
   CostSummary,
 } from "./TripDetailsComponents";
-import { FaChevronDown, FaChevronUp, FaMoneyBillWave, FaCar, FaUser, FaRedo, FaArrowLeft } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaMoneyBillWave, FaCar, FaUser, FaRedo, FaArrowLeft, FaCamera } from "react-icons/fa";
 import TripActionButtons from "./TripAction/TripActionButtons";
 import DamageCostModal from "./TripAction/DamageCostModal";
 import AddPaymentModal from "./TripAction/AddPaymentModal";
@@ -113,6 +113,11 @@ const handleDeletePayment = async (payment_id) => {
   const formatCurrency = (v) => (v == null ? "-" : `Rs. ${Number(v).toLocaleString()}`);
   const formatDate = (d) => (d ? new Date(d).toLocaleString() : "-");
   const isBase64 = (s) => typeof s === "string" && /^[A-Za-z0-9+/=]+$/.test(s.replace(/\s/g, ""));
+  const formatImage = (img) =>
+  img?.startsWith("data:")
+    ? img
+    : `data:image/jpeg;base64,${img}`;
+  const cleanUrl = (url) => url?.replace(/%22/g, "").replace(/"$/, "");
  
   if (loading)
     return (
@@ -138,10 +143,6 @@ const handleDeletePayment = async (payment_id) => {
     {/* Top Row: Trip ID / Status + Back & Refresh */}
     <div className="flex justify-between items-center mb-4">
     </div>
-
-    
-
-
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Participants & Actions */}
@@ -375,43 +376,48 @@ const handleDeletePayment = async (payment_id) => {
               <OneColumnRow label="Estimated Distance" value={trip.estimated_distance ? trip.estimated_distance + " km" : "-"} />
               <OneColumnRow label="Actual Distance" value={trip.actual_distance ? trip.actual_distance + " km" : "-"} />
               <OneColumnRow
-                  label="Start Meter"
-                  value={
-                    <>
-                      {trip.start_meter}
+                label="Start Meter"
+                value={
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-gray-900">{trip.start_meter}</span>
+                    {trip.start_meter_photo ? (
+                      <button
+                        onClick={() =>setMeterImage(cleanUrl(trip.start_meter_photo))}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 hover:text-indigo-800 transition-colors text-xs font-semibold shadow-sm"
+                      >
+                        <FaCamera size={12} />
+                        View Photo
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 text-gray-400 border border-gray-200 text-xs font-medium">
+                        No Photo
+                      </span>
+                    )}
+                  </div>
+                }
+              />
 
-                      {trip.start_meter_photo && (
-                        <button
-                          onClick={() =>
-                            setMeterImage(`data:image/jpeg;base64,${trip.start_meter_photo}`)
-                          }
-                          className="ml-2 text-blue-600 underline text-sm"
-                        >
-                          View Meter Image
-                        </button>
-                      )}
-                    </>
-                  }
-                />
-                <OneColumnRow
-                  label="End Meter"
-                  value={
-                    <>
-                      {trip.end_meter}
-
-                      {trip.end_meter_photo && (
-                        <button
-                          onClick={() =>
-                            setMeterImage(`data:image/jpeg;base64,${trip.end_meter_photo}`)
-                          }
-                          className="ml-2 text-blue-600 underline text-sm"
-                        >
-                          View Meter Image
-                        </button>
-                      )}
-                    </>
-                  }
-                />
+              <OneColumnRow
+                label="End Meter"
+                value={
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-gray-900">{trip.end_meter}</span>
+                    {trip.end_meter_photo ? (
+                      <button
+                        onClick={() => setMeterImage(cleanUrl(trip.end_meter_photo))}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 hover:text-indigo-800 transition-colors text-xs font-semibold shadow-sm"
+                      >
+                        <FaCamera size={12} />
+                        View Photo
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 text-gray-400 border border-gray-200 text-xs font-medium">
+                        No Photo
+                      </span>
+                    )}
+                  </div>
+                }
+              />
 
             </div>
 
@@ -502,25 +508,30 @@ const handleDeletePayment = async (payment_id) => {
           </div>
         </div>
       </div>
-            {/* Meter Image Viewer */}
-      {meterImage && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="relative">
-            <button
-              onClick={() => setMeterImage(null)}
-              className="absolute -top-10 right-0 text-white text-lg bg-red-500 px-3 py-1 rounded"
-            >
-              Close
-            </button>
 
-            <img
-              src={meterImage}
-              alt="Meter"
-              className="max-h-[80vh] max-w-[90vw] rounded shadow-lg"
-            />
+      {/* Meter Image Viewer */}
+        {meterImage && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="relative group max-w-4xl w-full flex flex-col items-center">
+              <button
+                onClick={() => setMeterImage(null)}
+                className="absolute -top-12 right-0 md:-right-12 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-all"
+                title="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <img
+                src={meterImage}
+                alt="Meter Reading"
+                className="max-h-[85vh] w-auto rounded-lg shadow-2xl border-4 border-white/10"
+              />
+
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
     </div>
   );
