@@ -31,19 +31,33 @@ export const createTripController = async (req: Request, res: Response, next: un
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
-};
-export const startTripController = async (req: Request, res: Response) => {
+};export const startTripController = async (req: Request, res: Response) => {
   try {
     const trip_id = parseInt(req.params.id);
-    const { start_meter } = req.body;
+    const { start_meter, start_meter_photo } = req.body;
 
-    if (start_meter === undefined)
-      return res.status(400).json({ success: false, message: "start_meter is required" });
+    if (start_meter === undefined || start_meter === null) {
+      return res.status(400).json({
+        success: false,
+        message: "start_meter is required",
+      });
+    }
 
-    const trip = await startTripService(trip_id, start_meter);
-    res.status(200).json({ success: true, data: trip, message: "Trip started successfully" });
+    const trip = await startTripService(trip_id, {
+      start_meter: Number(start_meter),
+      start_meter_photo_base64: start_meter_photo, // ✅ FIX
+    });
+
+    res.status(200).json({
+      success: true,
+      data: trip,
+      message: "Trip started successfully",
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 /**
@@ -103,17 +117,29 @@ export const deleteTripController = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
-};
-export const endTripController = async (req: Request, res: Response) => {
+};export const endTripController = async (req: Request, res: Response) => {
   try {
     const trip_id = parseInt(req.params.id);
-    const { end_meter } = req.body;
 
-    if (end_meter === undefined) {
-      return res.status(400).json({ success: false, message: "end_meter is required" });
+    const {
+      end_meter,
+      end_meter_photo,
+      end_meter_photo_base64,
+    } = req.body;
+
+    if (end_meter === undefined || end_meter === null) {
+      return res.status(400).json({
+        success: false,
+        message: "end_meter is required",
+      });
     }
 
-    const updatedTrip = await endTripService(trip_id, { end_meter });
+    const image = end_meter_photo_base64 || end_meter_photo || undefined;
+
+    const updatedTrip = await endTripService(trip_id, {
+      end_meter: Number(end_meter),
+      end_meter_photo_base64: image,
+    });
 
     res.status(200).json({
       success: true,
@@ -121,10 +147,12 @@ export const endTripController = async (req: Request, res: Response) => {
       message: "Trip ended successfully",
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
-
 export const addDamageCostController = async (req: Request, res: Response) => {
   try {
     const trip_id = parseInt(req.params.id);
